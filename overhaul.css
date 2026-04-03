@@ -2442,40 +2442,41 @@ body {
 }
 
 /* =======================================================================
-   72. FEATURE IMAGE SLIDER — Auto-rotating Carousel (v3)
+   72. FEATURE IMAGE SLIDER — Auto-rotating Carousel (v4)
    ======================================================================= */
 
 /* The whole strip section that holds the slider */
 #comp-lgckkvft {
-  overflow: hidden !important;
+  overflow: visible !important;
   position: relative !important;
 }
 
-/* KILL Wix grid layout — force block so absolute children work properly */
+/* KILL Wix grid layout — force block, use padding-top for slider space */
 [data-mesh-id="comp-lgckkvftinlineContent-gridContainer"] {
   display: block !important;
   position: relative !important;
-  overflow: hidden !important;
-  min-height: 440px !important;
+  overflow: visible !important;
+  min-height: 0 !important;
   width: 100% !important;
   padding: 0 !important;
+  padding-top: 400px !important;
   grid-template-rows: none !important;
   grid-template-columns: none !important;
 }
 
-/* Make the parent inline-content clip properly */
+/* Parent inline-content — no extra min-height */
 #comp-lgckkvft [data-mesh-id="comp-lgckkvftinlineContent"] {
-  min-height: 440px !important;
-  overflow: hidden !important;
+  min-height: 0 !important;
+  overflow: visible !important;
   position: relative !important;
 }
 
-/* Stack all 3 feature images — override ALL Wix grid/position props */
+/* Stack all 3 feature images — absolute inside the container's padding area */
 #comp-m4k7zp59,
 #comp-m4k7zp5d,
 #comp-m4k7zp5h {
   position: absolute !important;
-  top: 24px !important;
+  top: 20px !important;
   left: 50% !important;
   transform: translateX(-50%) !important;
   margin: 0 !important;
@@ -2525,23 +2526,50 @@ body {
   height: 100% !important;
 }
 
-/* Push the CTA button strip + text below the slider area */
+/* CTA button strip + turnaround text — flow naturally after padding-top */
 #comp-jqciyxe3 {
   position: relative !important;
-  margin-top: 380px !important;
+  margin: 0 !important;
   z-index: 3 !important;
+  grid-area: unset !important;
+  justify-self: unset !important;
+  align-self: unset !important;
+  left: 0 !important;
+  width: 100% !important;
 }
 
 #comp-l1ksl379,
 #comp-lktq0ekc {
   position: relative !important;
   z-index: 3 !important;
+  grid-area: unset !important;
+  justify-self: unset !important;
+  align-self: unset !important;
+  left: 0 !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  text-align: center !important;
+  width: 100% !important;
+  padding: 4px 30px !important;
+  box-sizing: border-box !important;
 }
 
-/* Slider controls container — inside the section */
+/* Sections below slider — kill Wix grid positioning */
+#comp-jqcejn7e,
+#comp-m4im13tj {
+  position: relative !important;
+  grid-area: unset !important;
+  justify-self: unset !important;
+  align-self: unset !important;
+  left: 0 !important;
+  margin-left: 0 !important;
+  width: 100% !important;
+}
+
+/* Slider controls — sits inside the padding-top area */
 .br-slider-controls {
   position: absolute;
-  bottom: 50px;
+  top: 370px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
@@ -2632,13 +2660,12 @@ body {
     top: 16px !important;
   }
 
-  #comp-jqciyxe3 {
-    margin-top: 290px !important;
+  [data-mesh-id="comp-lgckkvftinlineContent-gridContainer"] {
+    padding-top: 310px !important;
   }
 
-  [data-mesh-id="comp-lgckkvftinlineContent-gridContainer"],
-  #comp-lgckkvft [data-mesh-id="comp-lgckkvftinlineContent"] {
-    min-height: 360px !important;
+  .br-slider-controls {
+    top: 280px;
   }
 
   .br-slider-arrow {
@@ -2648,7 +2675,6 @@ body {
   }
 
   .br-slider-controls {
-    bottom: 30px;
     padding: 6px 12px;
   }
 }
