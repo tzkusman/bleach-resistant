@@ -2442,7 +2442,7 @@ body {
 }
 
 /* =======================================================================
-   72. FEATURE IMAGE SLIDER — Auto-rotating Carousel
+   72. FEATURE IMAGE SLIDER — Auto-rotating Carousel (v2)
    ======================================================================= */
 
 /* The whole strip section that holds the slider */
@@ -2455,12 +2455,12 @@ body {
 [data-mesh-id="comp-lgckkvftinlineContent-gridContainer"] {
   position: relative !important;
   overflow: hidden !important;
-  min-height: 400px !important;
+  min-height: 420px !important;
 }
 
 /* Make the parent inline-content clip properly */
 #comp-lgckkvft [data-mesh-id="comp-lgckkvftinlineContent"] {
-  min-height: 400px !important;
+  min-height: 420px !important;
   overflow: hidden !important;
   position: relative !important;
 }
@@ -2470,16 +2470,18 @@ body {
 #comp-m4k7zp5d,
 #comp-m4k7zp5h {
   position: absolute !important;
-  top: 20px !important;
+  top: 24px !important;
   left: 50% !important;
   transform: translateX(-50%) !important;
   margin: 0 !important;
-  width: 305px !important;
-  height: 331px !important;
+  width: 340px !important;
+  height: 340px !important;
+  max-width: 90vw !important;
   opacity: 0;
-  transition: opacity 0.8s ease-in-out;
+  transition: opacity 0.8s ease-in-out, transform 0.8s ease-in-out;
   z-index: 1;
   pointer-events: none;
+  overflow: hidden !important;
 }
 
 #comp-m4k7zp59.br-slide-active,
@@ -2490,26 +2492,52 @@ body {
   pointer-events: auto;
 }
 
+/* Slide in/out animation classes */
+#comp-m4k7zp59.br-slide-enter,
+#comp-m4k7zp5d.br-slide-enter,
+#comp-m4k7zp5h.br-slide-enter {
+  transform: translateX(-50%) scale(0.95) !important;
+  opacity: 0 !important;
+}
+
 #comp-m4k7zp59 img,
 #comp-m4k7zp5d img,
 #comp-m4k7zp5h img {
-  width: 305px !important;
-  height: 331px !important;
-  object-fit: cover !important;
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  border-radius: 14px !important;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
+  background: #fff !important;
+  display: block !important;
+}
+
+/* Wrapper clips */
+#comp-m4k7zp59 > div,
+#comp-m4k7zp5d > div,
+#comp-m4k7zp5h > div {
+  overflow: hidden !important;
+  border-radius: 14px !important;
+  width: 100% !important;
+  height: 100% !important;
 }
 
 /* Slider controls container — inside the section */
 .br-slider-controls {
   position: absolute;
-  bottom: 16px;
+  bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 8px 16px;
+  border-radius: 30px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.10);
 }
 
 /* Navigation dots */
@@ -2533,7 +2561,8 @@ body {
 .br-slider-dot.active {
   background: #C7065C;
   border-color: #C7065C;
-  transform: scale(1.2);
+  transform: scale(1.3);
+  box-shadow: 0 0 8px rgba(199,6,92,0.3);
 }
 
 .br-slider-dot:hover {
@@ -2543,19 +2572,18 @@ body {
 
 /* Prev / Next arrows */
 .br-slider-arrow {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  background: rgba(255,255,255,0.9);
-  border: 1px solid #ddd;
+  background: transparent;
+  border: 2px solid #C7065C;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
-  color: #333;
+  font-size: 14px;
+  color: #C7065C;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   padding: 0;
   line-height: 1;
 }
@@ -2566,30 +2594,40 @@ body {
   border-color: #C7065C;
 }
 
+/* Slider progress bar */
+.br-slider-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background: #C7065C;
+  border-radius: 0 0 14px 14px;
+  transition: width linear;
+  z-index: 10;
+}
+
 /* Mobile slider */
 @media (max-width: 768px) {
   #comp-m4k7zp59,
   #comp-m4k7zp5d,
   #comp-m4k7zp5h {
-    width: 260px !important;
-    height: 282px !important;
-  }
-
-  #comp-m4k7zp59 img,
-  #comp-m4k7zp5d img,
-  #comp-m4k7zp5h img {
-    width: 260px !important;
-    height: 282px !important;
+    width: 280px !important;
+    height: 280px !important;
+    top: 16px !important;
   }
 
   [data-mesh-id="comp-lgckkvftinlineContent-gridContainer"],
   #comp-lgckkvft [data-mesh-id="comp-lgckkvftinlineContent"] {
-    min-height: 340px !important;
+    min-height: 360px !important;
   }
 
   .br-slider-arrow {
-    width: 30px;
-    height: 30px;
-    font-size: 14px;
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+  }
+
+  .br-slider-controls {
+    padding: 6px 12px;
   }
 }

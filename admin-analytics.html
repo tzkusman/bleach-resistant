@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Analytics — Bleach Resistant Admin</title>
+  <link rel="icon" href="https://static.wixstatic.com/media/926a36_bea70e48de2b461ebaae685fdbb3be76%7Emv2.png/v1/fill/w_32%2Ch_32%2Clg_1%2Cusm_0.66_1.00_0.01/926a36_bea70e48de2b461ebaae685fdbb3be76%7Emv2.png" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <style>
+    .analytics-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; margin-bottom: 28px; }
+    .an-card {
+      background: #fff; border: 1px solid #e5e5e5; border-radius: 12px; padding: 20px;
+      position: relative; overflow: hidden;
+    }
+    .an-card .an-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 12px; }
+    .an-card .an-val { font-size: 28px; font-weight: 800; }
+    .an-card .an-label { font-size: 12px; color: #888; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .an-card .an-bar {
+      position: absolute; bottom: 0; left: 0; right: 0; height: 4px;
+    }
+    .chart-section { background: #fff; border: 1px solid #e5e5e5; border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+    .chart-section h3 { font-size: 16px; font-weight: 700; margin: 0 0 4px; }
+    .chart-section .chart-desc { font-size: 12px; color: #888; margin-bottom: 20px; }
+    .bar-chart { display: flex; align-items: flex-end; gap: 6px; height: 180px; padding: 0 4px; }
+    .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .bar-fill {
+      width: 100%; min-width: 12px; border-radius: 6px 6px 0 0; transition: height 0.5s ease;
+      position: relative; cursor: pointer;
+    }
+    .bar-fill:hover { opacity: 0.85; }
+    .bar-fill .bar-val {
+      position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
+      font-size: 10px; font-weight: 700; white-space: nowrap;
+    }
+    .bar-label { font-size: 10px; color: #666; writing-mode: horizontal-tb; text-align: center; }
+    .table-list { width: 100%; border-collapse: collapse; }
+    .table-list th { text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase; color: #888; padding: 8px 12px; border-bottom: 2px solid #eee; }
+    .table-list td { padding: 10px 12px; font-size: 13px; border-bottom: 1px solid #f5f5f5; }
+    .table-list tr:hover td { background: #fafafa; }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+    .split-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    @media (max-width: 800px) { .split-row { grid-template-columns: 1fr; } }
+    .filter-bar { display: flex; gap: 8px; margin-bottom: 20px; }
+    .filter-bar select { padding: 8px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 13px; font-family: inherit; }
+    .timeline-item { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid #f5f5f5; }
+    .timeline-dot { width: 10px; height: 10px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
+    .timeline-content { flex: 1; }
+    .timeline-title { font-size: 13px; font-weight: 600; }
+    .timeline-time { font-size: 11px; color: #888; }
+  </style>
+</head>
+<body>
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-brand"><h2>Bleach Resistant</h2><small>Admin Panel</small></div>
+    <div class="sidebar-nav">
+      <div class="nav-section">Main</div>
+      <a href="admin.html"><span class="icon">📊</span> Dashboard</a>
+      <a href="admin-orders.html"><span class="icon">📦</span> Orders</a>
+      <a href="admin-contacts.html"><span class="icon">💬</span> Contacts</a>
+      <div class="nav-section">Content</div>
+      <a href="admin-pages.html"><span class="icon">📄</span> Pages</a>
+      <a href="admin-media.html"><span class="icon">🖼️</span> Media Library</a>
+      <a href="admin-navigation.html"><span class="icon">🔗</span> Navigation</a>
+      <div class="nav-section">Settings</div>
+      <a href="admin-settings.html"><span class="icon">⚙️</span> Site Settings</a>
+      <a href="admin-analytics.html" class="active"><span class="icon">📈</span> Analytics</a>
+      <div class="nav-section">Website</div>
+      <a href="home.html" target="_blank"><span class="icon">🌐</span> View Site</a>
+      <a href="order.html" target="_blank"><span class="icon">🛒</span> Order Page</a>
+    </div>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" id="user-avatar">A</div>
+        <div>
+          <div style="font-size:12px;font-weight:600;" id="user-name">Admin</div>
+          <div class="user-email" id="user-email">loading…</div>
+        </div>
+      </div>
+      <button class="btn btn-secondary btn-sm btn-block" onclick="brSignOut()">Sign Out</button>
+    </div>
+  </nav>
+
+  <div class="main-content">
+    <div class="topbar">
+      <div>
+        <h1>Analytics</h1>
+        <div class="breadcrumb">Overview of your site data, activity, and content</div>
+      </div>
+      <div class="filter-bar" style="margin:0;">
+        <select id="time-range" onchange="loadAnalytics()">
+          <option value="7">Last 7 days</option>
+          <option value="30" selected>Last 30 days</option>
+          <option value="90">Last 90 days</option>
+          <option value="365">All time</option>
+        </select>
+        <button class="btn btn-secondary btn-sm" onclick="loadAnalytics()">Refresh</button>
+      </div>
+    </div>
+
+    <div class="content-area">
+      <!-- Overview Cards -->
+      <div class="analytics-grid" id="stats-grid">
+        <div class="an-card">
+          <div class="an-icon" style="background:#fef0f5;">📦</div>
+          <div class="an-val" id="stat-orders">–</div>
+          <div class="an-label">Total Orders</div>
+          <div class="an-bar" style="background:#C7065C;"></div>
+        </div>
+        <div class="an-card">
+          <div class="an-icon" style="background:#f0f9e8;">💬</div>
+          <div class="an-val" id="stat-contacts">–</div>
+          <div class="an-label">Contact Messages</div>
+          <div class="an-bar" style="background:#8DC63F;"></div>
+        </div>
+        <div class="an-card">
+          <div class="an-icon" style="background:#e8f4fd;">📄</div>
+          <div class="an-val" id="stat-overrides">–</div>
+          <div class="an-label">Content Overrides</div>
+          <div class="an-bar" style="background:#2196F3;"></div>
+        </div>
+        <div class="an-card">
+          <div class="an-icon" style="background:#fff8e1;">🖼️</div>
+          <div class="an-val" id="stat-media">–</div>
+          <div class="an-label">Media Files</div>
+          <div class="an-bar" style="background:#FFC107;"></div>
+        </div>
+        <div class="an-card">
+          <div class="an-icon" style="background:#f3e5f5;">⚙️</div>
+          <div class="an-val" id="stat-settings">–</div>
+          <div class="an-label">Settings Saved</div>
+          <div class="an-bar" style="background:#9C27B0;"></div>
+        </div>
+      </div>
+
+      <!-- Charts Row -->
+      <div class="split-row">
+        <div class="chart-section">
+          <h3>Orders Over Time</h3>
+          <div class="chart-desc">Order volume per day in the selected period</div>
+          <div class="bar-chart" id="orders-chart"></div>
+        </div>
+        <div class="chart-section">
+          <h3>Contacts Over Time</h3>
+          <div class="chart-desc">Contact form submissions per day</div>
+          <div class="bar-chart" id="contacts-chart"></div>
+        </div>
+      </div>
+
+      <!-- Tables Row -->
+      <div class="split-row" style="margin-top:0;">
+        <div class="chart-section">
+          <h3>Most Edited Pages</h3>
+          <div class="chart-desc">Pages with the most content overrides</div>
+          <table class="table-list" id="top-pages-table">
+            <thead><tr><th>Page</th><th>Overrides</th></tr></thead>
+            <tbody id="top-pages-body"></tbody>
+          </table>
+        </div>
+        <div class="chart-section">
+          <h3>Order Status Breakdown</h3>
+          <div class="chart-desc">Current distribution of order statuses</div>
+          <div id="status-breakdown"></div>
+        </div>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="chart-section">
+        <h3>Recent Activity</h3>
+        <div class="chart-desc">Latest actions across your site</div>
+        <div id="recent-activity"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+<script>
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.className = 'toast toast-' + (type || 'info');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function getDaysAgo(days) {
+  const d = new Date();
+  d.setDate(d.getDate() - days);
+  return d.toISOString();
+}
+
+function formatDate(iso) {
+  const d = new Date(iso);
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+function formatDateTime(iso) {
+  const d = new Date(iso);
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+
+async function loadAnalytics() {
+  const days = parseInt(document.getElementById('time-range').value) || 30;
+  const since = getDaysAgo(days);
+
+  try {
+    const [ordersRes, contactsRes, overridesRes, mediaRes, settingsRes] = await Promise.all([
+      db.from('orders').select('*'),
+      db.from('contacts').select('*'),
+      db.from('page_content').select('*'),
+      db.from('media').select('*'),
+      db.from('site_settings').select('*')
+    ]);
+
+    const allOrders = ordersRes.data || [];
+    const allContacts = contactsRes.data || [];
+    const allOverrides = overridesRes.data || [];
+    const allMedia = mediaRes.data || [];
+    const allSettings = settingsRes.data || [];
+
+    // Filter by date range
+    const orders = allOrders.filter(r => !r.created_at || r.created_at >= since);
+    const contacts = allContacts.filter(r => !r.created_at || r.created_at >= since);
+
+    // Stats
+    document.getElementById('stat-orders').textContent = orders.length;
+    document.getElementById('stat-contacts').textContent = contacts.length;
+    document.getElementById('stat-overrides').textContent = allOverrides.length;
+    document.getElementById('stat-media').textContent = allMedia.length;
+    document.getElementById('stat-settings').textContent = allSettings.length;
+
+    // Build time charts
+    buildTimeChart('orders-chart', orders, days, '#C7065C');
+    buildTimeChart('contacts-chart', contacts, days, '#8DC63F');
+
+    // Top edited pages
+    const pageCounts = {};
+    allOverrides.forEach(r => { pageCounts[r.page_name] = (pageCounts[r.page_name] || 0) + 1; });
+    const topPages = Object.entries(pageCounts).sort((a, b) => b[1] - a[1]).slice(0, 8);
+    const tbody = document.getElementById('top-pages-body');
+    tbody.innerHTML = topPages.length ? topPages.map(([page, count]) =>
+      `<tr><td><strong>${escH(page)}</strong></td><td>${count}</td></tr>`
+    ).join('') : '<tr><td colspan="2" style="color:#888;">No page overrides yet</td></tr>';
+
+    // Order status breakdown
+    const statuses = {};
+    allOrders.forEach(r => { const s = r.status || 'pending'; statuses[s] = (statuses[s] || 0) + 1; });
+    const statusColors = { pending: '#FFC107', processing: '#2196F3', completed: '#4CAF50', shipped: '#8DC63F', cancelled: '#e53935' };
+    const sbd = document.getElementById('status-breakdown');
+    const total = allOrders.length || 1;
+    sbd.innerHTML = Object.entries(statuses).map(([status, count]) => {
+      const pct = Math.round((count / total) * 100);
+      const color = statusColors[status] || '#888';
+      return `<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+        <span class="status-dot" style="background:${color};"></span>
+        <span style="text-transform:capitalize;font-weight:600;flex:1;">${escH(status)}</span>
+        <span style="font-weight:700;">${count}</span>
+        <span style="font-size:11px;color:#888;">(${pct}%)</span>
+        <div style="width:100px;height:8px;background:#eee;border-radius:4px;overflow:hidden;">
+          <div style="width:${pct}%;height:100%;background:${color};border-radius:4px;"></div>
+        </div>
+      </div>`;
+    }).join('') || '<div style="color:#888;font-size:13px;">No orders yet</div>';
+
+    // Recent activity feed
+    const activity = [];
+    allOrders.slice(-10).forEach(r => activity.push({ type: 'order', title: 'Order from ' + (r.name || r.email || 'Customer'), time: r.created_at, color: '#C7065C' }));
+    allContacts.slice(-10).forEach(r => activity.push({ type: 'contact', title: 'Message from ' + (r.name || r.email || 'Visitor'), time: r.created_at, color: '#8DC63F' }));
+    allOverrides.slice(-10).forEach(r => activity.push({ type: 'content', title: 'Page edited: ' + (r.page_name || 'Unknown'), time: r.updated_at || r.created_at, color: '#2196F3' }));
+    activity.sort((a, b) => new Date(b.time || 0) - new Date(a.time || 0));
+
+    const actDiv = document.getElementById('recent-activity');
+    actDiv.innerHTML = activity.slice(0, 15).map(item => `
+      <div class="timeline-item">
+        <div class="timeline-dot" style="background:${item.color};"></div>
+        <div class="timeline-content">
+          <div class="timeline-title">${escH(item.title)}</div>
+          <div class="timeline-time">${item.time ? formatDateTime(item.time) : 'Unknown date'}</div>
+        </div>
+      </div>
+    `).join('') || '<div style="color:#888;font-size:13px;padding:20px 0;">No recent activity</div>';
+
+  } catch(e) {
+    console.error('Analytics error:', e);
+    showToast('Error loading analytics: ' + e.message, 'error');
+  }
+}
+
+function buildTimeChart(containerId, data, days, color) {
+  const container = document.getElementById(containerId);
+  // Group by date
+  const buckets = {};
+  const now = new Date();
+  const numBuckets = Math.min(days, 14);
+  const bucketSize = Math.max(1, Math.floor(days / numBuckets));
+
+  for (let i = numBuckets - 1; i >= 0; i--) {
+    const d = new Date(now);
+    d.setDate(d.getDate() - i * bucketSize);
+    const key = d.toISOString().split('T')[0];
+    buckets[key] = { date: d, count: 0 };
+  }
+
+  data.forEach(r => {
+    if (!r.created_at) return;
+    const rDate = r.created_at.split('T')[0];
+    // Find nearest bucket
+    let closest = null, minDiff = Infinity;
+    for (const key of Object.keys(buckets)) {
+      const diff = Math.abs(new Date(rDate) - new Date(key));
+      if (diff < minDiff) { minDiff = diff; closest = key; }
+    }
+    if (closest) buckets[closest].count++;
+  });
+
+  const vals = Object.values(buckets);
+  const max = Math.max(...vals.map(v => v.count), 1);
+
+  container.innerHTML = vals.map(v => {
+    const h = Math.max(4, (v.count / max) * 160);
+    return `<div class="bar-col">
+      <div class="bar-fill" style="height:${h}px;background:${color};">
+        ${v.count > 0 ? `<span class="bar-val">${v.count}</span>` : ''}
+      </div>
+      <span class="bar-label">${formatDate(v.date)}</span>
+    </div>`;
+  }).join('');
+}
+
+function escH(str) { const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
+
+// Init
+(async () => {
+  try {
+    const user = await brRequireAdmin();
+    const name = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Admin';
+    document.getElementById('user-name').textContent = name;
+    document.getElementById('user-email').textContent = user.email;
+    document.getElementById('user-avatar').textContent = name.charAt(0).toUpperCase();
+    await loadAnalytics();
+  } catch(e) { console.error('Init error:', e); }
+})();
+</script>
+</body>
+</html>

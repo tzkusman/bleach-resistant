@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Site Settings — Bleach Resistant Admin</title>
+  <link rel="icon" href="https://static.wixstatic.com/media/926a36_bea70e48de2b461ebaae685fdbb3be76%7Emv2.png/v1/fill/w_32%2Ch_32%2Clg_1%2Cusm_0.66_1.00_0.01/926a36_bea70e48de2b461ebaae685fdbb3be76%7Emv2.png" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <style>
+    .settings-grid { display: grid; grid-template-columns: 260px 1fr; gap: 0; min-height: calc(100vh - 120px); }
+    .settings-nav {
+      background: #fafafa; border-right: 1px solid #eee; padding: 20px 0;
+    }
+    .settings-nav a {
+      display: block; padding: 10px 24px; font-size: 13px; font-weight: 600; color: #555;
+      text-decoration: none; transition: all 0.15s; border-left: 3px solid transparent;
+    }
+    .settings-nav a:hover { background: #f0f0f0; color: #333; }
+    .settings-nav a.active { color: #C7065C; background: #fef7fa; border-left-color: #C7065C; }
+    .settings-nav .nav-heading {
+      font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;
+      color: #aaa; padding: 16px 24px 6px; margin: 0;
+    }
+    .settings-panel { padding: 32px; max-width: 720px; }
+    .settings-panel h2 { font-size: 20px; font-weight: 800; margin: 0 0 6px; }
+    .settings-panel .panel-desc { font-size: 13px; color: #888; margin: 0 0 28px; }
+    .setting-section {
+      background: #fff; border: 1px solid #e5e5e5; border-radius: 12px; padding: 24px;
+      margin-bottom: 20px;
+    }
+    .setting-section h3 { font-size: 15px; font-weight: 700; margin: 0 0 16px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label {
+      display: block; font-size: 12px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.5px; color: #555; margin-bottom: 6px;
+    }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 8px;
+      font-size: 14px; font-family: inherit; box-sizing: border-box; transition: border-color 0.2s;
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+      border-color: #C7065C; outline: none; box-shadow: 0 0 0 3px rgba(199,6,92,0.1);
+    }
+    .form-group textarea { resize: vertical; min-height: 80px; }
+    .form-group .help { font-size: 11px; color: #999; margin-top: 4px; }
+    .color-row { display: flex; align-items: center; gap: 12px; }
+    .color-row input[type="color"] { width: 48px; height: 36px; border: 1px solid #ddd; border-radius: 6px; padding: 2px; cursor: pointer; }
+    .color-row input[type="text"] { flex: 1; }
+    .toggle-row {
+      display: flex; align-items: center; justify-content: space-between; padding: 12px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .toggle-row:last-child { border-bottom: none; }
+    .toggle-label { font-size: 14px; font-weight: 600; }
+    .toggle-desc { font-size: 12px; color: #888; }
+    .toggle-switch {
+      position: relative; width: 44px; height: 24px; flex-shrink: 0;
+    }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-switch .slider {
+      position: absolute; inset: 0; background: #ccc; border-radius: 24px;
+      transition: background 0.3s; cursor: pointer;
+    }
+    .toggle-switch .slider::before {
+      content: ''; position: absolute; width: 18px; height: 18px; left: 3px; bottom: 3px;
+      background: #fff; border-radius: 50%; transition: transform 0.3s;
+    }
+    .toggle-switch input:checked + .slider { background: #C7065C; }
+    .toggle-switch input:checked + .slider::before { transform: translateX(20px); }
+    .save-bar {
+      position: sticky; bottom: 0; background: #fff; border-top: 1px solid #eee;
+      padding: 16px 32px; display: flex; justify-content: flex-end; gap: 12px;
+    }
+    .sp-hidden { display: none; }
+    .sp-active { display: block; }
+  </style>
+</head>
+<body>
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-brand"><h2>Bleach Resistant</h2><small>Admin Panel</small></div>
+    <div class="sidebar-nav">
+      <div class="nav-section">Main</div>
+      <a href="admin.html"><span class="icon">📊</span> Dashboard</a>
+      <a href="admin-orders.html"><span class="icon">📦</span> Orders</a>
+      <a href="admin-contacts.html"><span class="icon">💬</span> Contacts</a>
+      <div class="nav-section">Content</div>
+      <a href="admin-pages.html"><span class="icon">📄</span> Pages</a>
+      <a href="admin-media.html"><span class="icon">🖼️</span> Media Library</a>
+      <a href="admin-navigation.html"><span class="icon">🔗</span> Navigation</a>
+      <div class="nav-section">Settings</div>
+      <a href="admin-settings.html" class="active"><span class="icon">⚙️</span> Site Settings</a>
+      <a href="admin-analytics.html"><span class="icon">📈</span> Analytics</a>
+      <div class="nav-section">Website</div>
+      <a href="home.html" target="_blank"><span class="icon">🌐</span> View Site</a>
+      <a href="order.html" target="_blank"><span class="icon">🛒</span> Order Page</a>
+    </div>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" id="user-avatar">A</div>
+        <div>
+          <div style="font-size:12px;font-weight:600;" id="user-name">Admin</div>
+          <div class="user-email" id="user-email">loading…</div>
+        </div>
+      </div>
+      <button class="btn btn-secondary btn-sm btn-block" onclick="brSignOut()">Sign Out</button>
+    </div>
+  </nav>
+
+  <div class="main-content">
+    <div class="topbar">
+      <div>
+        <h1>Site Settings</h1>
+        <div class="breadcrumb">Configure your website appearance, SEO, business info, and more</div>
+      </div>
+    </div>
+
+    <div class="content-area" style="padding:0;">
+      <div class="settings-grid">
+        <!-- Settings Nav -->
+        <div class="settings-nav">
+          <div class="nav-heading">General</div>
+          <a href="#" class="active" onclick="showPanel('general',this)">Business Info</a>
+          <a href="#" onclick="showPanel('branding',this)">Branding & Theme</a>
+          <a href="#" onclick="showPanel('social',this)">Social Media</a>
+          <div class="nav-heading">Website</div>
+          <a href="#" onclick="showPanel('seo',this)">SEO & Meta Tags</a>
+          <a href="#" onclick="showPanel('scripts',this)">Custom Code</a>
+          <a href="#" onclick="showPanel('maintenance',this)">Maintenance Mode</a>
+          <div class="nav-heading">Notifications</div>
+          <a href="#" onclick="showPanel('email',this)">Email Settings</a>
+          <a href="#" onclick="showPanel('notifications',this)">Order Notifications</a>
+          <div class="nav-heading">Advanced</div>
+          <a href="#" onclick="showPanel('backup',this)">Backup & Export</a>
+          <a href="#" onclick="showPanel('danger',this)">Danger Zone</a>
+        </div>
+
+        <!-- Settings Content -->
+        <div style="overflow-y:auto;">
+
+          <!-- General / Business Info -->
+          <div class="settings-panel sp-active" id="panel-general">
+            <h2>Business Information</h2>
+            <p class="panel-desc">Core details shown across your website footer, contact page, and SEO</p>
+            <div class="setting-section">
+              <h3>Company Details</h3>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Business Name</label>
+                  <input type="text" id="s-biz-name" value="Bleach Resistant">
+                </div>
+                <div class="form-group">
+                  <label>Tagline</label>
+                  <input type="text" id="s-tagline" value="Since 1995">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Phone</label>
+                  <input type="tel" id="s-phone" value="519-821-8622">
+                </div>
+                <div class="form-group">
+                  <label>Email</label>
+                  <input type="email" id="s-email" value="graphics.finprint@gmail.com">
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Address</label>
+                <input type="text" id="s-address" value="Guelph, ON Canada">
+              </div>
+            </div>
+            <div class="setting-section">
+              <h3>Business Hours</h3>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Weekdays</label>
+                  <input type="text" id="s-hours-weekday" value="Monday - Friday, 8:00 - 4:30 EST">
+                </div>
+                <div class="form-group">
+                  <label>Weekends</label>
+                  <input type="text" id="s-hours-weekend" value="Closed">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Branding & Theme -->
+          <div class="settings-panel sp-hidden" id="panel-branding">
+            <h2>Branding & Theme</h2>
+            <p class="panel-desc">Customize colors, fonts, and visual identity</p>
+            <div class="setting-section">
+              <h3>Brand Colors</h3>
+              <div class="form-group">
+                <label>Primary Color (Accent)</label>
+                <div class="color-row">
+                  <input type="color" id="s-color-primary" value="#C7065C">
+                  <input type="text" id="s-color-primary-hex" value="#C7065C">
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Secondary Color (Green)</label>
+                <div class="color-row">
+                  <input type="color" id="s-color-secondary" value="#8DC63F">
+                  <input type="text" id="s-color-secondary-hex" value="#8DC63F">
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Background Color</label>
+                <div class="color-row">
+                  <input type="color" id="s-color-bg" value="#ffffff">
+                  <input type="text" id="s-color-bg-hex" value="#ffffff">
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Text Color</label>
+                <div class="color-row">
+                  <input type="color" id="s-color-text" value="#333333">
+                  <input type="text" id="s-color-text-hex" value="#333333">
+                </div>
+              </div>
+            </div>
+            <div class="setting-section">
+              <h3>Typography</h3>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Heading Font</label>
+                  <select id="s-font-heading">
+                    <option value="Montserrat" selected>Montserrat</option>
+                    <option value="Oswald">Oswald</option>
+                    <option value="Bebas Neue">Bebas Neue</option>
+                    <option value="Barlow Condensed">Barlow Condensed</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Body Font</label>
+                  <select id="s-font-body">
+                    <option value="Montserrat" selected>Montserrat</option>
+                    <option value="Roboto">Roboto</option>
+                    <option value="Open Sans">Open Sans</option>
+                    <option value="Lato">Lato</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Social Media -->
+          <div class="settings-panel sp-hidden" id="panel-social">
+            <h2>Social Media</h2>
+            <p class="panel-desc">Social media profile URLs displayed in the site footer</p>
+            <div class="setting-section">
+              <div class="form-group">
+                <label>Facebook</label>
+                <input type="url" id="s-social-fb" value="https://www.facebook.com/finprintsublimation/">
+              </div>
+              <div class="form-group">
+                <label>Instagram</label>
+                <input type="url" id="s-social-ig" value="https://www.instagram.com/finprintapparel/">
+              </div>
+              <div class="form-group">
+                <label>YouTube</label>
+                <input type="url" id="s-social-yt" value="https://www.youtube.com/channel/UCl_BemjTA6tUNV-eGQ80X1g/playlists">
+              </div>
+              <div class="form-group">
+                <label>Twitter / X</label>
+                <input type="url" id="s-social-tw" placeholder="https://twitter.com/yourhandle">
+              </div>
+              <div class="form-group">
+                <label>LinkedIn</label>
+                <input type="url" id="s-social-li" placeholder="https://linkedin.com/company/yourcompany">
+              </div>
+              <div class="form-group">
+                <label>TikTok</label>
+                <input type="url" id="s-social-tt" placeholder="https://tiktok.com/@yourhandle">
+              </div>
+            </div>
+          </div>
+
+          <!-- SEO -->
+          <div class="settings-panel sp-hidden" id="panel-seo">
+            <h2>SEO & Meta Tags</h2>
+            <p class="panel-desc">Search engine optimization settings applied across your site</p>
+            <div class="setting-section">
+              <h3>Global SEO</h3>
+              <div class="form-group">
+                <label>Site Title Suffix</label>
+                <input type="text" id="s-seo-suffix" value="— Bleach Resistant">
+                <div class="help">Appended to every page title, e.g. "Products — Bleach Resistant"</div>
+              </div>
+              <div class="form-group">
+                <label>Default Meta Description</label>
+                <textarea id="s-seo-desc">Bleach Resistant — Canada's trusted sublimation printing company since 1995. Custom uniforms, workwear, and apparel.</textarea>
+              </div>
+              <div class="form-group">
+                <label>Meta Keywords</label>
+                <input type="text" id="s-seo-keywords" value="bleach resistant, sublimation printing, custom uniforms, workwear, Canada">
+              </div>
+            </div>
+            <div class="setting-section">
+              <h3>Open Graph / Social Sharing</h3>
+              <div class="form-group">
+                <label>OG Image URL</label>
+                <input type="url" id="s-og-image" placeholder="https://yourdomain.com/og-image.jpg">
+                <div class="help">Recommended: 1200×630px image shown when shared on social media</div>
+              </div>
+              <div class="form-group">
+                <label>Site Domain</label>
+                <input type="url" id="s-domain" value="https://bleach-resistant.vercel.app">
+              </div>
+            </div>
+          </div>
+
+          <!-- Custom Code -->
+          <div class="settings-panel sp-hidden" id="panel-scripts">
+            <h2>Custom Code</h2>
+            <p class="panel-desc">Inject custom HTML, CSS, or JavaScript into your site pages</p>
+            <div class="setting-section">
+              <h3>Head Code</h3>
+              <div class="form-group">
+                <label>Inject into &lt;head&gt;</label>
+                <textarea id="s-head-code" placeholder="<!-- Google Analytics, custom fonts, etc -->" style="font-family:monospace;font-size:12px;min-height:120px;"></textarea>
+                <div class="help">Added before &lt;/head&gt; on every page. Use for analytics, tracking pixels, or custom stylesheets.</div>
+              </div>
+            </div>
+            <div class="setting-section">
+              <h3>Body Code</h3>
+              <div class="form-group">
+                <label>Inject before &lt;/body&gt;</label>
+                <textarea id="s-body-code" placeholder="<!-- Chat widgets, custom scripts -->" style="font-family:monospace;font-size:12px;min-height:120px;"></textarea>
+                <div class="help">Added before &lt;/body&gt; on every page. Use for chat widgets, live support, or custom scripts.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Maintenance Mode -->
+          <div class="settings-panel sp-hidden" id="panel-maintenance">
+            <h2>Maintenance Mode</h2>
+            <p class="panel-desc">Take your site offline temporarily while making changes</p>
+            <div class="setting-section">
+              <div class="toggle-row">
+                <div>
+                  <div class="toggle-label">Enable Maintenance Mode</div>
+                  <div class="toggle-desc">Show a maintenance page to all visitors. Admins can still access the site.</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="s-maintenance">
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="form-group" style="margin-top:16px;">
+                <label>Maintenance Message</label>
+                <textarea id="s-maintenance-msg" placeholder="We're updating our site. Check back soon!"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Email Settings -->
+          <div class="settings-panel sp-hidden" id="panel-email">
+            <h2>Email Settings</h2>
+            <p class="panel-desc">Configure where form submissions and notifications are sent</p>
+            <div class="setting-section">
+              <div class="form-group">
+                <label>Order Notification Email</label>
+                <input type="email" id="s-notify-orders" value="graphics.finprint@gmail.com">
+                <div class="help">Receives notifications when new orders are submitted</div>
+              </div>
+              <div class="form-group">
+                <label>Contact Form Email</label>
+                <input type="email" id="s-notify-contacts" value="graphics.finprint@gmail.com">
+                <div class="help">Receives messages from the contact form</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Order Notifications -->
+          <div class="settings-panel sp-hidden" id="panel-notifications">
+            <h2>Order Notifications</h2>
+            <p class="panel-desc">Configure automatic notifications for order status changes</p>
+            <div class="setting-section">
+              <div class="toggle-row">
+                <div>
+                  <div class="toggle-label">Email on New Order</div>
+                  <div class="toggle-desc">Send email notification when a new order is submitted</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="s-notify-new-order" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="toggle-row">
+                <div>
+                  <div class="toggle-label">Email on Status Change</div>
+                  <div class="toggle-desc">Notify customer when their order status is updated</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="s-notify-status">
+                  <span class="slider"></span>
+                </label>
+              </div>
+              <div class="toggle-row">
+                <div>
+                  <div class="toggle-label">Email on New Contact Message</div>
+                  <div class="toggle-desc">Send notification when someone submits the contact form</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="s-notify-contact" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Backup & Export -->
+          <div class="settings-panel sp-hidden" id="panel-backup">
+            <h2>Backup & Export</h2>
+            <p class="panel-desc">Export your site data and content overrides</p>
+            <div class="setting-section">
+              <h3>Export Data</h3>
+              <div style="display:flex;flex-direction:column;gap:12px;">
+                <button class="btn btn-secondary btn-sm" onclick="exportData('orders')" style="justify-content:flex-start;">📦 Export Orders (CSV)</button>
+                <button class="btn btn-secondary btn-sm" onclick="exportData('contacts')" style="justify-content:flex-start;">💬 Export Contacts (CSV)</button>
+                <button class="btn btn-secondary btn-sm" onclick="exportData('page_content')" style="justify-content:flex-start;">📄 Export Page Overrides (JSON)</button>
+                <button class="btn btn-secondary btn-sm" onclick="exportData('site_settings')" style="justify-content:flex-start;">⚙️ Export Settings (JSON)</button>
+                <button class="btn btn-primary btn-sm" onclick="exportAll()" style="justify-content:flex-start;">📋 Export Everything (JSON)</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Danger Zone -->
+          <div class="settings-panel sp-hidden" id="panel-danger">
+            <h2>Danger Zone</h2>
+            <p class="panel-desc">Irreversible actions — proceed with caution</p>
+            <div class="setting-section" style="border-color:#ffcdd2;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                <div>
+                  <div style="font-weight:700;font-size:14px;">Clear All Page Overrides</div>
+                  <div style="font-size:12px;color:#888;">Remove all content edits made through the visual editor</div>
+                </div>
+                <button class="btn btn-sm" style="background:#e53935;color:#fff;" onclick="clearOverrides()">Clear Overrides</button>
+              </div>
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div>
+                  <div style="font-weight:700;font-size:14px;">Reset All Settings</div>
+                  <div style="font-size:12px;color:#888;">Restore all settings to factory defaults</div>
+                </div>
+                <button class="btn btn-sm" style="background:#e53935;color:#fff;" onclick="resetSettings()">Reset All</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Save Bar -->
+          <div class="save-bar">
+            <button class="btn btn-secondary btn-sm" onclick="loadSettings()">Discard Changes</button>
+            <button class="btn btn-primary btn-sm" onclick="saveSettings()">Save Settings</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+<script>
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.className = 'toast toast-' + (type || 'info');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function showPanel(name, el) {
+  document.querySelectorAll('.settings-panel').forEach(p => { p.classList.remove('sp-active'); p.classList.add('sp-hidden'); });
+  document.querySelectorAll('.settings-nav a').forEach(a => a.classList.remove('active'));
+  const panel = document.getElementById('panel-' + name);
+  if (panel) { panel.classList.remove('sp-hidden'); panel.classList.add('sp-active'); }
+  if (el) el.classList.add('active');
+  if (event) event.preventDefault();
+}
+
+// Color sync
+['primary','secondary','bg','text'].forEach(key => {
+  const cp = document.getElementById('s-color-' + key);
+  const hex = document.getElementById('s-color-' + key + '-hex');
+  if (cp && hex) {
+    cp.addEventListener('input', () => { hex.value = cp.value; });
+    hex.addEventListener('input', () => { if (/^#[0-9a-fA-F]{6}$/.test(hex.value)) cp.value = hex.value; });
+  }
+});
+
+async function loadSettings() {
+  try {
+    const { data } = await db.from('site_settings').select('*');
+    if (!data) return;
+    const settings = {};
+    data.forEach(row => { settings[row.setting_key] = row.setting_value; });
+
+    // Apply to fields
+    if (settings.biz_name) document.getElementById('s-biz-name').value = settings.biz_name;
+    if (settings.tagline) document.getElementById('s-tagline').value = settings.tagline;
+    if (settings.phone) document.getElementById('s-phone').value = settings.phone;
+    if (settings.email) document.getElementById('s-email').value = settings.email;
+    if (settings.address) document.getElementById('s-address').value = settings.address;
+    if (settings.hours_weekday) document.getElementById('s-hours-weekday').value = settings.hours_weekday;
+    if (settings.hours_weekend) document.getElementById('s-hours-weekend').value = settings.hours_weekend;
+    if (settings.color_primary) { document.getElementById('s-color-primary').value = settings.color_primary; document.getElementById('s-color-primary-hex').value = settings.color_primary; }
+    if (settings.color_secondary) { document.getElementById('s-color-secondary').value = settings.color_secondary; document.getElementById('s-color-secondary-hex').value = settings.color_secondary; }
+    if (settings.social_fb) document.getElementById('s-social-fb').value = settings.social_fb;
+    if (settings.social_ig) document.getElementById('s-social-ig').value = settings.social_ig;
+    if (settings.social_yt) document.getElementById('s-social-yt').value = settings.social_yt;
+    if (settings.social_tw) document.getElementById('s-social-tw').value = settings.social_tw;
+    if (settings.social_li) document.getElementById('s-social-li').value = settings.social_li;
+    if (settings.social_tt) document.getElementById('s-social-tt').value = settings.social_tt;
+    if (settings.seo_suffix) document.getElementById('s-seo-suffix').value = settings.seo_suffix;
+    if (settings.seo_desc) document.getElementById('s-seo-desc').value = settings.seo_desc;
+    if (settings.seo_keywords) document.getElementById('s-seo-keywords').value = settings.seo_keywords;
+    if (settings.domain) document.getElementById('s-domain').value = settings.domain;
+  } catch(e) { console.warn('Failed to load settings:', e); }
+}
+
+async function saveSettings() {
+  const fields = {
+    biz_name: 's-biz-name', tagline: 's-tagline', phone: 's-phone', email: 's-email',
+    address: 's-address', hours_weekday: 's-hours-weekday', hours_weekend: 's-hours-weekend',
+    color_primary: 's-color-primary-hex', color_secondary: 's-color-secondary-hex',
+    social_fb: 's-social-fb', social_ig: 's-social-ig', social_yt: 's-social-yt',
+    social_tw: 's-social-tw', social_li: 's-social-li', social_tt: 's-social-tt',
+    seo_suffix: 's-seo-suffix', seo_desc: 's-seo-desc', seo_keywords: 's-seo-keywords',
+    domain: 's-domain', head_code: 's-head-code', body_code: 's-body-code',
+    maintenance_msg: 's-maintenance-msg',
+    notify_orders: 's-notify-orders', notify_contacts: 's-notify-contacts'
+  };
+
+  const rows = [];
+  for (const [key, elId] of Object.entries(fields)) {
+    const el = document.getElementById(elId);
+    if (el) rows.push({ setting_key: key, setting_value: el.value });
+  }
+
+  // Checkboxes
+  ['s-maintenance','s-notify-new-order','s-notify-status','s-notify-contact'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) rows.push({ setting_key: id.replace('s-','').replace(/-/g,'_'), setting_value: el.checked ? 'true' : 'false' });
+  });
+
+  try {
+    for (const row of rows) {
+      await db.from('site_settings').upsert(row, { onConflict: 'setting_key' });
+    }
+    showToast('Settings saved!', 'success');
+  } catch(e) {
+    showToast('Error saving: ' + e.message, 'error');
+  }
+}
+
+async function exportData(table) {
+  try {
+    const { data, error } = await db.from(table).select('*');
+    if (error) throw error;
+    if (table === 'orders' || table === 'contacts') {
+      if (!data || data.length === 0) { showToast('No data to export', 'info'); return; }
+      const headers = Object.keys(data[0]);
+      const csv = [headers.join(','), ...data.map(row => headers.map(h => '"' + String(row[h] || '').replace(/"/g, '""') + '"').join(','))].join('\n');
+      downloadFile(csv, table + '.csv', 'text/csv');
+    } else {
+      downloadFile(JSON.stringify(data, null, 2), table + '.json', 'application/json');
+    }
+    showToast('Exported ' + table, 'success');
+  } catch(e) { showToast('Export failed: ' + e.message, 'error'); }
+}
+
+async function exportAll() {
+  try {
+    const [orders, contacts, pages, settings, media] = await Promise.all([
+      db.from('orders').select('*'),
+      db.from('contacts').select('*'),
+      db.from('page_content').select('*'),
+      db.from('site_settings').select('*'),
+      db.from('media').select('*')
+    ]);
+    const allData = {
+      exported_at: new Date().toISOString(),
+      orders: orders.data || [],
+      contacts: contacts.data || [],
+      page_content: pages.data || [],
+      site_settings: settings.data || [],
+      media: media.data || []
+    };
+    downloadFile(JSON.stringify(allData, null, 2), 'bleach-resistant-backup-' + new Date().toISOString().split('T')[0] + '.json', 'application/json');
+    showToast('Full backup exported!', 'success');
+  } catch(e) { showToast('Backup failed: ' + e.message, 'error'); }
+}
+
+function downloadFile(content, filename, mimeType) {
+  const blob = new Blob([content], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+async function clearOverrides() {
+  if (!confirm('This will delete ALL page content overrides. Are you sure?')) return;
+  try {
+    await db.from('page_content').delete().neq('id', 0);
+    showToast('All page overrides cleared', 'success');
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+}
+
+async function resetSettings() {
+  if (!confirm('This will reset ALL settings to defaults. Are you sure?')) return;
+  if (!confirm('Are you really sure? This cannot be undone.')) return;
+  try {
+    await db.from('site_settings').delete().neq('setting_key', '');
+    showToast('All settings reset to defaults', 'success');
+    location.reload();
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+}
+
+// Init
+(async () => {
+  try {
+    const user = await brRequireAdmin();
+    const name = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Admin';
+    document.getElementById('user-name').textContent = name;
+    document.getElementById('user-email').textContent = user.email;
+    document.getElementById('user-avatar').textContent = name.charAt(0).toUpperCase();
+    await loadSettings();
+  } catch(e) { console.error('Init error:', e); }
+})();
+</script>
+</body>
+</html>

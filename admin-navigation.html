@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Navigation & Pages — Bleach Resistant Admin</title>
+  <link rel="icon" href="https://static.wixstatic.com/media/926a36_bea70e48de2b461ebaae685fdbb3be76%7Emv2.png/v1/fill/w_32%2Ch_32%2Clg_1%2Cusm_0.66_1.00_0.01/926a36_bea70e48de2b461ebaae685fdbb3be76%7Emv2.png" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <style>
+    .page-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+    .page-card {
+      background: #fff; border-radius: 12px; border: 1px solid #e5e5e5; padding: 20px;
+      transition: all 0.2s; position: relative;
+    }
+    .page-card:hover { border-color: #C7065C; box-shadow: 0 4px 16px rgba(199,6,92,0.1); }
+    .page-card h4 { margin: 0 0 6px; font-size: 15px; font-weight: 700; }
+    .page-card .page-file { font-size: 12px; color: #888; font-family: monospace; margin-bottom: 12px; }
+    .page-card .page-desc { font-size: 13px; color: #555; line-height: 1.5; margin-bottom: 14px; }
+    .page-card .page-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .page-badge {
+      display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px;
+      border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .badge-nav { background: #e8f5e9; color: #2e7d32; }
+    .badge-hidden { background: #fff3e0; color: #e65100; }
+    .badge-custom { background: #e3f2fd; color: #1565c0; }
+
+    .link-list { background: #fff; border-radius: 12px; border: 1px solid #e5e5e5; overflow: hidden; }
+    .link-row {
+      display: flex; align-items: center; padding: 12px 20px; border-bottom: 1px solid #f0f0f0;
+      gap: 16px; transition: background 0.15s;
+    }
+    .link-row:hover { background: #fef7fa; }
+    .link-row:last-child { border-bottom: none; }
+    .link-label { flex: 1; font-weight: 600; font-size: 14px; }
+    .link-target { font-size: 12px; color: #888; font-family: monospace; }
+    .link-type { font-size: 11px; padding: 2px 8px; border-radius: 4px; background: #f0f0f0; color: #555; }
+
+    .tabs-bar { display: flex; gap: 0; border-bottom: 2px solid #eee; margin-bottom: 24px; }
+    .tabs-bar button {
+      padding: 10px 24px; border: none; background: none; cursor: pointer;
+      font-size: 14px; font-weight: 600; color: #888; border-bottom: 2px solid transparent;
+      margin-bottom: -2px; transition: all 0.2s;
+    }
+    .tabs-bar button.active { color: #C7065C; border-bottom-color: #C7065C; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+      z-index: 1000; align-items: center; justify-content: center;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal-box {
+      background: #fff; border-radius: 16px; width: 90%; max-width: 560px;
+      padding: 32px; box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    }
+    .modal-box h3 { margin: 0 0 20px; font-size: 18px; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 6px; color: #555; text-transform: uppercase; letter-spacing: 0.5px; }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 8px;
+      font-size: 14px; font-family: inherit; box-sizing: border-box;
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+      border-color: #C7065C; outline: none; box-shadow: 0 0 0 3px rgba(199,6,92,0.1);
+    }
+    .form-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px; }
+
+    .nav-preview {
+      background: #242323; border-radius: 12px; padding: 16px 24px;
+      display: flex; gap: 16px; flex-wrap: wrap; align-items: center; margin-bottom: 24px;
+    }
+    .nav-preview-item {
+      color: #8DC63F; font-size: 13px; font-weight: 600; font-family: Montserrat, sans-serif;
+      cursor: default; padding: 6px 12px; border-radius: 4px; transition: background 0.15s;
+    }
+    .nav-preview-item:hover { background: rgba(255,255,255,0.1); }
+    .nav-preview-item.has-sub::after { content: ' ▾'; font-size: 10px; }
+    .quick-stats { display: flex; gap: 24px; margin-bottom: 24px; flex-wrap: wrap; }
+    .quick-stat { text-align: center; }
+    .quick-stat .num { font-size: 28px; font-weight: 800; color: #C7065C; }
+    .quick-stat .label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
+  </style>
+</head>
+<body>
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-brand"><h2>Bleach Resistant</h2><small>Admin Panel</small></div>
+    <div class="sidebar-nav">
+      <div class="nav-section">Main</div>
+      <a href="admin.html"><span class="icon">📊</span> Dashboard</a>
+      <a href="admin-orders.html"><span class="icon">📦</span> Orders</a>
+      <a href="admin-contacts.html"><span class="icon">💬</span> Contacts</a>
+      <div class="nav-section">Content</div>
+      <a href="admin-pages.html"><span class="icon">📄</span> Pages</a>
+      <a href="admin-media.html"><span class="icon">🖼️</span> Media Library</a>
+      <a href="admin-navigation.html" class="active"><span class="icon">🔗</span> Navigation</a>
+      <div class="nav-section">Settings</div>
+      <a href="admin-settings.html"><span class="icon">⚙️</span> Site Settings</a>
+      <a href="admin-analytics.html"><span class="icon">📈</span> Analytics</a>
+      <div class="nav-section">Website</div>
+      <a href="home.html" target="_blank"><span class="icon">🌐</span> View Site</a>
+      <a href="order.html" target="_blank"><span class="icon">🛒</span> Order Page</a>
+    </div>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" id="user-avatar">A</div>
+        <div>
+          <div style="font-size:12px;font-weight:600;" id="user-name">Admin</div>
+          <div class="user-email" id="user-email">loading…</div>
+        </div>
+      </div>
+      <button class="btn btn-secondary btn-sm btn-block" onclick="brSignOut()">Sign Out</button>
+    </div>
+  </nav>
+
+  <div class="main-content">
+    <div class="topbar">
+      <div>
+        <h1>Navigation & Pages</h1>
+        <div class="breadcrumb">Manage your site pages, navigation menus, and external links</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn btn-primary btn-sm" onclick="showCreatePageModal()">+ Create New Page</button>
+      </div>
+    </div>
+
+    <div class="content-area">
+
+      <!-- Quick Stats -->
+      <div class="quick-stats">
+        <div class="quick-stat"><div class="num" id="stat-pages">20</div><div class="label">Site Pages</div></div>
+        <div class="quick-stat"><div class="num" id="stat-nav-items">6</div><div class="label">Nav Items</div></div>
+        <div class="quick-stat"><div class="num" id="stat-dropdowns">2</div><div class="label">Dropdown Menus</div></div>
+        <div class="quick-stat"><div class="num" id="stat-links">0</div><div class="label">Custom Links</div></div>
+      </div>
+
+      <!-- Nav Preview -->
+      <div style="margin-bottom:8px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#888;">Live Navigation Preview</div>
+      <div class="nav-preview" id="nav-preview">
+        <div class="nav-preview-item has-sub">PRODUCTS</div>
+        <div class="nav-preview-item has-sub">SERVICES</div>
+        <div class="nav-preview-item">SHOWCASE</div>
+        <div class="nav-preview-item">ORDER</div>
+        <div class="nav-preview-item">SIZE CHART</div>
+        <div class="nav-preview-item">FAQs</div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs-bar">
+        <button class="active" onclick="switchTab('pages')">All Pages</button>
+        <button onclick="switchTab('navigation')">Navigation Menu</button>
+        <button onclick="switchTab('links')">Custom Links</button>
+        <button onclick="switchTab('redirects')">Redirects</button>
+      </div>
+
+      <!-- Tab: All Pages -->
+      <div class="tab-panel active" id="tab-pages">
+        <div class="page-grid" id="pages-grid"></div>
+      </div>
+
+      <!-- Tab: Navigation Menu -->
+      <div class="tab-panel" id="tab-navigation">
+        <div class="table-card" style="padding:20px;">
+          <h3 style="margin:0 0 16px;font-size:16px;">Main Navigation Items</h3>
+          <p style="font-size:13px;color:#888;margin:0 0 20px;">These items appear in the top navigation bar. Drag to reorder.</p>
+          <div class="link-list" id="nav-items-list"></div>
+        </div>
+        <div class="table-card" style="padding:20px;margin-top:20px;">
+          <h3 style="margin:0 0 16px;font-size:16px;">Products Dropdown</h3>
+          <div class="link-list" id="products-dropdown-list"></div>
+        </div>
+        <div class="table-card" style="padding:20px;margin-top:20px;">
+          <h3 style="margin:0 0 16px;font-size:16px;">Services Dropdown</h3>
+          <div class="link-list" id="services-dropdown-list"></div>
+        </div>
+      </div>
+
+      <!-- Tab: Custom Links -->
+      <div class="tab-panel" id="tab-links">
+        <div class="table-card" style="padding:20px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+            <div>
+              <h3 style="margin:0;font-size:16px;">Custom Links</h3>
+              <p style="font-size:13px;color:#888;margin:4px 0 0;">Manage external URLs, social media links, and custom redirects</p>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="showAddLinkModal()">+ Add Link</button>
+          </div>
+          <div class="link-list" id="custom-links-list">
+            <div style="padding:40px;text-align:center;color:#888;">
+              <p style="font-size:14px;">No custom links yet</p>
+              <p style="font-size:12px;">Click "Add Link" to create external links, social media URLs, or custom navigation items</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab: Redirects -->
+      <div class="tab-panel" id="tab-redirects">
+        <div class="table-card" style="padding:20px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+            <div>
+              <h3 style="margin:0;font-size:16px;">URL Redirects</h3>
+              <p style="font-size:13px;color:#888;margin:4px 0 0;">Redirect old URLs to new pages</p>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="showAddRedirectModal()">+ Add Redirect</button>
+          </div>
+          <div class="link-list" id="redirects-list">
+            <div style="padding:40px;text-align:center;color:#888;">
+              <p style="font-size:14px;">No redirects configured</p>
+              <p style="font-size:12px;">Add redirects to forward old URLs to current pages</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Create Page Modal -->
+  <div class="modal-overlay" id="create-page-modal">
+    <div class="modal-box">
+      <h3>Create New Page</h3>
+      <div class="form-group">
+        <label>Page Title</label>
+        <input type="text" id="new-page-title" placeholder="e.g. Contact Us">
+      </div>
+      <div class="form-group">
+        <label>File Name</label>
+        <input type="text" id="new-page-file" placeholder="e.g. contact.html" pattern="[a-zA-Z0-9_-]+\.html">
+        <small style="color:#888;font-size:11px;">Must end in .html — letters, numbers, hyphens only</small>
+      </div>
+      <div class="form-group">
+        <label>Template</label>
+        <select id="new-page-template">
+          <option value="blank">Blank Page</option>
+          <option value="content">Content Page (text + images)</option>
+          <option value="contact">Contact Form Page</option>
+          <option value="gallery">Gallery Page</option>
+          <option value="landing">Landing Page</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Add to Navigation?</label>
+        <select id="new-page-nav">
+          <option value="no">No — Hidden page</option>
+          <option value="main">Yes — Main navigation</option>
+          <option value="products">Yes — Products dropdown</option>
+          <option value="services">Yes — Services dropdown</option>
+          <option value="footer">Yes — Footer only</option>
+        </select>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-secondary btn-sm" onclick="closeModals()">Cancel</button>
+        <button class="btn btn-primary btn-sm" onclick="createNewPage()">Create Page</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Link Modal -->
+  <div class="modal-overlay" id="add-link-modal">
+    <div class="modal-box">
+      <h3>Add Custom Link</h3>
+      <div class="form-group">
+        <label>Link Label</label>
+        <input type="text" id="link-label" placeholder="e.g. Our Instagram">
+      </div>
+      <div class="form-group">
+        <label>URL</label>
+        <input type="url" id="link-url" placeholder="https://instagram.com/yourpage">
+      </div>
+      <div class="form-group">
+        <label>Open In</label>
+        <select id="link-target">
+          <option value="_blank">New Tab</option>
+          <option value="_self">Same Window</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Location</label>
+        <select id="link-location">
+          <option value="footer">Footer</option>
+          <option value="navigation">Main Navigation</option>
+          <option value="social">Social Media Bar</option>
+        </select>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-secondary btn-sm" onclick="closeModals()">Cancel</button>
+        <button class="btn btn-primary btn-sm" onclick="saveCustomLink()">Save Link</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Redirect Modal -->
+  <div class="modal-overlay" id="add-redirect-modal">
+    <div class="modal-box">
+      <h3>Add URL Redirect</h3>
+      <div class="form-group">
+        <label>From Path</label>
+        <input type="text" id="redirect-from" placeholder="/old-page">
+      </div>
+      <div class="form-group">
+        <label>To Path</label>
+        <input type="text" id="redirect-to" placeholder="/new-page.html">
+      </div>
+      <div class="form-group">
+        <label>Type</label>
+        <select id="redirect-type">
+          <option value="301">301 — Permanent Redirect</option>
+          <option value="302">302 — Temporary Redirect</option>
+        </select>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-secondary btn-sm" onclick="closeModals()">Cancel</button>
+        <button class="btn btn-primary btn-sm" onclick="saveRedirect()">Save Redirect</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+<script>
+// ===== Site Pages Data =====
+const SITE_PAGES = [
+  { file: 'home.html', title: 'Home', desc: 'Main landing page with hero slider, CTA buttons, and company overview', nav: 'main', type: 'landing' },
+  { file: 'finprint.html', title: 'Showcase', desc: 'Instagram gallery feed and feature product showcase', nav: 'main', type: 'gallery' },
+  { file: 'About.html', title: 'About Us', desc: 'Company history, team info, and brand story', nav: 'hidden', type: 'content' },
+  { file: 'services.html', title: 'Services', desc: 'Overview of all services offered', nav: 'main', type: 'content' },
+  { file: 'product.html', title: 'Products', desc: 'Main products landing page', nav: 'dropdown', type: 'content' },
+  { file: 'Pricelist.html', title: 'Price List', desc: 'Complete pricing for all products and services', nav: 'products', type: 'content' },
+  { file: 'headgear.html', title: 'Head Gear', desc: 'Hats, caps, toques and headwear products', nav: 'products', type: 'product' },
+  { file: 'basicpoly.html', title: 'Basics & Poly', desc: 'Basic polyester and cotton garment options', nav: 'products', type: 'product' },
+  { file: 'stockdesigns.html', title: 'Stock Designs', desc: 'Pre-made design templates and patterns', nav: 'products', type: 'product' },
+  { file: 'fabricdescriptions.html', title: 'Fabric Descriptions', desc: 'Detailed fabric types, weights, and characteristics', nav: 'products', type: 'content' },
+  { file: 'sublimationprinting.html', title: 'Sublimation Printing', desc: 'Full sublimation printing process and options', nav: 'products', type: 'content' },
+  { file: 'grapicdesign.html', title: 'Logos & Graphic Design', desc: 'Custom logo and graphic design services', nav: 'services', type: 'content' },
+  { file: 'customlogos.html', title: 'Logo Showcase', desc: 'Portfolio of custom logo designs', nav: 'services', type: 'gallery' },
+  { file: 'wrapdesign.html', title: 'Wrap Design', desc: 'Vehicle and equipment wrap design services', nav: 'services', type: 'content' },
+  { file: 'copyofwashingsamples.html', title: 'Showcase / Washing', desc: 'Washing and care sample results showcase', nav: 'main', type: 'gallery' },
+  { file: 'sizechart.html', title: 'Size Chart', desc: 'Complete sizing guide for all garments', nav: 'main', type: 'content' },
+  { file: 'order.html', title: 'Order', desc: 'Order form for new and returning clients', nav: 'main', type: 'form' },
+  { file: 'FAQs.html', title: 'FAQs', desc: 'Frequently asked questions and answers', nav: 'main', type: 'content' },
+  { file: 'privacypolicy.html', title: 'Privacy Policy', desc: 'Privacy policy and data handling information', nav: 'footer', type: 'legal' },
+  { file: 'termsconditions.html', title: 'Terms & Conditions', desc: 'Terms of service and conditions of use', nav: 'footer', type: 'legal' }
+];
+
+const NAV_ITEMS = [
+  { label: 'PRODUCTS', file: 'Pricelist.html', type: 'dropdown', children: ['Pricelist.html','headgear.html','basicpoly.html','stockdesigns.html','fabricdescriptions.html','sublimationprinting.html'] },
+  { label: 'SERVICES', file: 'services.html', type: 'dropdown', children: ['grapicdesign.html','customlogos.html','wrapdesign.html'] },
+  { label: 'SHOWCASE', file: 'copyofwashingsamples.html', type: 'link' },
+  { label: 'ORDER', file: 'order.html', type: 'link' },
+  { label: 'SIZE CHART', file: 'sizechart.html', type: 'link' },
+  { label: 'FAQs', file: 'FAQs.html', type: 'link' }
+];
+
+// ===== Custom links/redirects stored in Supabase =====
+let customLinks = [];
+let customRedirects = [];
+
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.className = 'toast toast-' + (type || 'info');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function switchTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tabs-bar button').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  event.target.classList.add('active');
+}
+
+function renderPages() {
+  const grid = document.getElementById('pages-grid');
+  grid.innerHTML = SITE_PAGES.map(p => {
+    let badge = '';
+    if (p.nav === 'main') badge = '<span class="page-badge badge-nav">Main Nav</span>';
+    else if (p.nav === 'products') badge = '<span class="page-badge badge-nav">Products</span>';
+    else if (p.nav === 'services') badge = '<span class="page-badge badge-nav">Services</span>';
+    else if (p.nav === 'hidden') badge = '<span class="page-badge badge-hidden">Hidden</span>';
+    else if (p.nav === 'footer') badge = '<span class="page-badge badge-hidden">Footer Only</span>';
+
+    return `<div class="page-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">
+        <h4>${esc(p.title)}</h4>
+        ${badge}
+      </div>
+      <div class="page-file">${esc(p.file)}</div>
+      <div class="page-desc">${esc(p.desc)}</div>
+      <div class="page-actions">
+        <a href="${esc(p.file)}" target="_blank" class="btn btn-sm btn-secondary">View</a>
+        <a href="admin-pages.html?page=${encodeURIComponent(p.file)}" class="btn btn-sm btn-primary">Edit Content</a>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderNavigation() {
+  // Main nav items
+  const navList = document.getElementById('nav-items-list');
+  navList.innerHTML = NAV_ITEMS.map((item, i) => `
+    <div class="link-row">
+      <span style="color:#C7065C;font-size:16px;cursor:grab;">☰</span>
+      <span class="link-label">${esc(item.label)}</span>
+      <span class="link-target">${esc(item.file)}</span>
+      <span class="link-type">${item.type === 'dropdown' ? 'Dropdown (' + item.children.length + ')' : 'Link'}</span>
+    </div>
+  `).join('');
+
+  // Products dropdown
+  const prodItem = NAV_ITEMS.find(n => n.label === 'PRODUCTS');
+  const prodList = document.getElementById('products-dropdown-list');
+  if (prodItem) {
+    prodList.innerHTML = prodItem.children.map(file => {
+      const page = SITE_PAGES.find(p => p.file === file);
+      return `<div class="link-row">
+        <span style="color:#C7065C;font-size:16px;cursor:grab;">☰</span>
+        <span class="link-label">${page ? esc(page.title) : esc(file)}</span>
+        <span class="link-target">${esc(file)}</span>
+      </div>`;
+    }).join('');
+  }
+
+  // Services dropdown
+  const svcItem = NAV_ITEMS.find(n => n.label === 'SERVICES');
+  const svcList = document.getElementById('services-dropdown-list');
+  if (svcItem) {
+    svcList.innerHTML = svcItem.children.map(file => {
+      const page = SITE_PAGES.find(p => p.file === file);
+      return `<div class="link-row">
+        <span style="color:#C7065C;font-size:16px;cursor:grab;">☰</span>
+        <span class="link-label">${page ? esc(page.title) : esc(file)}</span>
+        <span class="link-target">${esc(file)}</span>
+      </div>`;
+    }).join('');
+  }
+}
+
+async function loadCustomLinks() {
+  try {
+    const { data } = await db.from('site_settings').select('*').eq('setting_key', 'custom_links').single();
+    if (data) customLinks = JSON.parse(data.setting_value || '[]');
+  } catch(e) {}
+  renderCustomLinks();
+}
+
+function renderCustomLinks() {
+  const list = document.getElementById('custom-links-list');
+  if (customLinks.length === 0) {
+    list.innerHTML = '<div style="padding:40px;text-align:center;color:#888;"><p style="font-size:14px;">No custom links yet</p></div>';
+    return;
+  }
+  list.innerHTML = customLinks.map((link, i) => `
+    <div class="link-row">
+      <span class="link-label">${esc(link.label)}</span>
+      <span class="link-target">${esc(link.url)}</span>
+      <span class="link-type">${esc(link.location)}</span>
+      <button class="btn btn-sm btn-secondary" onclick="deleteCustomLink(${i})" style="color:#e53935;">Delete</button>
+    </div>
+  `).join('');
+  document.getElementById('stat-links').textContent = customLinks.length;
+}
+
+async function saveCustomLink() {
+  const label = document.getElementById('link-label').value.trim();
+  const url = document.getElementById('link-url').value.trim();
+  const target = document.getElementById('link-target').value;
+  const location = document.getElementById('link-location').value;
+
+  if (!label || !url) { showToast('Label and URL required', 'error'); return; }
+
+  customLinks.push({ label, url, target, location });
+  await db.from('site_settings').upsert({ setting_key: 'custom_links', setting_value: JSON.stringify(customLinks) }, { onConflict: 'setting_key' });
+  renderCustomLinks();
+  closeModals();
+  showToast('Link added!', 'success');
+}
+
+async function deleteCustomLink(idx) {
+  customLinks.splice(idx, 1);
+  await db.from('site_settings').upsert({ setting_key: 'custom_links', setting_value: JSON.stringify(customLinks) }, { onConflict: 'setting_key' });
+  renderCustomLinks();
+  showToast('Link removed', 'success');
+}
+
+async function loadRedirects() {
+  try {
+    const { data } = await db.from('site_settings').select('*').eq('setting_key', 'redirects').single();
+    if (data) customRedirects = JSON.parse(data.setting_value || '[]');
+  } catch(e) {}
+  renderRedirects();
+}
+
+function renderRedirects() {
+  const list = document.getElementById('redirects-list');
+  if (customRedirects.length === 0) {
+    list.innerHTML = '<div style="padding:40px;text-align:center;color:#888;"><p style="font-size:14px;">No redirects configured</p></div>';
+    return;
+  }
+  list.innerHTML = customRedirects.map((r, i) => `
+    <div class="link-row">
+      <span class="link-label" style="font-family:monospace;">${esc(r.from)}</span>
+      <span style="color:#888;">→</span>
+      <span class="link-target">${esc(r.to)}</span>
+      <span class="link-type">${r.type}</span>
+      <button class="btn btn-sm btn-secondary" onclick="deleteRedirect(${i})" style="color:#e53935;">Delete</button>
+    </div>
+  `).join('');
+}
+
+async function saveRedirect() {
+  const from = document.getElementById('redirect-from').value.trim();
+  const to = document.getElementById('redirect-to').value.trim();
+  const type = document.getElementById('redirect-type').value;
+  if (!from || !to) { showToast('Both paths required', 'error'); return; }
+  customRedirects.push({ from, to, type });
+  await db.from('site_settings').upsert({ setting_key: 'redirects', setting_value: JSON.stringify(customRedirects) }, { onConflict: 'setting_key' });
+  renderRedirects();
+  closeModals();
+  showToast('Redirect saved!', 'success');
+}
+
+async function deleteRedirect(idx) {
+  customRedirects.splice(idx, 1);
+  await db.from('site_settings').upsert({ setting_key: 'redirects', setting_value: JSON.stringify(customRedirects) }, { onConflict: 'setting_key' });
+  renderRedirects();
+  showToast('Redirect removed', 'success');
+}
+
+function showCreatePageModal() { document.getElementById('create-page-modal').classList.add('show'); }
+function showAddLinkModal() { document.getElementById('add-link-modal').classList.add('show'); }
+function showAddRedirectModal() { document.getElementById('add-redirect-modal').classList.add('show'); }
+function closeModals() { document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('show')); }
+
+function createNewPage() {
+  const title = document.getElementById('new-page-title').value.trim();
+  const file = document.getElementById('new-page-file').value.trim();
+  const template = document.getElementById('new-page-template').value;
+
+  if (!title || !file) { showToast('Title and filename are required', 'error'); return; }
+  if (!/^[a-zA-Z0-9_-]+\.html$/.test(file)) { showToast('Invalid filename — use letters, numbers, hyphens, ending in .html', 'error'); return; }
+  if (SITE_PAGES.find(p => p.file === file)) { showToast('A page with that filename already exists', 'error'); return; }
+
+  showToast('Page "' + title + '" registered! Use the visual editor to customize content.', 'success');
+  SITE_PAGES.push({ file, title, desc: 'Custom page created via admin panel', nav: document.getElementById('new-page-nav').value, type: template });
+  renderPages();
+  closeModals();
+  document.getElementById('stat-pages').textContent = SITE_PAGES.length;
+}
+
+function esc(s) {
+  if (!s) return '';
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+// ===== Init =====
+(async () => {
+  try {
+    const user = await brRequireAdmin();
+    const name = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Admin';
+    document.getElementById('user-name').textContent = name;
+    document.getElementById('user-email').textContent = user.email;
+    document.getElementById('user-avatar').textContent = name.charAt(0).toUpperCase();
+
+    renderPages();
+    renderNavigation();
+    await Promise.all([loadCustomLinks(), loadRedirects()]);
+  } catch(e) {
+    console.error('Init error:', e);
+  }
+})();
+
+// Close modals on overlay click
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', function(e) { if (e.target === this) closeModals(); });
+});
+</script>
+</body>
+</html>
