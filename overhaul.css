@@ -2442,60 +2442,58 @@ body {
 }
 
 /* =======================================================================
-   72. FEATURE IMAGE SLIDER — Auto-rotating Carousel (v4)
+   72. FEATURE IMAGE SLIDER — Auto-rotating Carousel (v5)
    ======================================================================= */
 
-/* The whole strip section that holds the slider */
+/*
+ * Strategy: KEEP the Wix grid layout intact.
+ * All 3 images already share grid-area 1/1/2/2 (same cell).
+ * Wix offsets them side-by-side via left:26px / 337px / 651px.
+ * We just override left + opacity so they stack & fade.
+ * Everything else (CTA strip, text, Instagram) keeps its Wix grid position.
+ */
+
+/* Section container */
 #comp-lgckkvft {
-  overflow: visible !important;
+  overflow: hidden !important;
   position: relative !important;
 }
 
-/* KILL Wix grid layout — force block, use padding-top for slider space */
+/* Grid container — keep grid, just ensure relative + overflow hidden */
 [data-mesh-id="comp-lgckkvftinlineContent-gridContainer"] {
-  display: block !important;
   position: relative !important;
-  overflow: visible !important;
-  min-height: 0 !important;
-  width: 100% !important;
-  padding: 0 !important;
-  padding-top: 400px !important;
-  grid-template-rows: none !important;
-  grid-template-columns: none !important;
+  overflow: hidden !important;
 }
 
-/* Parent inline-content — no extra min-height */
+/* Inline content wrapper */
 #comp-lgckkvft [data-mesh-id="comp-lgckkvftinlineContent"] {
-  min-height: 0 !important;
-  overflow: visible !important;
+  overflow: hidden !important;
   position: relative !important;
 }
 
-/* Stack all 3 feature images — absolute inside the container's padding area */
+/* === SLIDER IMAGES: stack them in center of their shared grid cell === */
 #comp-m4k7zp59,
 #comp-m4k7zp5d,
 #comp-m4k7zp5h {
-  position: absolute !important;
-  top: 20px !important;
+  /* Override Wix side-by-side left values to center all in same spot */
   left: 50% !important;
   transform: translateX(-50%) !important;
-  margin: 0 !important;
-  width: 340px !important;
-  height: 340px !important;
-  max-width: 90vw !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  /* Make them stack via opacity */
   opacity: 0 !important;
   transition: opacity 0.8s ease-in-out !important;
-  z-index: 1 !important;
   pointer-events: none !important;
+  z-index: 1 !important;
+  /* Override Wix width/height to be square */
+  width: 340px !important;
+  height: 340px !important;
   overflow: hidden !important;
-  /* Kill Wix grid properties */
-  grid-area: unset !important;
-  justify-self: unset !important;
-  align-self: unset !important;
-  /* Kill Wix motion-enter animations */
+  /* Kill Wix entry animations */
   animation: none !important;
 }
 
+/* Active slide */
 #comp-m4k7zp59.br-slide-active,
 #comp-m4k7zp5d.br-slide-active,
 #comp-m4k7zp5h.br-slide-active {
@@ -2504,6 +2502,7 @@ body {
   pointer-events: auto !important;
 }
 
+/* Image styling */
 #comp-m4k7zp59 img,
 #comp-m4k7zp5d img,
 #comp-m4k7zp5h img {
@@ -2516,7 +2515,7 @@ body {
   display: block !important;
 }
 
-/* Wrapper clips */
+/* Inner wrapper */
 #comp-m4k7zp59 > div,
 #comp-m4k7zp5d > div,
 #comp-m4k7zp5h > div {
@@ -2526,50 +2525,10 @@ body {
   height: 100% !important;
 }
 
-/* CTA button strip + turnaround text — flow naturally after padding-top */
-#comp-jqciyxe3 {
-  position: relative !important;
-  margin: 0 !important;
-  z-index: 3 !important;
-  grid-area: unset !important;
-  justify-self: unset !important;
-  align-self: unset !important;
-  left: 0 !important;
-  width: 100% !important;
-}
-
-#comp-l1ksl379,
-#comp-lktq0ekc {
-  position: relative !important;
-  z-index: 3 !important;
-  grid-area: unset !important;
-  justify-self: unset !important;
-  align-self: unset !important;
-  left: 0 !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
-  text-align: center !important;
-  width: 100% !important;
-  padding: 4px 30px !important;
-  box-sizing: border-box !important;
-}
-
-/* Sections below slider — kill Wix grid positioning */
-#comp-jqcejn7e,
-#comp-m4im13tj {
-  position: relative !important;
-  grid-area: unset !important;
-  justify-self: unset !important;
-  align-self: unset !important;
-  left: 0 !important;
-  margin-left: 0 !important;
-  width: 100% !important;
-}
-
-/* Slider controls — sits inside the padding-top area */
+/* Slider controls — positioned in the grid container */
 .br-slider-controls {
   position: absolute;
-  top: 370px;
+  bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
@@ -2655,17 +2614,8 @@ body {
   #comp-m4k7zp59,
   #comp-m4k7zp5d,
   #comp-m4k7zp5h {
-    width: 260px !important;
-    height: 260px !important;
-    top: 16px !important;
-  }
-
-  [data-mesh-id="comp-lgckkvftinlineContent-gridContainer"] {
-    padding-top: 310px !important;
-  }
-
-  .br-slider-controls {
-    top: 280px;
+    width: 280px !important;
+    height: 280px !important;
   }
 
   .br-slider-arrow {
