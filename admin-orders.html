@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Orders â€” Bleach Resistant Admin</title>
+  <title>Orders &#x2014; Bleach Resistant Admin</title>
   <link rel="icon" href="favicon.svg" type="image/png">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="admin.css">
@@ -20,26 +20,26 @@
     </div>
     <div class="sidebar-nav">
       <div class="nav-section">Main</div>
-      <a href="admin.html"><span class="icon">ðŸ“Š</span> Dashboard</a>
-      <a href="admin-orders.html" class="active"><span class="icon">ðŸ“¦</span> Orders</a>
-      <a href="admin-contacts.html"><span class="icon">ðŸ’¬</span> Contacts</a>
+      <a href="admin.html"><span class="icon">&#x1F4CA;</span> Dashboard</a>
+      <a href="admin-orders.html" class="active"><span class="icon">&#x1F4E6;</span> Orders</a>
+      <a href="admin-contacts.html"><span class="icon">&#x1F4AC;</span> Contacts</a>
       <div class="nav-section">Content</div>
-      <a href="admin-pages.html"><span class="icon">ðŸ“„</span> Pages</a>
-      <a href="admin-media.html"><span class="icon">ðŸ–¼ï¸</span> Media Library</a>
-      <a href="admin-navigation.html"><span class="icon">ðŸ”—</span> Navigation</a>
+      <a href="admin-pages.html"><span class="icon">&#x1F4C4;</span> Pages</a>
+      <a href="admin-media.html"><span class="icon">&#x1F5BC;&#xFE0F;</span> Media Library</a>
+      <a href="admin-navigation.html"><span class="icon">&#x1F517;</span> Navigation</a>
       <div class="nav-section">Settings</div>
-      <a href="admin-settings.html"><span class="icon">âš™ï¸</span> Site Settings</a>
-      <a href="admin-analytics.html"><span class="icon">ðŸ“ˆ</span> Analytics</a>
+      <a href="admin-settings.html"><span class="icon">&#x2699;&#xFE0F;</span> Site Settings</a>
+      <a href="admin-analytics.html"><span class="icon">&#x1F4C8;</span> Analytics</a>
       <div class="nav-section">Website</div>
-      <a href="home.html" target="_blank"><span class="icon">ðŸŒ</span> View Site</a>
-      <a href="order.html" target="_blank"><span class="icon">ðŸ›’</span> Order Page</a>
+      <a href="home.html" target="_blank"><span class="icon">&#x1F310;</span> View Site</a>
+      <a href="order.html" target="_blank"><span class="icon">&#x1F6D2;</span> Order Page</a>
     </div>
     <div class="sidebar-footer">
       <div class="user-info">
         <div class="user-avatar" id="user-avatar">A</div>
         <div>
           <div style="font-size:12px;font-weight:600;" id="user-name">Admin</div>
-          <div class="user-email" id="user-email">loadingâ€¦</div>
+          <div class="user-email" id="user-email">loading&#x2026;</div>
         </div>
       </div>
       <button class="btn btn-secondary btn-sm btn-block" onclick="brSignOut()">Sign Out</button>
@@ -61,7 +61,7 @@
           <option value="complete">Complete</option>
           <option value="closed">Closed</option>
         </select>
-        <button class="btn btn-sm btn-primary" onclick="exportCSV()">ðŸ“¥ Export CSV</button>
+        <button class="btn btn-sm btn-primary" onclick="exportCSV()">&#x1F4E5; Export CSV</button>
       </div>
     </div>
 
@@ -70,7 +70,7 @@
         <div class="table-header">
           <h3>All Orders <span id="order-count" style="color:#aaa;font-weight:400;"></span></h3>
           <div class="table-actions">
-            <input type="text" class="search-input" id="search-input" placeholder="Search by name or emailâ€¦">
+            <input type="text" class="search-input" id="search-input" placeholder="Search by name or email&#x2026;">
           </div>
         </div>
         <div style="overflow-x:auto;">
@@ -89,7 +89,7 @@
               </tr>
             </thead>
             <tbody id="orders-body">
-              <tr><td colspan="9" class="loading-overlay"><span class="spinner"></span> Loading ordersâ€¦</td></tr>
+              <tr><td colspan="9" class="loading-overlay"><span class="spinner"></span> Loading orders&#x2026;</td></tr>
             </tbody>
           </table>
         </div>
@@ -179,14 +179,14 @@
             <td style="white-space:nowrap;">${brFormatDate(o.created_at)}</td>
             <td><strong>${brEscapeHtml(o.name)}</strong></td>
             <td>${brEscapeHtml(o.email)}</td>
-            <td>${brEscapeHtml(o.phone || 'â€”')}</td>
-            <td>${brEscapeHtml(o.item_type || 'â€”')}</td>
-            <td>${o.quantity || 'â€”'}</td>
-            <td>${o.deadline || 'â€”'}</td>
+            <td>${brEscapeHtml(o.phone || '&#x2014;')}</td>
+            <td>${brEscapeHtml(o.item_type || '&#x2014;')}</td>
+            <td>${o.quantity || '&#x2014;'}</td>
+            <td>${o.deadline || '&#x2014;'}</td>
             <td>${statusBadge(o.status)}</td>
             <td style="white-space:nowrap;">
               <button class="btn btn-sm btn-secondary" onclick="viewOrder('${o.id}')">View</button>
-              <button class="btn btn-sm btn-danger" onclick="deleteOrder('${o.id}')">âœ•</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteOrder('${o.id}')">&#x2715;</button>
             </td>
           </tr>
         `).join('');
@@ -195,11 +195,11 @@
       // Pagination
       const pag = document.getElementById('pagination');
       if (pages <= 1) { pag.innerHTML = ''; return; }
-      let html = '<button ' + (currentPage === 1 ? 'disabled' : '') + ' onclick="goPage(' + (currentPage-1) + ')">â€¹</button>';
+      let html = '<button ' + (currentPage === 1 ? 'disabled' : '') + ' onclick="goPage(' + (currentPage-1) + ')">&#x2039;</button>';
       for (let i = 1; i <= pages; i++) {
         html += '<button class="' + (i === currentPage ? 'active' : '') + '" onclick="goPage(' + i + ')">' + i + '</button>';
       }
-      html += '<button ' + (currentPage === pages ? 'disabled' : '') + ' onclick="goPage(' + (currentPage+1) + ')">â€º</button>';
+      html += '<button ' + (currentPage === pages ? 'disabled' : '') + ' onclick="goPage(' + (currentPage+1) + ')">&#x203A;</button>';
       pag.innerHTML = html;
     }
 

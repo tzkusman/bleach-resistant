@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Sign In â€” Bleach Resistant</title>
+  <title>Sign In &#x2014; Bleach Resistant</title>
   <link rel="icon" href="favicon.svg" type="image/png">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="admin.css">
@@ -29,7 +29,7 @@
         </div>
         <div class="form-group">
           <label for="password">Password</label>
-          <input id="password" name="password" type="password" required placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" autocomplete="current-password" minlength="6">
+          <input id="password" name="password" type="password" required placeholder="&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;" autocomplete="current-password" minlength="6">
         </div>
         <button type="submit" class="btn btn-primary btn-block" id="submit-btn">
           Sign In
@@ -40,7 +40,7 @@
         Don't have an account? <a href="signup.html">Create one</a>
       </div>
       <div style="text-align:center;margin-top:12px;">
-        <a href="home.html" style="font-size:11px;color:#aaa;text-decoration:none;">â† Back to Website</a>
+        <a href="home.html" style="font-size:11px;color:#aaa;text-decoration:none;">&#x2190; Back to Website</a>
       </div>
     </div>
   </div>
@@ -70,7 +70,7 @@
       }
 
       btn.disabled = true;
-      btn.textContent = 'Signing inâ€¦';
+      btn.textContent = 'Signing in&#x2026;';
 
       try {
         const { data, error } = await db.auth.signInWithPassword({ email, password });
