@@ -2442,7 +2442,7 @@ body {
 }
 
 /* =======================================================================
-   72. FEATURE IMAGE SLIDER — Auto-rotating Carousel (v2)
+   72. FEATURE IMAGE SLIDER — Auto-rotating Carousel (v3)
    ======================================================================= */
 
 /* The whole strip section that holds the slider */
@@ -2451,21 +2451,26 @@ body {
   position: relative !important;
 }
 
-/* Container: the section holding the 3 feature images */
+/* KILL Wix grid layout — force block so absolute children work properly */
 [data-mesh-id="comp-lgckkvftinlineContent-gridContainer"] {
+  display: block !important;
   position: relative !important;
   overflow: hidden !important;
-  min-height: 420px !important;
+  min-height: 440px !important;
+  width: 100% !important;
+  padding: 0 !important;
+  grid-template-rows: none !important;
+  grid-template-columns: none !important;
 }
 
 /* Make the parent inline-content clip properly */
 #comp-lgckkvft [data-mesh-id="comp-lgckkvftinlineContent"] {
-  min-height: 420px !important;
+  min-height: 440px !important;
   overflow: hidden !important;
   position: relative !important;
 }
 
-/* Stack all 3 feature images in same position — contained inside parent */
+/* Stack all 3 feature images — override ALL Wix grid/position props */
 #comp-m4k7zp59,
 #comp-m4k7zp5d,
 #comp-m4k7zp5h {
@@ -2477,27 +2482,25 @@ body {
   width: 340px !important;
   height: 340px !important;
   max-width: 90vw !important;
-  opacity: 0;
-  transition: opacity 0.8s ease-in-out, transform 0.8s ease-in-out;
-  z-index: 1;
-  pointer-events: none;
+  opacity: 0 !important;
+  transition: opacity 0.8s ease-in-out !important;
+  z-index: 1 !important;
+  pointer-events: none !important;
   overflow: hidden !important;
+  /* Kill Wix grid properties */
+  grid-area: unset !important;
+  justify-self: unset !important;
+  align-self: unset !important;
+  /* Kill Wix motion-enter animations */
+  animation: none !important;
 }
 
 #comp-m4k7zp59.br-slide-active,
 #comp-m4k7zp5d.br-slide-active,
 #comp-m4k7zp5h.br-slide-active {
   opacity: 1 !important;
-  z-index: 2;
-  pointer-events: auto;
-}
-
-/* Slide in/out animation classes */
-#comp-m4k7zp59.br-slide-enter,
-#comp-m4k7zp5d.br-slide-enter,
-#comp-m4k7zp5h.br-slide-enter {
-  transform: translateX(-50%) scale(0.95) !important;
-  opacity: 0 !important;
+  z-index: 2 !important;
+  pointer-events: auto !important;
 }
 
 #comp-m4k7zp59 img,
@@ -2522,10 +2525,23 @@ body {
   height: 100% !important;
 }
 
+/* Push the CTA button strip + text below the slider area */
+#comp-jqciyxe3 {
+  position: relative !important;
+  margin-top: 380px !important;
+  z-index: 3 !important;
+}
+
+#comp-l1ksl379,
+#comp-lktq0ekc {
+  position: relative !important;
+  z-index: 3 !important;
+}
+
 /* Slider controls container — inside the section */
 .br-slider-controls {
   position: absolute;
-  bottom: 20px;
+  bottom: 50px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
@@ -2611,9 +2627,13 @@ body {
   #comp-m4k7zp59,
   #comp-m4k7zp5d,
   #comp-m4k7zp5h {
-    width: 280px !important;
-    height: 280px !important;
+    width: 260px !important;
+    height: 260px !important;
     top: 16px !important;
+  }
+
+  #comp-jqciyxe3 {
+    margin-top: 290px !important;
   }
 
   [data-mesh-id="comp-lgckkvftinlineContent-gridContainer"],
@@ -2628,6 +2648,7 @@ body {
   }
 
   .br-slider-controls {
+    bottom: 30px;
     padding: 6px 12px;
   }
 }

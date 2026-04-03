@@ -5,6 +5,7 @@ __pycache__/
 # Raw/backup files
 *.txt
 *.md
+!README.md
 
 # OS files
 .DS_Store
