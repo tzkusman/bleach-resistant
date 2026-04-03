@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Sign In — Bleach Resistant</title>
-  <link rel="icon" href="https://static.wixstatic.com/media/926a36_bea70e48de2b461ebaae685fdbb3be76%7Emv2.png/v1/fill/w_32%2Ch_32%2Clg_1%2Cusm_0.66_1.00_0.01/926a36_bea70e48de2b461ebaae685fdbb3be76%7Emv2.png" type="image/png">
+  <title>Sign In â€” Bleach Resistant</title>
+  <link rel="icon" href="favicon.svg" type="image/png">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="admin.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -29,7 +29,7 @@
         </div>
         <div class="form-group">
           <label for="password">Password</label>
-          <input id="password" name="password" type="password" required placeholder="••••••••" autocomplete="current-password" minlength="6">
+          <input id="password" name="password" type="password" required placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢" autocomplete="current-password" minlength="6">
         </div>
         <button type="submit" class="btn btn-primary btn-block" id="submit-btn">
           Sign In
@@ -40,7 +40,7 @@
         Don't have an account? <a href="signup.html">Create one</a>
       </div>
       <div style="text-align:center;margin-top:12px;">
-        <a href="home.html" style="font-size:11px;color:#aaa;text-decoration:none;">← Back to Website</a>
+        <a href="home.html" style="font-size:11px;color:#aaa;text-decoration:none;">â† Back to Website</a>
       </div>
     </div>
   </div>
@@ -70,7 +70,7 @@
       }
 
       btn.disabled = true;
-      btn.textContent = 'Signing in…';
+      btn.textContent = 'Signing inâ€¦';
 
       try {
         const { data, error } = await db.auth.signInWithPassword({ email, password });

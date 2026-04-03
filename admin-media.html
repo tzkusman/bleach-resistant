@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Media Library — Bleach Resistant Admin</title>
-  <link rel="icon" href="https://static.wixstatic.com/media/926a36_bea70e48de2b461ebaae685fdbb3be76%7Emv2.png/v1/fill/w_32%2Ch_32%2Clg_1%2Cusm_0.66_1.00_0.01/926a36_bea70e48de2b461ebaae685fdbb3be76%7Emv2.png" type="image/png">
+  <title>Media Library â€” Bleach Resistant Admin</title>
+  <link rel="icon" href="favicon.svg" type="image/png">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="admin.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -20,26 +20,26 @@
     </div>
     <div class="sidebar-nav">
       <div class="nav-section">Main</div>
-      <a href="admin.html"><span class="icon">📊</span> Dashboard</a>
-      <a href="admin-orders.html"><span class="icon">📦</span> Orders</a>
-      <a href="admin-contacts.html"><span class="icon">💬</span> Contacts</a>
+      <a href="admin.html"><span class="icon">ðŸ“Š</span> Dashboard</a>
+      <a href="admin-orders.html"><span class="icon">ðŸ“¦</span> Orders</a>
+      <a href="admin-contacts.html"><span class="icon">ðŸ’¬</span> Contacts</a>
       <div class="nav-section">Content</div>
-      <a href="admin-pages.html"><span class="icon">📄</span> Pages</a>
-      <a href="admin-media.html" class="active"><span class="icon">🖼️</span> Media Library</a>
-      <a href="admin-navigation.html"><span class="icon">🔗</span> Navigation</a>
+      <a href="admin-pages.html"><span class="icon">ðŸ“„</span> Pages</a>
+      <a href="admin-media.html" class="active"><span class="icon">ðŸ–¼ï¸</span> Media Library</a>
+      <a href="admin-navigation.html"><span class="icon">ðŸ”—</span> Navigation</a>
       <div class="nav-section">Settings</div>
-      <a href="admin-settings.html"><span class="icon">⚙️</span> Site Settings</a>
-      <a href="admin-analytics.html"><span class="icon">📈</span> Analytics</a>
+      <a href="admin-settings.html"><span class="icon">âš™ï¸</span> Site Settings</a>
+      <a href="admin-analytics.html"><span class="icon">ðŸ“ˆ</span> Analytics</a>
       <div class="nav-section">Website</div>
-      <a href="home.html" target="_blank"><span class="icon">🌐</span> View Site</a>
-      <a href="order.html" target="_blank"><span class="icon">🛒</span> Order Page</a>
+      <a href="home.html" target="_blank"><span class="icon">ðŸŒ</span> View Site</a>
+      <a href="order.html" target="_blank"><span class="icon">ðŸ›’</span> Order Page</a>
     </div>
     <div class="sidebar-footer">
       <div class="user-info">
         <div class="user-avatar" id="user-avatar">A</div>
         <div>
           <div style="font-size:12px;font-weight:600;" id="user-name">Admin</div>
-          <div class="user-email" id="user-email">loading…</div>
+          <div class="user-email" id="user-email">loadingâ€¦</div>
         </div>
       </div>
       <button class="btn btn-secondary btn-sm btn-block" onclick="brSignOut()">Sign Out</button>
@@ -62,10 +62,10 @@
 
       <!-- Upload Zone -->
       <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()">
-        <div class="upload-icon">📤</div>
+        <div class="upload-icon">ðŸ“¤</div>
         <div class="upload-text">
           <strong>Click to upload</strong> or drag and drop images here<br>
-          <span style="font-size:11px;color:#aaa;">PNG, JPG, GIF, WEBP, SVG — Max 10MB per file</span>
+          <span style="font-size:11px;color:#aaa;">PNG, JPG, GIF, WEBP, SVG â€” Max 10MB per file</span>
         </div>
         <input type="file" id="file-input" multiple accept="image/*" style="display:none;" onchange="handleFileSelect(this.files)">
       </div>
@@ -74,22 +74,22 @@
       <div id="upload-progress" style="display:none;margin-bottom:24px;">
         <div style="display:flex;align-items:center;gap:12px;">
           <span class="spinner"></span>
-          <span id="upload-status" style="font-size:13px;color:#888;">Uploading…</span>
+          <span id="upload-status" style="font-size:13px;color:#888;">Uploadingâ€¦</span>
         </div>
       </div>
 
       <!-- Search & Filter -->
       <div class="table-card" style="margin-bottom:24px;">
         <div style="padding:16px 20px;display:flex;align-items:center;gap:12px;">
-          <input type="text" class="search-input" id="search-input" placeholder="Search by filename…" style="flex:1;">
-          <button class="btn btn-sm btn-secondary" onclick="loadMedia()">🔄 Refresh</button>
+          <input type="text" class="search-input" id="search-input" placeholder="Search by filenameâ€¦" style="flex:1;">
+          <button class="btn btn-sm btn-secondary" onclick="loadMedia()">ðŸ”„ Refresh</button>
         </div>
       </div>
 
       <!-- Media Grid -->
       <div class="media-grid" id="media-grid">
         <div style="grid-column:1/-1;text-align:center;padding:60px;color:#aaa;">
-          <span class="spinner"></span><br><br>Loading media…
+          <span class="spinner"></span><br><br>Loading mediaâ€¦
         </div>
       </div>
 
@@ -127,7 +127,7 @@
     }
 
     function formatBytes(bytes) {
-      if (!bytes) return '—';
+      if (!bytes) return 'â€”';
       if (bytes < 1024) return bytes + ' B';
       if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
       return (bytes / 1048576).toFixed(1) + ' MB';
@@ -169,7 +169,7 @@
           continue;
         }
 
-        status.textContent = 'Uploading ' + file.name + '…';
+        status.textContent = 'Uploading ' + file.name + 'â€¦';
 
         try {
           const result = await brUploadFile('media', file, 'uploads');
@@ -235,23 +235,23 @@
       const grid = document.getElementById('media-grid');
 
       if (filtered.length === 0) {
-        grid.innerHTML = '<div style="grid-column:1/-1;" class="empty-state"><div class="empty-icon">🖼️</div><p>No images uploaded yet.<br>Drag and drop files above to get started.</p></div>';
+        grid.innerHTML = '<div style="grid-column:1/-1;" class="empty-state"><div class="empty-icon">ðŸ–¼ï¸</div><p>No images uploaded yet.<br>Drag and drop files above to get started.</p></div>';
         return;
       }
 
       grid.innerHTML = filtered.map(m => `
         <div class="media-item">
           <div class="media-actions">
-            <button class="btn-icon" title="Copy URL" onclick="event.stopPropagation();copyUrl('${brEscapeHtml(m.file_url)}')">📋</button>
-            <button class="btn-icon" title="Delete" onclick="event.stopPropagation();deleteMedia('${m.id}','${brEscapeHtml(m.file_path)}')">🗑</button>
+            <button class="btn-icon" title="Copy URL" onclick="event.stopPropagation();copyUrl('${brEscapeHtml(m.file_url)}')">ðŸ“‹</button>
+            <button class="btn-icon" title="Delete" onclick="event.stopPropagation();deleteMedia('${m.id}','${brEscapeHtml(m.file_path)}')">ðŸ—‘</button>
           </div>
           <img src="${brEscapeHtml(m.file_url)}" alt="${brEscapeHtml(m.file_name)}"
                onerror="this.style.display='none';this.parentElement.querySelector('.img-fallback').style.display='flex';"
                onclick="viewMedia('${m.id}')">
-          <div class="img-fallback" style="display:none;width:100%;height:140px;background:#f4f4f4;align-items:center;justify-content:center;color:#ccc;font-size:32px;">🖼️</div>
+          <div class="img-fallback" style="display:none;width:100%;height:140px;background:#f4f4f4;align-items:center;justify-content:center;color:#ccc;font-size:32px;">ðŸ–¼ï¸</div>
           <div class="media-info">
             <div class="filename" title="${brEscapeHtml(m.file_name)}">${brEscapeHtml(m.file_name)}</div>
-            <div class="filesize">${formatBytes(m.file_size)} · ${brFormatDate(m.created_at)}</div>
+            <div class="filesize">${formatBytes(m.file_size)} Â· ${brFormatDate(m.created_at)}</div>
           </div>
         </div>
       `).join('');
@@ -294,8 +294,8 @@
       `;
       document.getElementById('modal-footer').innerHTML = `
         <button class="btn btn-secondary" onclick="closeModal()">Close</button>
-        <button class="btn btn-primary" onclick="copyUrl('${brEscapeHtml(m.file_url)}');closeModal();">📋 Copy URL</button>
-        <button class="btn btn-danger" onclick="deleteMedia('${m.id}','${brEscapeHtml(m.file_path)}');closeModal();">🗑 Delete</button>
+        <button class="btn btn-primary" onclick="copyUrl('${brEscapeHtml(m.file_url)}');closeModal();">ðŸ“‹ Copy URL</button>
+        <button class="btn btn-danger" onclick="deleteMedia('${m.id}','${brEscapeHtml(m.file_path)}');closeModal();">ðŸ—‘ Delete</button>
       `;
       document.getElementById('modal-overlay').classList.add('active');
     }

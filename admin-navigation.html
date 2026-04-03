@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Navigation & Pages — Bleach Resistant Admin</title>
-  <link rel="icon" href="https://static.wixstatic.com/media/926a36_bea70e48de2b461ebaae685fdbb3be76%7Emv2.png/v1/fill/w_32%2Ch_32%2Clg_1%2Cusm_0.66_1.00_0.01/926a36_bea70e48de2b461ebaae685fdbb3be76%7Emv2.png" type="image/png">
+  <title>Navigation & Pages â€” Bleach Resistant Admin</title>
+  <link rel="icon" href="favicon.svg" type="image/png">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="admin.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -79,7 +79,7 @@
       cursor: default; padding: 6px 12px; border-radius: 4px; transition: background 0.15s;
     }
     .nav-preview-item:hover { background: rgba(255,255,255,0.1); }
-    .nav-preview-item.has-sub::after { content: ' ▾'; font-size: 10px; }
+    .nav-preview-item.has-sub::after { content: ' â–¾'; font-size: 10px; }
     .quick-stats { display: flex; gap: 24px; margin-bottom: 24px; flex-wrap: wrap; }
     .quick-stat { text-align: center; }
     .quick-stat .num { font-size: 28px; font-weight: 800; color: #C7065C; }
@@ -91,26 +91,26 @@
     <div class="sidebar-brand"><h2>Bleach Resistant</h2><small>Admin Panel</small></div>
     <div class="sidebar-nav">
       <div class="nav-section">Main</div>
-      <a href="admin.html"><span class="icon">📊</span> Dashboard</a>
-      <a href="admin-orders.html"><span class="icon">📦</span> Orders</a>
-      <a href="admin-contacts.html"><span class="icon">💬</span> Contacts</a>
+      <a href="admin.html"><span class="icon">ðŸ“Š</span> Dashboard</a>
+      <a href="admin-orders.html"><span class="icon">ðŸ“¦</span> Orders</a>
+      <a href="admin-contacts.html"><span class="icon">ðŸ’¬</span> Contacts</a>
       <div class="nav-section">Content</div>
-      <a href="admin-pages.html"><span class="icon">📄</span> Pages</a>
-      <a href="admin-media.html"><span class="icon">🖼️</span> Media Library</a>
-      <a href="admin-navigation.html" class="active"><span class="icon">🔗</span> Navigation</a>
+      <a href="admin-pages.html"><span class="icon">ðŸ“„</span> Pages</a>
+      <a href="admin-media.html"><span class="icon">ðŸ–¼ï¸</span> Media Library</a>
+      <a href="admin-navigation.html" class="active"><span class="icon">ðŸ”—</span> Navigation</a>
       <div class="nav-section">Settings</div>
-      <a href="admin-settings.html"><span class="icon">⚙️</span> Site Settings</a>
-      <a href="admin-analytics.html"><span class="icon">📈</span> Analytics</a>
+      <a href="admin-settings.html"><span class="icon">âš™ï¸</span> Site Settings</a>
+      <a href="admin-analytics.html"><span class="icon">ðŸ“ˆ</span> Analytics</a>
       <div class="nav-section">Website</div>
-      <a href="home.html" target="_blank"><span class="icon">🌐</span> View Site</a>
-      <a href="order.html" target="_blank"><span class="icon">🛒</span> Order Page</a>
+      <a href="home.html" target="_blank"><span class="icon">ðŸŒ</span> View Site</a>
+      <a href="order.html" target="_blank"><span class="icon">ðŸ›’</span> Order Page</a>
     </div>
     <div class="sidebar-footer">
       <div class="user-info">
         <div class="user-avatar" id="user-avatar">A</div>
         <div>
           <div style="font-size:12px;font-weight:600;" id="user-name">Admin</div>
-          <div class="user-email" id="user-email">loading…</div>
+          <div class="user-email" id="user-email">loadingâ€¦</div>
         </div>
       </div>
       <button class="btn btn-secondary btn-sm btn-block" onclick="brSignOut()">Sign Out</button>
@@ -231,7 +231,7 @@
       <div class="form-group">
         <label>File Name</label>
         <input type="text" id="new-page-file" placeholder="e.g. contact.html" pattern="[a-zA-Z0-9_-]+\.html">
-        <small style="color:#888;font-size:11px;">Must end in .html — letters, numbers, hyphens only</small>
+        <small style="color:#888;font-size:11px;">Must end in .html â€” letters, numbers, hyphens only</small>
       </div>
       <div class="form-group">
         <label>Template</label>
@@ -246,11 +246,11 @@
       <div class="form-group">
         <label>Add to Navigation?</label>
         <select id="new-page-nav">
-          <option value="no">No — Hidden page</option>
-          <option value="main">Yes — Main navigation</option>
-          <option value="products">Yes — Products dropdown</option>
-          <option value="services">Yes — Services dropdown</option>
-          <option value="footer">Yes — Footer only</option>
+          <option value="no">No â€” Hidden page</option>
+          <option value="main">Yes â€” Main navigation</option>
+          <option value="products">Yes â€” Products dropdown</option>
+          <option value="services">Yes â€” Services dropdown</option>
+          <option value="footer">Yes â€” Footer only</option>
         </select>
       </div>
       <div class="form-actions">
@@ -309,8 +309,8 @@
       <div class="form-group">
         <label>Type</label>
         <select id="redirect-type">
-          <option value="301">301 — Permanent Redirect</option>
-          <option value="302">302 — Temporary Redirect</option>
+          <option value="301">301 â€” Permanent Redirect</option>
+          <option value="302">302 â€” Temporary Redirect</option>
         </select>
       </div>
       <div class="form-actions">
@@ -405,7 +405,7 @@ function renderNavigation() {
   const navList = document.getElementById('nav-items-list');
   navList.innerHTML = NAV_ITEMS.map((item, i) => `
     <div class="link-row">
-      <span style="color:#C7065C;font-size:16px;cursor:grab;">☰</span>
+      <span style="color:#C7065C;font-size:16px;cursor:grab;">â˜°</span>
       <span class="link-label">${esc(item.label)}</span>
       <span class="link-target">${esc(item.file)}</span>
       <span class="link-type">${item.type === 'dropdown' ? 'Dropdown (' + item.children.length + ')' : 'Link'}</span>
@@ -419,7 +419,7 @@ function renderNavigation() {
     prodList.innerHTML = prodItem.children.map(file => {
       const page = SITE_PAGES.find(p => p.file === file);
       return `<div class="link-row">
-        <span style="color:#C7065C;font-size:16px;cursor:grab;">☰</span>
+        <span style="color:#C7065C;font-size:16px;cursor:grab;">â˜°</span>
         <span class="link-label">${page ? esc(page.title) : esc(file)}</span>
         <span class="link-target">${esc(file)}</span>
       </div>`;
@@ -433,7 +433,7 @@ function renderNavigation() {
     svcList.innerHTML = svcItem.children.map(file => {
       const page = SITE_PAGES.find(p => p.file === file);
       return `<div class="link-row">
-        <span style="color:#C7065C;font-size:16px;cursor:grab;">☰</span>
+        <span style="color:#C7065C;font-size:16px;cursor:grab;">â˜°</span>
         <span class="link-label">${page ? esc(page.title) : esc(file)}</span>
         <span class="link-target">${esc(file)}</span>
       </div>`;
@@ -505,7 +505,7 @@ function renderRedirects() {
   list.innerHTML = customRedirects.map((r, i) => `
     <div class="link-row">
       <span class="link-label" style="font-family:monospace;">${esc(r.from)}</span>
-      <span style="color:#888;">→</span>
+      <span style="color:#888;">â†’</span>
       <span class="link-target">${esc(r.to)}</span>
       <span class="link-type">${r.type}</span>
       <button class="btn btn-sm btn-secondary" onclick="deleteRedirect(${i})" style="color:#e53935;">Delete</button>
@@ -543,7 +543,7 @@ function createNewPage() {
   const template = document.getElementById('new-page-template').value;
 
   if (!title || !file) { showToast('Title and filename are required', 'error'); return; }
-  if (!/^[a-zA-Z0-9_-]+\.html$/.test(file)) { showToast('Invalid filename — use letters, numbers, hyphens, ending in .html', 'error'); return; }
+  if (!/^[a-zA-Z0-9_-]+\.html$/.test(file)) { showToast('Invalid filename â€” use letters, numbers, hyphens, ending in .html', 'error'); return; }
   if (SITE_PAGES.find(p => p.file === file)) { showToast('A page with that filename already exists', 'error'); return; }
 
   showToast('Page "' + title + '" registered! Use the visual editor to customize content.', 'success');

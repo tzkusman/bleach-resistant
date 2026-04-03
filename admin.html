@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Dashboard — Bleach Resistant Admin</title>
-  <link rel="icon" href="https://static.wixstatic.com/media/926a36_bea70e48de2b461ebaae685fdbb3be76%7Emv2.png/v1/fill/w_32%2Ch_32%2Clg_1%2Cusm_0.66_1.00_0.01/926a36_bea70e48de2b461ebaae685fdbb3be76%7Emv2.png" type="image/png">
+  <title>Dashboard â€” Bleach Resistant Admin</title>
+  <link rel="icon" href="favicon.svg" type="image/png">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="admin.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -20,29 +20,29 @@
     </div>
     <div class="sidebar-nav">
       <div class="nav-section">Main</div>
-      <a href="admin.html" class="active"><span class="icon">📊</span> Dashboard</a>
-      <a href="admin-orders.html"><span class="icon">📦</span> Orders</a>
-      <a href="admin-contacts.html"><span class="icon">💬</span> Contacts</a>
+      <a href="admin.html" class="active"><span class="icon">ðŸ“Š</span> Dashboard</a>
+      <a href="admin-orders.html"><span class="icon">ðŸ“¦</span> Orders</a>
+      <a href="admin-contacts.html"><span class="icon">ðŸ’¬</span> Contacts</a>
 
       <div class="nav-section">Content</div>
-      <a href="admin-pages.html"><span class="icon">📄</span> Pages</a>
-      <a href="admin-media.html"><span class="icon">🖼️</span> Media Library</a>
-      <a href="admin-navigation.html"><span class="icon">🔗</span> Navigation</a>
+      <a href="admin-pages.html"><span class="icon">ðŸ“„</span> Pages</a>
+      <a href="admin-media.html"><span class="icon">ðŸ–¼ï¸</span> Media Library</a>
+      <a href="admin-navigation.html"><span class="icon">ðŸ”—</span> Navigation</a>
 
       <div class="nav-section">Settings</div>
-      <a href="admin-settings.html"><span class="icon">⚙️</span> Site Settings</a>
-      <a href="admin-analytics.html"><span class="icon">📈</span> Analytics</a>
+      <a href="admin-settings.html"><span class="icon">âš™ï¸</span> Site Settings</a>
+      <a href="admin-analytics.html"><span class="icon">ðŸ“ˆ</span> Analytics</a>
 
       <div class="nav-section">Website</div>
-      <a href="home.html" target="_blank"><span class="icon">🌐</span> View Site</a>
-      <a href="order.html" target="_blank"><span class="icon">🛒</span> Order Page</a>
+      <a href="home.html" target="_blank"><span class="icon">ðŸŒ</span> View Site</a>
+      <a href="order.html" target="_blank"><span class="icon">ðŸ›’</span> Order Page</a>
     </div>
     <div class="sidebar-footer">
       <div class="user-info">
         <div class="user-avatar" id="user-avatar">A</div>
         <div>
           <div style="font-size:12px;font-weight:600;" id="user-name">Admin</div>
-          <div class="user-email" id="user-email">loading…</div>
+          <div class="user-email" id="user-email">loadingâ€¦</div>
         </div>
       </div>
       <button class="btn btn-secondary btn-sm btn-block" onclick="brSignOut()">Sign Out</button>
@@ -57,7 +57,7 @@
         <div class="breadcrumb">Overview of your site activity</div>
       </div>
       <div class="topbar-actions">
-        <a href="home.html" target="_blank" class="visit-site-link">🌐 View Site</a>
+        <a href="home.html" target="_blank" class="visit-site-link">ðŸŒ View Site</a>
       </div>
     </div>
 
@@ -67,22 +67,22 @@
       <div class="stats-grid">
         <div class="stat-card">
           <div class="stat-label">Total Orders</div>
-          <div class="stat-value" id="stat-orders">—</div>
+          <div class="stat-value" id="stat-orders">â€”</div>
           <div class="stat-sub" id="stat-orders-new"></div>
         </div>
         <div class="stat-card">
           <div class="stat-label">Total Contacts</div>
-          <div class="stat-value" id="stat-contacts">—</div>
+          <div class="stat-value" id="stat-contacts">â€”</div>
           <div class="stat-sub" id="stat-contacts-today"></div>
         </div>
         <div class="stat-card">
           <div class="stat-label">Media Files</div>
-          <div class="stat-value" id="stat-media">—</div>
+          <div class="stat-value" id="stat-media">â€”</div>
           <div class="stat-sub">Uploaded images</div>
         </div>
         <div class="stat-card">
           <div class="stat-label">Page Edits</div>
-          <div class="stat-value" id="stat-edits">—</div>
+          <div class="stat-value" id="stat-edits">â€”</div>
           <div class="stat-sub">Content overrides active</div>
         </div>
       </div>
@@ -91,7 +91,7 @@
       <div class="table-card">
         <div class="table-header">
           <h3>Recent Orders</h3>
-          <a href="admin-orders.html" class="btn btn-sm btn-secondary">View All →</a>
+          <a href="admin-orders.html" class="btn btn-sm btn-secondary">View All â†’</a>
         </div>
         <table class="data-table">
           <thead>
@@ -105,7 +105,7 @@
             </tr>
           </thead>
           <tbody id="recent-orders">
-            <tr><td colspan="6" class="loading-overlay"><span class="spinner"></span> Loading…</td></tr>
+            <tr><td colspan="6" class="loading-overlay"><span class="spinner"></span> Loadingâ€¦</td></tr>
           </tbody>
         </table>
       </div>
@@ -114,7 +114,7 @@
       <div class="table-card">
         <div class="table-header">
           <h3>Recent Messages</h3>
-          <a href="admin-contacts.html" class="btn btn-sm btn-secondary">View All →</a>
+          <a href="admin-contacts.html" class="btn btn-sm btn-secondary">View All â†’</a>
         </div>
         <table class="data-table">
           <thead>
@@ -127,7 +127,7 @@
             </tr>
           </thead>
           <tbody id="recent-contacts">
-            <tr><td colspan="5" class="loading-overlay"><span class="spinner"></span> Loading…</td></tr>
+            <tr><td colspan="5" class="loading-overlay"><span class="spinner"></span> Loadingâ€¦</td></tr>
           </tbody>
         </table>
       </div>
@@ -137,10 +137,10 @@
         <div class="table-card" style="padding:24px;">
           <h3 style="font-size:15px;font-weight:700;margin-bottom:16px;">Quick Actions</h3>
           <div style="display:flex;flex-direction:column;gap:8px;">
-            <a href="admin-orders.html" class="btn btn-primary btn-sm" style="justify-content:flex-start;">📦 Manage Orders</a>
-            <a href="admin-pages.html" class="btn btn-secondary btn-sm" style="justify-content:flex-start;">📄 Edit Page Content</a>
-            <a href="admin-media.html" class="btn btn-secondary btn-sm" style="justify-content:flex-start;">🖼️ Upload Images</a>
-            <a href="order.html" target="_blank" class="btn btn-secondary btn-sm" style="justify-content:flex-start;">🛒 View Order Form</a>
+            <a href="admin-orders.html" class="btn btn-primary btn-sm" style="justify-content:flex-start;">ðŸ“¦ Manage Orders</a>
+            <a href="admin-pages.html" class="btn btn-secondary btn-sm" style="justify-content:flex-start;">ðŸ“„ Edit Page Content</a>
+            <a href="admin-media.html" class="btn btn-secondary btn-sm" style="justify-content:flex-start;">ðŸ–¼ï¸ Upload Images</a>
+            <a href="order.html" target="_blank" class="btn btn-secondary btn-sm" style="justify-content:flex-start;">ðŸ›’ View Order Form</a>
           </div>
         </div>
         <div class="table-card" style="padding:24px;">
@@ -229,8 +229,8 @@
               <td>${brFormatDate(o.created_at)}</td>
               <td><strong>${brEscapeHtml(o.name)}</strong></td>
               <td>${brEscapeHtml(o.email)}</td>
-              <td>${brEscapeHtml(o.item_type || '—')}</td>
-              <td>${o.quantity || '—'}</td>
+              <td>${brEscapeHtml(o.item_type || 'â€”')}</td>
+              <td>${o.quantity || 'â€”'}</td>
               <td>${statusBadge(o.status)}</td>
             </tr>
           `).join('');
@@ -252,7 +252,7 @@
               <td><strong>${brEscapeHtml(c.name)}</strong></td>
               <td>${brEscapeHtml(c.email)}</td>
               <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${brEscapeHtml(c.message)}</td>
-              <td>${brEscapeHtml(c.page_source || '—')}</td>
+              <td>${brEscapeHtml(c.page_source || 'â€”')}</td>
             </tr>
           `).join('');
         } else {

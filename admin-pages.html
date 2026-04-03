@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Page Editor — Bleach Resistant Admin</title>
-  <link rel="icon" href="https://static.wixstatic.com/media/926a36_bea70e48de2b461ebaae685fdbb3be76%7Emv2.png/v1/fill/w_32%2Ch_32%2Clg_1%2Cusm_0.66_1.00_0.01/926a36_bea70e48de2b461ebaae685fdbb3be76%7Emv2.png" type="image/png">
+  <title>Page Editor â€” Bleach Resistant Admin</title>
+  <link rel="icon" href="favicon.svg" type="image/png">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="admin.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -177,25 +177,25 @@
     <div class="sidebar-brand"><h2>Bleach Resistant</h2><small>Admin Panel</small></div>
     <div class="sidebar-nav">
       <div class="nav-section">Main</div>
-      <a href="admin.html"><span class="icon">📊</span> Dashboard</a>
-      <a href="admin-orders.html"><span class="icon">📦</span> Orders</a>
-      <a href="admin-contacts.html"><span class="icon">💬</span> Contacts</a>
+      <a href="admin.html"><span class="icon">ðŸ“Š</span> Dashboard</a>
+      <a href="admin-orders.html"><span class="icon">ðŸ“¦</span> Orders</a>
+      <a href="admin-contacts.html"><span class="icon">ðŸ’¬</span> Contacts</a>
       <div class="nav-section">Content</div>
-      <a href="admin-pages.html" class="active"><span class="icon">📄</span> Pages</a>
-      <a href="admin-media.html"><span class="icon">🖼️</span> Media Library</a>
-      <a href="admin-navigation.html"><span class="icon">🔗</span> Navigation</a>
+      <a href="admin-pages.html" class="active"><span class="icon">ðŸ“„</span> Pages</a>
+      <a href="admin-media.html"><span class="icon">ðŸ–¼ï¸</span> Media Library</a>
+      <a href="admin-navigation.html"><span class="icon">ðŸ”—</span> Navigation</a>
       <div class="nav-section">Settings</div>
-      <a href="admin-settings.html"><span class="icon">⚙️</span> Site Settings</a>
-      <a href="admin-analytics.html"><span class="icon">📈</span> Analytics</a>
+      <a href="admin-settings.html"><span class="icon">âš™ï¸</span> Site Settings</a>
+      <a href="admin-analytics.html"><span class="icon">ðŸ“ˆ</span> Analytics</a>
       <div class="nav-section">Website</div>
-      <a href="home.html" target="_blank"><span class="icon">🌐</span> View Site</a>
+      <a href="home.html" target="_blank"><span class="icon">ðŸŒ</span> View Site</a>
     </div>
     <div class="sidebar-footer">
       <div class="user-info">
         <div class="user-avatar" id="user-avatar">A</div>
         <div>
           <div style="font-size:12px;font-weight:600;" id="user-name">Admin</div>
-          <div class="user-email" id="user-email">loading…</div>
+          <div class="user-email" id="user-email">loadingâ€¦</div>
         </div>
       </div>
       <button class="btn btn-secondary btn-sm btn-block" onclick="brSignOut()">Sign Out</button>
@@ -208,17 +208,17 @@
       <div class="editor-sidebar-panel">
         <div class="page-pills" id="page-pills"></div>
         <div class="panel-tabs">
-          <div class="panel-tab active" data-tab="edit" onclick="switchTab('edit')">✏️ Edit</div>
-          <div class="panel-tab" data-tab="elements" onclick="switchTab('elements')">🧩 Elements</div>
-          <div class="panel-tab" data-tab="overrides" onclick="switchTab('overrides')">📋 Saved</div>
-          <div class="panel-tab" data-tab="guide" onclick="switchTab('guide')">💡 Guide</div>
+          <div class="panel-tab active" data-tab="edit" onclick="switchTab('edit')">âœï¸ Edit</div>
+          <div class="panel-tab" data-tab="elements" onclick="switchTab('elements')">ðŸ§© Elements</div>
+          <div class="panel-tab" data-tab="overrides" onclick="switchTab('overrides')">ðŸ“‹ Saved</div>
+          <div class="panel-tab" data-tab="guide" onclick="switchTab('guide')">ðŸ’¡ Guide</div>
         </div>
-        <div class="click-mode-banner" id="click-banner">🎯 Click any element in the preview to select it</div>
+        <div class="click-mode-banner" id="click-banner">ðŸŽ¯ Click any element in the preview to select it</div>
         <div class="panel-body">
           <!-- Tab: Edit -->
           <div class="tab-content active" id="tab-edit">
             <div class="empty-panel" id="edit-empty">
-              <div class="ep-icon">👆</div>
+              <div class="ep-icon">ðŸ‘†</div>
               <p>Select a page above, then click<br><strong>"Select Element"</strong> and click any<br>element in the preview to edit it.<br><br>
               Or use the <strong>Elements</strong> tab to see<br>all editable elements on the page.</p>
             </div>
@@ -230,7 +230,7 @@
                   <div class="sel-dims" id="sel-dims"></div>
                 </div>
                 <div class="edit-section" id="section-content">
-                  <h5>📝 Content</h5>
+                  <h5>ðŸ“ Content</h5>
                   <div class="edit-field">
                     <label>Content Type</label>
                     <select id="edit-type" onchange="onTypeChange()">
@@ -247,7 +247,7 @@
                   </div>
                   <div class="edit-field" id="edit-value-group">
                     <label id="edit-value-label">New Text</label>
-                    <textarea id="edit-value" placeholder="Enter new content…"></textarea>
+                    <textarea id="edit-value" placeholder="Enter new contentâ€¦"></textarea>
                   </div>
                   <div class="edit-field" id="edit-upload-group" style="display:none;">
                     <label>Or Upload Image</label>
@@ -256,7 +256,7 @@
                   </div>
                 </div>
                 <div class="edit-section" id="section-link" style="display:none;">
-                  <h5>🔗 Link Settings</h5>
+                  <h5>ðŸ”— Link Settings</h5>
                   <div class="edit-field">
                     <label>Link URL</label>
                     <input type="text" id="edit-link-href" placeholder="https://example.com or page.html">
@@ -272,10 +272,10 @@
                       <option value="_blank">New Tab</option>
                     </select>
                   </div>
-                  <button class="btn btn-primary btn-sm" onclick="saveLinkChanges()" style="width:100%;">💾 Save Link</button>
+                  <button class="btn btn-primary btn-sm" onclick="saveLinkChanges()" style="width:100%;">ðŸ’¾ Save Link</button>
                 </div>
                 <div class="edit-section" id="section-style">
-                  <h5>🎨 Quick Styles</h5>
+                  <h5>ðŸŽ¨ Quick Styles</h5>
                   <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
                     <div class="edit-field" style="margin:0;">
                       <label>Text Color</label>
@@ -292,7 +292,7 @@
                     <div class="edit-field" style="margin:0;">
                       <label>Font Weight</label>
                       <select id="edit-font-weight">
-                        <option value="">—</option>
+                        <option value="">â€”</option>
                         <option value="400">Normal</option>
                         <option value="600">Semi-Bold</option>
                         <option value="700">Bold</option>
@@ -300,11 +300,11 @@
                       </select>
                     </div>
                   </div>
-                  <button class="btn btn-secondary btn-sm" onclick="saveQuickStyle()" style="width:100%;margin-top:8px;">🎨 Apply Style</button>
+                  <button class="btn btn-secondary btn-sm" onclick="saveQuickStyle()" style="width:100%;margin-top:8px;">ðŸŽ¨ Apply Style</button>
                 </div>
               </div>
               <div class="save-bar">
-                <button class="btn btn-primary" onclick="saveOverride()">💾 Save Change</button>
+                <button class="btn btn-primary" onclick="saveOverride()">ðŸ’¾ Save Change</button>
                 <button class="btn btn-secondary" onclick="clearSelection()">Cancel</button>
               </div>
             </div>
@@ -351,22 +351,22 @@
           </div>
           <div style="display:flex;align-items:center;gap:8px;">
             <div class="viewport-toggle">
-              <button class="active" onclick="setViewport('desktop',this)" title="Desktop">🖥️</button>
-              <button onclick="setViewport('tablet',this)" title="Tablet">📱</button>
-              <button onclick="setViewport('mobile',this)" title="Mobile">📲</button>
+              <button class="active" onclick="setViewport('desktop',this)" title="Desktop">ðŸ–¥ï¸</button>
+              <button onclick="setViewport('tablet',this)" title="Tablet">ðŸ“±</button>
+              <button onclick="setViewport('mobile',this)" title="Mobile">ðŸ“²</button>
             </div>
             <div class="editor-mode-toggle">
               <button id="mode-preview" class="active" onclick="setMode('preview')">Preview</button>
               <button id="mode-select" onclick="setMode('select')">Select Element</button>
             </div>
-            <button class="btn btn-sm btn-secondary" onclick="reloadPreview()" title="Reload">🔄</button>
-            <a id="open-page-link" href="#" target="_blank" class="btn btn-sm btn-secondary">↗ Open</a>
+            <button class="btn btn-sm btn-secondary" onclick="reloadPreview()" title="Reload">ðŸ”„</button>
+            <a id="open-page-link" href="#" target="_blank" class="btn btn-sm btn-secondary">â†— Open</a>
           </div>
         </div>
         <div class="preview-frame-wrap" id="preview-wrap">
           <div class="preview-loader">
             <div class="spinner"></div>
-            <span>Loading preview…</span>
+            <span>Loading previewâ€¦</span>
           </div>
           <iframe id="preview-frame" src="about:blank"></iframe>
         </div>
@@ -378,7 +378,7 @@
 
 <script>
 /* ========================================================
-   VISUAL PAGE EDITOR v2 — Full WordPress-like editing
+   VISUAL PAGE EDITOR v2 â€” Full WordPress-like editing
    Supports: text, images, links, buttons, styles, hide/show
    ======================================================== */
 
@@ -515,7 +515,7 @@ function onIframeLoaded() {
       return;
     }
 
-    // Prevent internal navigation — instead navigate pages in editor
+    // Prevent internal navigation â€” instead navigate pages in editor
     fdoc.addEventListener('click', function(e) {
       if (selectMode) return; // handled by editorClick
       var link = e.target.closest('a');
@@ -541,14 +541,14 @@ function onIframeLoaded() {
 
   } catch(e) {
     console.warn('Cannot access iframe content:', e);
-    // This happens with cross-origin — show helpful message
+    // This happens with cross-origin â€” show helpful message
     document.getElementById('elements-loading').innerHTML =
       '<p style="font-size:12px;color:#c00;">Cannot scan page elements (cross-origin). ' +
       'Use the Guide tab or manually enter selectors.</p>';
   }
 }
 
-// ─── Element Scanner ──────────────────────
+// â”€â”€â”€ Element Scanner â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function scanElements(doc) {
   var images = [], links = [], headings = [], texts = [];
 
@@ -602,9 +602,9 @@ function scanElements(doc) {
   document.getElementById('el-img-count').textContent = '(' + images.length + ')';
   document.getElementById('el-images').innerHTML = images.slice(0, 30).map(function(img) {
     return '<div class="detected-el" onclick="selectDetected(\'' + escAttr(img.selector) + '\',\'image\')">' +
-      '<div class="de-icon">🖼️</div>' +
+      '<div class="de-icon">ðŸ–¼ï¸</div>' +
       '<div class="de-info"><div class="de-label">' + escHtml(img.alt) + '</div>' +
-      '<div class="de-detail">' + img.w + '×' + img.h + 'px — ' + escHtml(img.src) + '</div></div>' +
+      '<div class="de-detail">' + img.w + 'Ã—' + img.h + 'px â€” ' + escHtml(img.src) + '</div></div>' +
       '<div class="de-badge" style="background:#fef0f5;color:#C7065C;">IMG</div></div>';
   }).join('') || '<p style="font-size:11px;color:#aaa;">No images found</p>';
 
@@ -612,7 +612,7 @@ function scanElements(doc) {
   document.getElementById('el-links').innerHTML = links.slice(0, 30).map(function(lk) {
     var badgeBg = lk.type === 'button' ? '#e8f4fd;color:#2196f3' : '#f0f9e8;color:#4caf50';
     return '<div class="detected-el" onclick="selectDetected(\'' + escAttr(lk.selector) + '\',\'href\')">' +
-      '<div class="de-icon">' + (lk.type === 'button' ? '🔘' : '🔗') + '</div>' +
+      '<div class="de-icon">' + (lk.type === 'button' ? 'ðŸ”˜' : 'ðŸ”—') + '</div>' +
       '<div class="de-info"><div class="de-label">' + escHtml(lk.text) + '</div>' +
       '<div class="de-detail">' + escHtml(lk.href) + '</div></div>' +
       '<div class="de-badge" style="background:' + badgeBg + '">' + lk.type.toUpperCase() + '</div></div>';
@@ -621,7 +621,7 @@ function scanElements(doc) {
   document.getElementById('el-heading-count').textContent = '(' + headings.length + ')';
   document.getElementById('el-headings').innerHTML = headings.slice(0, 20).map(function(h) {
     return '<div class="detected-el" onclick="selectDetected(\'' + escAttr(h.selector) + '\',\'text\')">' +
-      '<div class="de-icon">📝</div>' +
+      '<div class="de-icon">ðŸ“</div>' +
       '<div class="de-info"><div class="de-label">' + escHtml(h.text) + '</div>' +
       '<div class="de-detail">' + h.tag + '</div></div>' +
       '<div class="de-badge" style="background:#fff8e1;color:#ff9800;">' + h.tag + '</div></div>';
@@ -630,7 +630,7 @@ function scanElements(doc) {
   document.getElementById('el-text-count').textContent = '(' + texts.length + ')';
   document.getElementById('el-texts').innerHTML = texts.slice(0, 20).map(function(t) {
     return '<div class="detected-el" onclick="selectDetected(\'' + escAttr(t.selector) + '\',\'text\')">' +
-      '<div class="de-icon">📄</div>' +
+      '<div class="de-icon">ðŸ“„</div>' +
       '<div class="de-info"><div class="de-label">' + escHtml(t.text) + '</div>' +
       '<div class="de-detail">' + t.tag + '</div></div>' +
       '<div class="de-badge" style="background:#f3e5f5;color:#9c27b0;">TXT</div></div>';
@@ -665,7 +665,7 @@ function ensureEditorStyle(doc) {
   }
 }
 
-// ─── Select Mode ─────────────────────────
+// â”€â”€â”€ Select Mode â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function setMode(mode) {
   selectMode = (mode === 'select');
   document.getElementById('mode-preview').classList.toggle('active', !selectMode);
@@ -729,7 +729,7 @@ function editorClick(e) {
   setMode('preview');
 }
 
-// ─── Build Selector ──────────────────────
+// â”€â”€â”€ Build Selector â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function buildSelector(el) {
   if (el.id && el.id.indexOf('br-editor') !== 0) return '#' + CSS.escape(el.id);
   if (el.tagName === 'IMG') {
@@ -755,7 +755,7 @@ function buildSelector(el) {
   return path.join(' > ');
 }
 
-// ─── Select Element ──────────────────────
+// â”€â”€â”€ Select Element â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function selectElement(el, selector) {
   selectedSelector = selector;
   selectedElement = el;
@@ -771,7 +771,7 @@ function selectElement(el, selector) {
   var shortClass = el.className ? ('.' + String(el.className).split(' ')[0].substring(0, 20)) : '';
   document.getElementById('sel-tag').textContent = tag + shortClass;
   document.getElementById('sel-path').textContent = selector;
-  document.getElementById('sel-dims').textContent = Math.round(el.offsetWidth) + ' × ' + Math.round(el.offsetHeight) + 'px';
+  document.getElementById('sel-dims').textContent = Math.round(el.offsetWidth) + ' Ã— ' + Math.round(el.offsetHeight) + 'px';
 
   // Auto-detect type
   var typeSelect = document.getElementById('edit-type');
@@ -845,7 +845,7 @@ function clearSelection() {
   } catch(e) {}
 }
 
-// ─── Save Override ────────────────────────
+// â”€â”€â”€ Save Override â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function saveOverride() {
   if (!currentPage || !selectedSelector) { showToast('Select a page and element first', 'error'); return; }
   var type = document.getElementById('edit-type').value;
@@ -855,7 +855,7 @@ async function saveOverride() {
 
   try {
     await brUpsertContent(currentPage, selectedSelector, type, saveValue);
-    showToast('Saved! Refreshing…', 'success');
+    showToast('Saved! Refreshingâ€¦', 'success');
     clearSelection();
     await loadOverrides();
     setTimeout(reloadPreview, 500);
@@ -864,7 +864,7 @@ async function saveOverride() {
   }
 }
 
-// ─── Save Link ────────────────────────────
+// â”€â”€â”€ Save Link â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function saveLinkChanges() {
   if (!currentPage || !selectedSelector) { showToast('No element selected', 'error'); return; }
   var href = document.getElementById('edit-link-href').value.trim();
@@ -884,7 +884,7 @@ async function saveLinkChanges() {
   }
 }
 
-// ─── Save Style ───────────────────────────
+// â”€â”€â”€ Save Style â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function saveQuickStyle() {
   if (!currentPage || !selectedSelector) { showToast('No element selected', 'error'); return; }
   var parts = [];
@@ -911,27 +911,27 @@ async function saveQuickStyle() {
   }
 }
 
-// ─── Upload ───────────────────────────────
+// â”€â”€â”€ Upload â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function handleEditUpload(input) {
   var file = input.files[0];
   if (!file) return;
   var status = document.getElementById('edit-upload-status');
-  status.textContent = 'Uploading…';
+  status.textContent = 'Uploadingâ€¦';
   try {
     var result = await brUploadFile('media', file, 'pages');
     document.getElementById('edit-value').value = result.url;
-    status.textContent = '✅ Uploaded!';
+    status.textContent = 'âœ… Uploaded!';
     await db.from('media').insert({
       file_name: file.name, file_path: result.path, file_url: result.url,
       file_size: file.size, mime_type: file.type, bucket: 'media'
     });
   } catch(err) {
-    status.textContent = '❌ ' + err.message;
+    status.textContent = 'âŒ ' + err.message;
   }
   input.value = '';
 }
 
-// ─── Overrides ────────────────────────────
+// â”€â”€â”€ Overrides â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 async function loadOverrides() {
   if (!currentPage) return;
   try {
@@ -957,9 +957,9 @@ function renderOverrides() {
       '<div class="oi-value">' + brEscapeHtml((o.content_value || '').substring(0, 60)) + '</div>' +
       '</div>' +
       '<div class="oi-actions">' +
-      '<button title="Edit" onclick="editExisting(\'' + o.id + '\')">✏️</button>' +
-      '<button title="Highlight" onclick="highlightOverride(\'' + escAttr(o.element_selector) + '\')">🎯</button>' +
-      '<button title="Delete" onclick="deleteOverride(\'' + o.id + '\')">🗑️</button>' +
+      '<button title="Edit" onclick="editExisting(\'' + o.id + '\')">âœï¸</button>' +
+      '<button title="Highlight" onclick="highlightOverride(\'' + escAttr(o.element_selector) + '\')">ðŸŽ¯</button>' +
+      '<button title="Delete" onclick="deleteOverride(\'' + o.id + '\')">ðŸ—‘ï¸</button>' +
       '</div></div>';
   }).join('');
 }
@@ -1005,7 +1005,7 @@ async function deleteOverride(id) {
   } catch(err) { showToast('Error: ' + err.message, 'error'); }
 }
 
-// ─── Guide ────────────────────────────────
+// â”€â”€â”€ Guide â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function renderGuide() {
   var list = document.getElementById('guide-list');
   var items = (EDIT_GUIDE['_common'] || []).concat(EDIT_GUIDE[currentPage] || []);
@@ -1025,7 +1025,7 @@ function reloadPreview() {
   if (currentPage) selectPage(currentPage);
 }
 
-// ─── Utility ──────────────────────────────
+// â”€â”€â”€ Utility â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function escAttr(str) { return (str || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'"); }
 function escHtml(str) { var d = document.createElement('div'); d.textContent = str || ''; return d.innerHTML; }
 
@@ -1036,7 +1036,7 @@ function rgbToHex(rgb) {
   return '#' + [m[1], m[2], m[3]].map(function(x) { return parseInt(x).toString(16).padStart(2, '0'); }).join('');
 }
 
-// ─── Init ─────────────────────────────────
+// â”€â”€â”€ Init â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 (async function() {
   try {
     var user = await brRequireAdmin();
