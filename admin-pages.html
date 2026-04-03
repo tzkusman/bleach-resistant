@@ -10,22 +10,40 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
   <style>
-    /* ===== VISUAL EDITOR STYLES ===== */
-    .editor-layout { display: flex; height: calc(100vh - 60px); overflow: hidden; }
+    .editor-layout { display: flex; height: calc(100vh - 0px); overflow: hidden; }
     .editor-sidebar-panel {
-      width: 380px; min-width: 320px; background: #fff; border-right: 1px solid #e5e5e5;
+      width: 400px; min-width: 340px; background: #fff; border-right: 1px solid #e5e5e5;
       display: flex; flex-direction: column; overflow: hidden;
     }
-    .editor-preview-panel { flex: 1; display: flex; flex-direction: column; background: #f0f0f0; }
+    .editor-preview-panel { flex: 1; display: flex; flex-direction: column; background: #e8e8e8; }
     .editor-preview-toolbar {
       display: flex; align-items: center; justify-content: space-between;
       padding: 8px 16px; background: #fff; border-bottom: 1px solid #e5e5e5;
       gap: 12px; flex-shrink: 0;
     }
-    .editor-preview-toolbar select { padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; }
-    .editor-preview-toolbar .btn { font-size: 11px; }
     .preview-frame-wrap { flex: 1; position: relative; overflow: hidden; }
-    .preview-frame-wrap iframe { width: 100%; height: 100%; border: none; }
+    .preview-frame-wrap iframe {
+      width: 100%; height: 100%; border: none; background: #fff;
+      transition: opacity 0.3s;
+    }
+    .preview-frame-wrap.loading iframe { opacity: 0.3; }
+    .preview-loader {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+      text-align: center; z-index: 10; display: none;
+    }
+    .preview-frame-wrap.loading .preview-loader { display: block; }
+    .preview-loader .spinner {
+      width: 36px; height: 36px; border: 3px solid #eee; border-top-color: #C7065C;
+      border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 12px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .preview-loader span { font-size: 12px; color: #888; font-weight: 600; }
+    .viewport-toggle { display: flex; gap: 2px; background: #f4f4f4; border-radius: 6px; padding: 2px; }
+    .viewport-toggle button {
+      padding: 5px 10px; border: none; background: none; cursor: pointer;
+      font-size: 14px; border-radius: 4px; transition: all 0.15s;
+    }
+    .viewport-toggle button.active { background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
     .editor-mode-toggle {
       display: flex; background: #f4f4f4; border-radius: 6px; overflow: hidden; border: 1px solid #ddd;
     }
@@ -34,18 +52,17 @@
       font-size: 11px; font-weight: 600; color: #666; transition: all 0.2s;
     }
     .editor-mode-toggle button.active { background: #C7065C; color: #fff; }
-
-    /* Sidebar sections */
     .panel-header {
-      padding: 16px 20px; border-bottom: 1px solid #eee; flex-shrink: 0;
+      padding: 12px 20px; border-bottom: 1px solid #eee; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: space-between;
     }
     .panel-header h3 { font-size: 14px; font-weight: 700; margin: 0; }
-    .panel-header p { font-size: 11px; color: #888; margin: 4px 0 0; }
     .panel-body { flex: 1; overflow-y: auto; padding: 0; }
     .panel-section { padding: 16px 20px; border-bottom: 1px solid #f0f0f0; }
-    .panel-section h4 { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #999; margin: 0 0 12px; }
-
-    /* Selected element info */
+    .panel-section h4 {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.5px; color: #999; margin: 0 0 12px;
+    }
     .selected-info {
       background: #fef7fa; border: 1px solid #f0d0de; border-radius: 8px;
       padding: 14px; margin-bottom: 16px;
@@ -53,17 +70,13 @@
     .selected-info .tag-name {
       display: inline-block; background: #C7065C; color: #fff; padding: 2px 8px;
       border-radius: 3px; font-size: 10px; font-weight: 700; text-transform: uppercase;
-      font-family: monospace; letter-spacing: 0.5px;
+      font-family: monospace;
     }
     .selected-info .sel-path {
       font-family: monospace; font-size: 11px; color: #666; margin-top: 6px;
       word-break: break-all; background: #f8f8f8; padding: 6px 8px; border-radius: 4px;
     }
-    .selected-info .sel-dims {
-      font-size: 10px; color: #aaa; margin-top: 4px;
-    }
-
-    /* Edit fields */
+    .selected-info .sel-dims { font-size: 10px; color: #aaa; margin-top: 4px; }
     .edit-field { margin-bottom: 14px; }
     .edit-field label {
       display: block; font-size: 11px; font-weight: 600; color: #555;
@@ -74,9 +87,17 @@
       font-size: 13px; font-family: inherit; box-sizing: border-box;
     }
     .edit-field textarea { resize: vertical; min-height: 80px; }
-    .edit-field input:focus, .edit-field textarea:focus { border-color: #C7065C; outline: none; box-shadow: 0 0 0 2px rgba(199,6,92,0.1); }
-
-    /* Override list items */
+    .edit-field input:focus, .edit-field textarea:focus, .edit-field select:focus {
+      border-color: #C7065C; outline: none; box-shadow: 0 0 0 2px rgba(199,6,92,0.1);
+    }
+    .edit-section {
+      background: #f8f9fa; border: 1px solid #eee; border-radius: 8px;
+      padding: 14px; margin-bottom: 12px;
+    }
+    .edit-section h5 {
+      font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+      color: #999; margin: 0 0 10px; display: flex; align-items: center; gap: 6px;
+    }
     .override-item {
       display: flex; align-items: center; justify-content: space-between;
       padding: 10px 12px; border: 1px solid #eee; border-radius: 6px;
@@ -94,8 +115,6 @@
       align-items: center; justify-content: center; transition: all 0.15s;
     }
     .override-item .oi-actions button:hover { background: #C7065C; color: #fff; border-color: #C7065C; }
-
-    /* Guide panel */
     .guide-item {
       padding: 10px 14px; border: 1px solid #e8e8e8; border-radius: 6px;
       margin-bottom: 8px; cursor: pointer; transition: all 0.15s;
@@ -104,13 +123,9 @@
     .guide-item .gi-title { font-size: 12px; font-weight: 600; color: #333; }
     .guide-item .gi-desc { font-size: 10px; color: #888; margin-top: 2px; }
     .guide-item .gi-selector { font-family: monospace; font-size: 10px; color: #C7065C; margin-top: 4px; }
-
-    /* Empty / placeholder states */
     .empty-panel { text-align: center; padding: 40px 20px; color: #aaa; }
     .empty-panel .ep-icon { font-size: 48px; margin-bottom: 12px; }
     .empty-panel p { font-size: 12px; line-height: 1.6; }
-
-    /* Page selector buttons */
     .page-pills { display: flex; flex-wrap: wrap; gap: 6px; padding: 12px 20px; border-bottom: 1px solid #eee; flex-shrink: 0; }
     .page-pill {
       padding: 5px 12px; border: 1px solid #ddd; border-radius: 20px;
@@ -119,11 +134,7 @@
     }
     .page-pill:hover { border-color: #C7065C; color: #C7065C; }
     .page-pill.active { background: #C7065C; color: #fff; border-color: #C7065C; }
-
-    /* Tabs */
-    .panel-tabs {
-      display: flex; border-bottom: 2px solid #eee; flex-shrink: 0;
-    }
+    .panel-tabs { display: flex; border-bottom: 2px solid #eee; flex-shrink: 0; }
     .panel-tab {
       flex: 1; padding: 10px; text-align: center; font-size: 11px; font-weight: 600;
       text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer;
@@ -134,26 +145,34 @@
     .panel-tab.active { color: #C7065C; border-bottom-color: #C7065C; }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
-
-    /* Click-mode indicator */
     .click-mode-banner {
       background: #C7065C; color: #fff; text-align: center; padding: 8px;
       font-size: 12px; font-weight: 600; display: none; flex-shrink: 0;
       animation: pulse-bg 1.5s ease infinite;
     }
-    @keyframes pulse-bg { 0%,100%{ opacity: 1; } 50%{ opacity: 0.85; } }
-
-    /* Save button group */
+    @keyframes pulse-bg { 0%,100%{ opacity:1; } 50%{ opacity:0.85; } }
     .save-bar {
       padding: 12px 20px; border-top: 1px solid #eee; flex-shrink: 0;
       display: flex; gap: 8px;
     }
     .save-bar .btn { flex: 1; }
+    .detected-el {
+      display: flex; align-items: center; gap: 10px; padding: 8px 10px;
+      border: 1px solid #eee; border-radius: 6px; margin-bottom: 6px;
+      cursor: pointer; transition: all 0.15s; font-size: 12px;
+    }
+    .detected-el:hover { background: #fef7fa; border-color: #C7065C; }
+    .detected-el .de-icon { font-size: 16px; width: 28px; text-align: center; }
+    .detected-el .de-info { flex: 1; min-width: 0; }
+    .detected-el .de-label { font-weight: 600; font-size: 12px; }
+    .detected-el .de-detail { font-size: 10px; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .detected-el .de-badge {
+      font-size: 9px; font-weight: 600; padding: 2px 6px; border-radius: 3px;
+      text-transform: uppercase;
+    }
   </style>
 </head>
 <body>
-
-  <!-- ===== SIDEBAR NAV ===== -->
   <nav class="sidebar" id="sidebar">
     <div class="sidebar-brand"><h2>Bleach Resistant</h2><small>Admin Panel</small></div>
     <div class="sidebar-nav">
@@ -183,30 +202,25 @@
     </div>
   </nav>
 
-  <!-- ===== MAIN EDITOR ===== -->
   <div class="main-content" style="padding:0;overflow:hidden;">
     <div class="editor-layout">
-
-      <!-- LEFT: Editor sidebar panel -->
+      <!-- LEFT Sidebar -->
       <div class="editor-sidebar-panel">
-        <!-- Page pills -->
         <div class="page-pills" id="page-pills"></div>
-
-        <!-- Tabs -->
         <div class="panel-tabs">
           <div class="panel-tab active" data-tab="edit" onclick="switchTab('edit')">✏️ Edit</div>
-          <div class="panel-tab" data-tab="overrides" onclick="switchTab('overrides')">📋 Overrides</div>
+          <div class="panel-tab" data-tab="elements" onclick="switchTab('elements')">🧩 Elements</div>
+          <div class="panel-tab" data-tab="overrides" onclick="switchTab('overrides')">📋 Saved</div>
           <div class="panel-tab" data-tab="guide" onclick="switchTab('guide')">💡 Guide</div>
         </div>
-
         <div class="click-mode-banner" id="click-banner">🎯 Click any element in the preview to select it</div>
-
-        <!-- Tab: Edit -->
         <div class="panel-body">
+          <!-- Tab: Edit -->
           <div class="tab-content active" id="tab-edit">
             <div class="empty-panel" id="edit-empty">
               <div class="ep-icon">👆</div>
-              <p>Select a page above, then click<br><strong>"Select Element"</strong> and click any<br>element in the preview to edit it.</p>
+              <p>Select a page above, then click<br><strong>"Select Element"</strong> and click any<br>element in the preview to edit it.<br><br>
+              Or use the <strong>Elements</strong> tab to see<br>all editable elements on the page.</p>
             </div>
             <div id="edit-form" style="display:none;">
               <div class="panel-section">
@@ -215,495 +229,827 @@
                   <div class="sel-path" id="sel-path"></div>
                   <div class="sel-dims" id="sel-dims"></div>
                 </div>
-
-                <div class="edit-field">
-                  <label>Content Type</label>
-                  <select id="edit-type" onchange="onTypeChange()">
-                    <option value="text">Text Content</option>
-                    <option value="html">HTML Content</option>
-                    <option value="image">Image Source (src)</option>
-                    <option value="background">Background Image</option>
-                    <option value="style">Custom CSS Style</option>
-                    <option value="attribute">Attribute</option>
-                  </select>
+                <div class="edit-section" id="section-content">
+                  <h5>📝 Content</h5>
+                  <div class="edit-field">
+                    <label>Content Type</label>
+                    <select id="edit-type" onchange="onTypeChange()">
+                      <option value="text">Text Content</option>
+                      <option value="html">HTML Content</option>
+                      <option value="image">Image Source</option>
+                      <option value="background">Background Image</option>
+                      <option value="href">Link URL (href)</option>
+                      <option value="style">Custom CSS</option>
+                      <option value="attribute">Attribute</option>
+                      <option value="hide">Hide Element</option>
+                      <option value="show">Show Element</option>
+                    </select>
+                  </div>
+                  <div class="edit-field" id="edit-value-group">
+                    <label id="edit-value-label">New Text</label>
+                    <textarea id="edit-value" placeholder="Enter new content…"></textarea>
+                  </div>
+                  <div class="edit-field" id="edit-upload-group" style="display:none;">
+                    <label>Or Upload Image</label>
+                    <input type="file" id="edit-upload" accept="image/*" onchange="handleEditUpload(this)">
+                    <span id="edit-upload-status" style="font-size:10px;color:#888;"></span>
+                  </div>
                 </div>
-
-                <div class="edit-field" id="edit-value-group">
-                  <label id="edit-value-label">New Text</label>
-                  <textarea id="edit-value" placeholder="Enter new content…"></textarea>
+                <div class="edit-section" id="section-link" style="display:none;">
+                  <h5>🔗 Link Settings</h5>
+                  <div class="edit-field">
+                    <label>Link URL</label>
+                    <input type="text" id="edit-link-href" placeholder="https://example.com or page.html">
+                  </div>
+                  <div class="edit-field">
+                    <label>Link Text</label>
+                    <input type="text" id="edit-link-text" placeholder="Button label">
+                  </div>
+                  <div class="edit-field">
+                    <label>Open In</label>
+                    <select id="edit-link-target">
+                      <option value="">Same Window</option>
+                      <option value="_blank">New Tab</option>
+                    </select>
+                  </div>
+                  <button class="btn btn-primary btn-sm" onclick="saveLinkChanges()" style="width:100%;">💾 Save Link</button>
                 </div>
-
-                <div class="edit-field" id="edit-upload-group" style="display:none;">
-                  <label>Or Upload Image</label>
-                  <input type="file" id="edit-upload" accept="image/*" onchange="handleEditUpload(this)">
-                  <span id="edit-upload-status" style="font-size:10px;color:#888;"></span>
+                <div class="edit-section" id="section-style">
+                  <h5>🎨 Quick Styles</h5>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                    <div class="edit-field" style="margin:0;">
+                      <label>Text Color</label>
+                      <input type="color" id="edit-color" value="#333333" style="height:32px;padding:2px;">
+                    </div>
+                    <div class="edit-field" style="margin:0;">
+                      <label>Background</label>
+                      <input type="color" id="edit-bg-color" value="#ffffff" style="height:32px;padding:2px;">
+                    </div>
+                    <div class="edit-field" style="margin:0;">
+                      <label>Font Size</label>
+                      <input type="text" id="edit-font-size" placeholder="16px">
+                    </div>
+                    <div class="edit-field" style="margin:0;">
+                      <label>Font Weight</label>
+                      <select id="edit-font-weight">
+                        <option value="">—</option>
+                        <option value="400">Normal</option>
+                        <option value="600">Semi-Bold</option>
+                        <option value="700">Bold</option>
+                        <option value="800">Extra Bold</option>
+                      </select>
+                    </div>
+                  </div>
+                  <button class="btn btn-secondary btn-sm" onclick="saveQuickStyle()" style="width:100%;margin-top:8px;">🎨 Apply Style</button>
                 </div>
               </div>
-
               <div class="save-bar">
                 <button class="btn btn-primary" onclick="saveOverride()">💾 Save Change</button>
                 <button class="btn btn-secondary" onclick="clearSelection()">Cancel</button>
               </div>
             </div>
           </div>
-
+          <!-- Tab: Elements -->
+          <div class="tab-content" id="tab-elements">
+            <div class="panel-section" id="elements-loading" style="text-align:center;padding:30px;">
+              <p style="font-size:12px;color:#aaa;">Select a page to scan for editable elements</p>
+            </div>
+            <div class="panel-section" id="elements-section" style="display:none;">
+              <h4>Images <span id="el-img-count"></span></h4>
+              <div id="el-images"></div>
+              <h4 style="margin-top:16px;">Links & Buttons <span id="el-link-count"></span></h4>
+              <div id="el-links"></div>
+              <h4 style="margin-top:16px;">Headings <span id="el-heading-count"></span></h4>
+              <div id="el-headings"></div>
+              <h4 style="margin-top:16px;">Text Blocks <span id="el-text-count"></span></h4>
+              <div id="el-texts"></div>
+            </div>
+          </div>
           <!-- Tab: Overrides -->
           <div class="tab-content" id="tab-overrides">
             <div class="panel-section">
-              <h4>Active Overrides <span id="ov-count"></span></h4>
+              <h4>Saved Overrides <span id="ov-count"></span></h4>
               <div id="overrides-list"></div>
             </div>
           </div>
-
           <!-- Tab: Guide -->
           <div class="tab-content" id="tab-guide">
             <div class="panel-section">
               <h4>Common Editable Elements</h4>
-              <p style="font-size:11px;color:#888;margin-bottom:12px;">Click any item below to auto-fill the selector. Then click "Select Element" to find it on the page.</p>
+              <p style="font-size:11px;color:#888;margin-bottom:12px;">Click any item to auto-select it in the preview.</p>
               <div id="guide-list"></div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- RIGHT: Preview panel -->
+      <!-- RIGHT Preview -->
       <div class="editor-preview-panel">
         <div class="editor-preview-toolbar">
           <div style="display:flex;align-items:center;gap:10px;">
             <strong id="preview-title" style="font-size:13px;">Select a page</strong>
           </div>
           <div style="display:flex;align-items:center;gap:8px;">
+            <div class="viewport-toggle">
+              <button class="active" onclick="setViewport('desktop',this)" title="Desktop">🖥️</button>
+              <button onclick="setViewport('tablet',this)" title="Tablet">📱</button>
+              <button onclick="setViewport('mobile',this)" title="Mobile">📲</button>
+            </div>
             <div class="editor-mode-toggle">
               <button id="mode-preview" class="active" onclick="setMode('preview')">Preview</button>
               <button id="mode-select" onclick="setMode('select')">Select Element</button>
             </div>
-            <button class="btn btn-sm btn-secondary" onclick="reloadPreview()">🔄</button>
+            <button class="btn btn-sm btn-secondary" onclick="reloadPreview()" title="Reload">🔄</button>
             <a id="open-page-link" href="#" target="_blank" class="btn btn-sm btn-secondary">↗ Open</a>
           </div>
         </div>
-        <div class="preview-frame-wrap">
-          <iframe id="preview-frame" src="about:blank" sandbox="allow-same-origin allow-scripts"></iframe>
+        <div class="preview-frame-wrap" id="preview-wrap">
+          <div class="preview-loader">
+            <div class="spinner"></div>
+            <span>Loading preview…</span>
+          </div>
+          <iframe id="preview-frame" src="about:blank"></iframe>
         </div>
       </div>
-
     </div>
   </div>
 
-  <!-- Toast -->
   <div id="toast" class="toast"></div>
 
-  <script>
-    /* ========================================================
-       VISUAL PAGE EDITOR — WordPress-like Click-to-Edit
-       ======================================================== */
+<script>
+/* ========================================================
+   VISUAL PAGE EDITOR v2 — Full WordPress-like editing
+   Supports: text, images, links, buttons, styles, hide/show
+   ======================================================== */
 
-    const SITE_PAGES = [
-      { file: 'home.html', name: 'Home' },
-      { file: 'finprint.html', name: 'Showcase' },
-      { file: 'About.html', name: 'About' },
-      { file: 'services.html', name: 'Services' },
-      { file: 'product.html', name: 'Products' },
-      { file: 'Pricelist.html', name: 'Price List' },
-      { file: 'headgear.html', name: 'Head Gear' },
-      { file: 'basicpoly.html', name: 'Basics' },
-      { file: 'stockdesigns.html', name: 'Stock Designs' },
-      { file: 'fabricdescriptions.html', name: 'Fabrics' },
-      { file: 'sublimationprinting.html', name: 'Sublimation' },
-      { file: 'grapicdesign.html', name: 'Graphic Design' },
-      { file: 'customlogos.html', name: 'Custom Logos' },
-      { file: 'wrapdesign.html', name: 'Wrap Design' },
-      { file: 'copyofwashingsamples.html', name: 'Showcase' },
-      { file: 'sizechart.html', name: 'Size Chart' },
-      { file: 'order.html', name: 'Order' },
-      { file: 'FAQs.html', name: 'FAQs' },
-      { file: 'privacypolicy.html', name: 'Privacy' },
-      { file: 'termsconditions.html', name: 'Terms' }
-    ];
+const SITE_PAGES = [
+  { file: 'home.html', name: 'Home' },
+  { file: 'finprint.html', name: 'Showcase' },
+  { file: 'About.html', name: 'About' },
+  { file: 'services.html', name: 'Services' },
+  { file: 'product.html', name: 'Products' },
+  { file: 'Pricelist.html', name: 'Price List' },
+  { file: 'headgear.html', name: 'Head Gear' },
+  { file: 'basicpoly.html', name: 'Basics' },
+  { file: 'stockdesigns.html', name: 'Stock Designs' },
+  { file: 'fabricdescriptions.html', name: 'Fabrics' },
+  { file: 'sublimationprinting.html', name: 'Sublimation' },
+  { file: 'grapicdesign.html', name: 'Graphic Design' },
+  { file: 'customlogos.html', name: 'Custom Logos' },
+  { file: 'wrapdesign.html', name: 'Wrap Design' },
+  { file: 'copyofwashingsamples.html', name: 'Wash Samples' },
+  { file: 'sizechart.html', name: 'Size Chart' },
+  { file: 'order.html', name: 'Order' },
+  { file: 'FAQs.html', name: 'FAQs' },
+  { file: 'privacypolicy.html', name: 'Privacy' },
+  { file: 'termsconditions.html', name: 'Terms' }
+];
 
-    // Known editable elements guide (per-page suggestions)
-    const EDIT_GUIDE = {
-      '_common': [
-        { selector: '.br-auth-logo', type: 'text', title: 'Brand Name (Auth Bar)', desc: 'The "BLEACH RESISTANT" text in the top bar' },
-        { selector: '#img_comp-ky0cyl68', type: 'image', title: 'Site Logo Image', desc: 'The main logo in the header navigation' },
-      ],
-      'home.html': [
-        { selector: '#img_comp-m4k7zp59', type: 'image', title: 'Feature Image 1 (Slider)', desc: 'First image in the rotating slider' },
-        { selector: '#img_comp-m4k7zp5d', type: 'image', title: 'Feature Image 2 (Slider)', desc: 'Second image in the rotating slider' },
-        { selector: '#img_comp-m4k7zp5h', type: 'image', title: 'Feature Image 3 (Slider)', desc: 'Third image in the rotating slider' },
-        { selector: '#comp-m4k7xime', type: 'text', title: 'Hero Text Block', desc: 'Main description text on the home page' },
-        { selector: '#comp-jqcejn7e', type: 'text', title: 'Tagline / CTA Block', desc: 'Call-to-action section text' },
-      ],
-      'About.html': [
-        { selector: '#comp-jqdibrfp', type: 'text', title: 'About Text', desc: 'Main about description paragraph' },
-      ],
-      'order.html': [
-        { selector: '#br-order-form-wrapper h2', type: 'text', title: 'Order Form Title', desc: 'Title above the order form' },
-      ],
-      'FAQs.html': [
-        { selector: '#br-contact-wrapper h2', type: 'text', title: 'Contact Form Title', desc: 'Title above the contact form' },
-      ]
-    };
+const EDIT_GUIDE = {
+  '_common': [
+    { selector: '.br-auth-logo', type: 'text', title: 'Brand Name', desc: 'BLEACH RESISTANT text in auth bar' },
+    { selector: '#img_comp-ky0cyl68', type: 'image', title: 'Logo Image', desc: 'Header navigation logo' },
+  ],
+  'home.html': [
+    { selector: '#img_comp-m4k7zp59', type: 'image', title: 'Slider Image 1', desc: 'First feature slider image' },
+    { selector: '#img_comp-m4k7zp5d', type: 'image', title: 'Slider Image 2', desc: 'Second feature slider image' },
+    { selector: '#img_comp-m4k7zp5h', type: 'image', title: 'Slider Image 3', desc: 'Third feature slider image' },
+    { selector: '#comp-m4k7xime', type: 'text', title: 'Hero Text', desc: 'Main description text' },
+    { selector: '#comp-jqcejn7e', type: 'text', title: 'CTA Block', desc: 'Call-to-action text' },
+  ],
+  'About.html': [
+    { selector: '#comp-jqdibrfp', type: 'text', title: 'About Text', desc: 'Main about paragraph' },
+  ],
+  'order.html': [
+    { selector: '#br-order-form-wrapper h2', type: 'text', title: 'Order Form Title', desc: 'Heading above order form' },
+  ],
+  'FAQs.html': [
+    { selector: '#br-contact-wrapper h2', type: 'text', title: 'Contact Title', desc: 'Heading above contact form' },
+  ]
+};
 
-    let currentPage = null;
-    let selectMode = false;
-    let selectedSelector = null;
-    let overrides = [];
+let currentPage = null;
+let selectMode = false;
+let selectedSelector = null;
+let selectedElement = null;
+let overrides = [];
+let iframeReady = false;
 
-    // ─── Toast ────────────────────────────────
-    function showToast(msg, type) {
-      const t = document.getElementById('toast');
-      t.className = 'toast toast-' + (type || 'info');
-      t.textContent = msg;
-      t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 3000);
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.className = 'toast toast-' + (type || 'info');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function switchTab(name) {
+  document.querySelectorAll('.panel-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === 'tab-' + name));
+}
+
+function setViewport(size, btn) {
+  const frame = document.getElementById('preview-frame');
+  document.querySelectorAll('.viewport-toggle button').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  frame.style.maxWidth = size === 'tablet' ? '768px' : size === 'mobile' ? '375px' : '100%';
+  frame.style.margin = size === 'desktop' ? '0' : '0 auto';
+  frame.style.boxShadow = size === 'desktop' ? 'none' : '0 0 20px rgba(0,0,0,0.1)';
+}
+
+function renderPagePills() {
+  document.getElementById('page-pills').innerHTML = SITE_PAGES.map(p =>
+    '<div class="page-pill' + (currentPage === p.file ? ' active' : '') + '" onclick="selectPage(\'' + p.file + '\')">' + p.name + '</div>'
+  ).join('');
+}
+
+function selectPage(file) {
+  currentPage = file;
+  iframeReady = false;
+  renderPagePills();
+
+  var page = SITE_PAGES.find(function(p) { return p.file === file; });
+  document.getElementById('preview-title').textContent = page ? page.name : file;
+  document.getElementById('open-page-link').href = file;
+
+  var wrap = document.getElementById('preview-wrap');
+  wrap.classList.add('loading');
+
+  var frame = document.getElementById('preview-frame');
+
+  // Remove old listeners
+  frame.onload = null;
+
+  frame.onload = function() {
+    wrap.classList.remove('loading');
+    iframeReady = true;
+    onIframeLoaded();
+  };
+
+  // Set src with cache bust to ensure fresh load
+  frame.src = file + '?_editor=' + Date.now();
+
+  // Fallback timeout
+  setTimeout(function() {
+    if (!iframeReady) {
+      wrap.classList.remove('loading');
+      iframeReady = true;
+      try { onIframeLoaded(); } catch(e) { console.warn('Iframe fallback:', e); }
+    }
+  }, 10000);
+
+  clearSelection();
+  loadOverrides();
+  renderGuide();
+  setMode('preview');
+}
+
+function onIframeLoaded() {
+  try {
+    var frame = document.getElementById('preview-frame');
+    var fdoc = frame.contentDocument || frame.contentWindow.document;
+
+    // Check if document has content
+    if (!fdoc || !fdoc.body) {
+      console.warn('Iframe document not accessible');
+      return;
     }
 
-    // ─── Tabs ─────────────────────────────────
-    function switchTab(name) {
-      document.querySelectorAll('.panel-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
-      document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === 'tab-' + name));
-    }
-
-    // ─── Page Selection ───────────────────────
-    function renderPagePills() {
-      document.getElementById('page-pills').innerHTML = SITE_PAGES.map(p =>
-        `<div class="page-pill${currentPage === p.file ? ' active' : ''}" onclick="selectPage('${p.file}')">${p.name}</div>`
-      ).join('');
-    }
-
-    function selectPage(file) {
-      currentPage = file;
-      renderPagePills();
-      const page = SITE_PAGES.find(p => p.file === file);
-      document.getElementById('preview-title').textContent = page ? page.name : file;
-      document.getElementById('open-page-link').href = file;
-      document.getElementById('preview-frame').src = file;
-      clearSelection();
-      loadOverrides();
-      renderGuide();
-      setMode('preview');
-    }
-
-    // ─── Preview Mode ─────────────────────────
-    function setMode(mode) {
-      selectMode = (mode === 'select');
-      document.getElementById('mode-preview').classList.toggle('active', !selectMode);
-      document.getElementById('mode-select').classList.toggle('active', selectMode);
-      document.getElementById('click-banner').style.display = selectMode ? 'block' : 'none';
-
-      const frame = document.getElementById('preview-frame');
-      try {
-        const doc = frame.contentDocument || frame.contentWindow.document;
-        if (selectMode) {
-          injectSelectMode(doc);
-        } else {
-          removeSelectMode(doc);
-        }
-      } catch(e) { console.warn('Cannot access iframe:', e); }
-    }
-
-    function injectSelectMode(doc) {
-      // Add hover highlight CSS
-      let style = doc.getElementById('br-editor-style');
-      if (!style) {
-        style = doc.createElement('style');
-        style.id = 'br-editor-style';
-        style.textContent = `
-          .br-editor-hover { outline: 2px dashed #C7065C !important; outline-offset: 2px; cursor: crosshair !important; }
-          .br-editor-selected { outline: 3px solid #C7065C !important; outline-offset: 2px; }
-          * { cursor: crosshair !important; }
-        `;
-        doc.head.appendChild(style);
-      }
-
-      // Add hover/click handlers
-      doc.body.addEventListener('mouseover', editorMouseOver, true);
-      doc.body.addEventListener('mouseout', editorMouseOut, true);
-      doc.body.addEventListener('click', editorClick, true);
-    }
-
-    function removeSelectMode(doc) {
-      const style = doc.getElementById('br-editor-style');
-      if (style) style.remove();
-      doc.body.removeEventListener('mouseover', editorMouseOver, true);
-      doc.body.removeEventListener('mouseout', editorMouseOut, true);
-      doc.body.removeEventListener('click', editorClick, true);
-      doc.querySelectorAll('.br-editor-hover').forEach(el => el.classList.remove('br-editor-hover'));
-    }
-
-    function editorMouseOver(e) {
-      e.target.classList.add('br-editor-hover');
-    }
-
-    function editorMouseOut(e) {
-      e.target.classList.remove('br-editor-hover');
-    }
-
-    function editorClick(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      e.stopImmediatePropagation();
-
-      const el = e.target;
-      el.classList.remove('br-editor-hover');
-
-      // Remove previous selection highlight
-      const frame = document.getElementById('preview-frame');
-      const doc = frame.contentDocument || frame.contentWindow.document;
-      doc.querySelectorAll('.br-editor-selected').forEach(s => s.classList.remove('br-editor-selected'));
-      el.classList.add('br-editor-selected');
-
-      // Build a unique CSS selector for this element
-      const selector = buildSelector(el);
-      selectElement(el, selector);
-      setMode('preview'); // Exit select mode
-    }
-
-    // ─── Build CSS Selector ───────────────────
-    function buildSelector(el) {
-      // Prefer ID
-      if (el.id && !el.id.startsWith('br-editor')) {
-        return '#' + CSS.escape(el.id);
-      }
-      // For images, use img#id or img[alt]
-      if (el.tagName === 'IMG') {
-        if (el.id) return 'img#' + CSS.escape(el.id);
-        if (el.alt) return 'img[alt="' + el.alt.replace(/"/g, '\\"') + '"]';
-      }
-      // Build path from parent with ID
-      let path = [];
-      let cur = el;
-      while (cur && cur !== cur.ownerDocument.body) {
-        if (cur.id && !cur.id.startsWith('br-editor')) {
-          path.unshift('#' + CSS.escape(cur.id));
-          break;
-        }
-        let tag = cur.tagName.toLowerCase();
-        let parent = cur.parentElement;
-        if (parent) {
-          let siblings = Array.from(parent.children).filter(c => c.tagName === cur.tagName);
-          if (siblings.length > 1) {
-            let idx = siblings.indexOf(cur) + 1;
-            tag += ':nth-of-type(' + idx + ')';
+    // Prevent internal navigation — instead navigate pages in editor
+    fdoc.addEventListener('click', function(e) {
+      if (selectMode) return; // handled by editorClick
+      var link = e.target.closest('a');
+      if (link) {
+        var href = link.getAttribute('href');
+        if (href && href !== '#' && !href.startsWith('javascript:') && !href.startsWith('mailto:') && !href.startsWith('tel:')) {
+          e.preventDefault();
+          e.stopPropagation();
+          // Navigate to local pages within editor
+          var pageName = href.split('?')[0].split('#')[0];
+          var match = SITE_PAGES.find(function(p) { return p.file === pageName; });
+          if (match) {
+            selectPage(match.file);
+          } else if (href.startsWith('http')) {
+            window.open(href, '_blank');
           }
         }
-        path.unshift(tag);
-        cur = cur.parentElement;
       }
-      return path.join(' > ');
+    }, true);
+
+    // Scan for editable elements
+    scanElements(fdoc);
+
+  } catch(e) {
+    console.warn('Cannot access iframe content:', e);
+    // This happens with cross-origin — show helpful message
+    document.getElementById('elements-loading').innerHTML =
+      '<p style="font-size:12px;color:#c00;">Cannot scan page elements (cross-origin). ' +
+      'Use the Guide tab or manually enter selectors.</p>';
+  }
+}
+
+// ─── Element Scanner ──────────────────────
+function scanElements(doc) {
+  var images = [], links = [], headings = [], texts = [];
+
+  // Images
+  doc.querySelectorAll('img').forEach(function(img, i) {
+    if (img.offsetWidth < 10 && img.offsetHeight < 10) return;
+    var sel = buildSelector(img);
+    var src = img.src || '';
+    var shortSrc = src.substring(src.lastIndexOf('/') + 1).substring(0, 40);
+    images.push({ selector: sel, src: shortSrc, alt: img.alt || 'Image ' + (i + 1), w: img.offsetWidth, h: img.offsetHeight });
+  });
+
+  // Links and Buttons
+  doc.querySelectorAll('a[href], button, [role="button"]').forEach(function(el) {
+    var text = el.textContent.trim().substring(0, 50);
+    if (!text || text.length < 2) return;
+    if (el.offsetWidth < 5) return;
+    var sel = buildSelector(el);
+    var href = el.getAttribute('href') || '';
+    var isBtn = el.tagName === 'BUTTON' || (el.className && el.className.toString().indexOf('btn') >= 0) || el.getAttribute('role') === 'button';
+    links.push({ selector: sel, text: text, href: href, type: isBtn ? 'button' : 'link' });
+  });
+
+  // Headings
+  doc.querySelectorAll('h1, h2, h3, h4').forEach(function(el) {
+    var text = el.textContent.trim().substring(0, 60);
+    if (!text) return;
+    if (el.offsetWidth < 5) return;
+    headings.push({ selector: buildSelector(el), text: text, tag: el.tagName });
+  });
+
+  // Text blocks (only significant ones)
+  doc.querySelectorAll('p, span').forEach(function(el) {
+    if (el.children.length > 3) return;
+    var text = el.textContent.trim();
+    if (text.length < 5 || text.length > 200) return;
+    if (el.closest('script, style, noscript, nav')) return;
+    if (el.offsetWidth < 10) return;
+    var ownText = '';
+    for (var i = 0; i < el.childNodes.length; i++) {
+      if (el.childNodes[i].nodeType === 3) ownText += el.childNodes[i].textContent.trim();
     }
+    if (ownText.length < 3) return;
+    texts.push({ selector: buildSelector(el), text: text.substring(0, 60), tag: el.tagName.toLowerCase() });
+  });
 
-    // ─── Select Element ───────────────────────
-    function selectElement(el, selector) {
-      selectedSelector = selector;
-      const tag = el.tagName.toLowerCase();
-      const isImg = tag === 'img';
-      const text = el.textContent ? el.textContent.trim().substring(0, 100) : '';
+  // Render elements tab
+  document.getElementById('elements-loading').style.display = 'none';
+  document.getElementById('elements-section').style.display = '';
 
-      document.getElementById('edit-empty').style.display = 'none';
-      document.getElementById('edit-form').style.display = '';
-      document.getElementById('sel-tag').textContent = tag + (el.className ? '.' + el.className.split(' ')[0] : '');
-      document.getElementById('sel-path').textContent = selector;
-      document.getElementById('sel-dims').textContent = Math.round(el.offsetWidth) + ' × ' + Math.round(el.offsetHeight) + 'px';
+  document.getElementById('el-img-count').textContent = '(' + images.length + ')';
+  document.getElementById('el-images').innerHTML = images.slice(0, 30).map(function(img) {
+    return '<div class="detected-el" onclick="selectDetected(\'' + escAttr(img.selector) + '\',\'image\')">' +
+      '<div class="de-icon">🖼️</div>' +
+      '<div class="de-info"><div class="de-label">' + escHtml(img.alt) + '</div>' +
+      '<div class="de-detail">' + img.w + '×' + img.h + 'px — ' + escHtml(img.src) + '</div></div>' +
+      '<div class="de-badge" style="background:#fef0f5;color:#C7065C;">IMG</div></div>';
+  }).join('') || '<p style="font-size:11px;color:#aaa;">No images found</p>';
 
-      // Auto-detect type
-      const typeSelect = document.getElementById('edit-type');
-      if (isImg) {
-        typeSelect.value = 'image';
-        document.getElementById('edit-value').value = el.src || '';
-      } else if (el.style.backgroundImage) {
-        typeSelect.value = 'background';
-        document.getElementById('edit-value').value = el.style.backgroundImage.replace(/url\(['"]?|['"]?\)/g, '');
+  document.getElementById('el-link-count').textContent = '(' + links.length + ')';
+  document.getElementById('el-links').innerHTML = links.slice(0, 30).map(function(lk) {
+    var badgeBg = lk.type === 'button' ? '#e8f4fd;color:#2196f3' : '#f0f9e8;color:#4caf50';
+    return '<div class="detected-el" onclick="selectDetected(\'' + escAttr(lk.selector) + '\',\'href\')">' +
+      '<div class="de-icon">' + (lk.type === 'button' ? '🔘' : '🔗') + '</div>' +
+      '<div class="de-info"><div class="de-label">' + escHtml(lk.text) + '</div>' +
+      '<div class="de-detail">' + escHtml(lk.href) + '</div></div>' +
+      '<div class="de-badge" style="background:' + badgeBg + '">' + lk.type.toUpperCase() + '</div></div>';
+  }).join('') || '<p style="font-size:11px;color:#aaa;">No links found</p>';
+
+  document.getElementById('el-heading-count').textContent = '(' + headings.length + ')';
+  document.getElementById('el-headings').innerHTML = headings.slice(0, 20).map(function(h) {
+    return '<div class="detected-el" onclick="selectDetected(\'' + escAttr(h.selector) + '\',\'text\')">' +
+      '<div class="de-icon">📝</div>' +
+      '<div class="de-info"><div class="de-label">' + escHtml(h.text) + '</div>' +
+      '<div class="de-detail">' + h.tag + '</div></div>' +
+      '<div class="de-badge" style="background:#fff8e1;color:#ff9800;">' + h.tag + '</div></div>';
+  }).join('') || '<p style="font-size:11px;color:#aaa;">No headings found</p>';
+
+  document.getElementById('el-text-count').textContent = '(' + texts.length + ')';
+  document.getElementById('el-texts').innerHTML = texts.slice(0, 20).map(function(t) {
+    return '<div class="detected-el" onclick="selectDetected(\'' + escAttr(t.selector) + '\',\'text\')">' +
+      '<div class="de-icon">📄</div>' +
+      '<div class="de-info"><div class="de-label">' + escHtml(t.text) + '</div>' +
+      '<div class="de-detail">' + t.tag + '</div></div>' +
+      '<div class="de-badge" style="background:#f3e5f5;color:#9c27b0;">TXT</div></div>';
+  }).join('') || '<p style="font-size:11px;color:#aaa;">No text blocks found</p>';
+}
+
+function selectDetected(selector, type) {
+  try {
+    var doc = document.getElementById('preview-frame').contentDocument;
+    var el = doc.querySelector(selector);
+    if (el) {
+      doc.querySelectorAll('.br-editor-selected').forEach(function(s) { s.classList.remove('br-editor-selected'); });
+      ensureEditorStyle(doc);
+      el.classList.add('br-editor-selected');
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      selectElement(el, selector);
+    } else {
+      showToast('Element not found in preview', 'error');
+    }
+  } catch(e) {
+    showToast('Cannot access preview: ' + e.message, 'error');
+  }
+  switchTab('edit');
+}
+
+function ensureEditorStyle(doc) {
+  if (!doc.getElementById('br-editor-style')) {
+    var style = doc.createElement('style');
+    style.id = 'br-editor-style';
+    style.textContent = '.br-editor-selected { outline: 3px solid #C7065C !important; outline-offset: 2px; }';
+    doc.head.appendChild(style);
+  }
+}
+
+// ─── Select Mode ─────────────────────────
+function setMode(mode) {
+  selectMode = (mode === 'select');
+  document.getElementById('mode-preview').classList.toggle('active', !selectMode);
+  document.getElementById('mode-select').classList.toggle('active', selectMode);
+  document.getElementById('click-banner').style.display = selectMode ? 'block' : 'none';
+
+  try {
+    var frame = document.getElementById('preview-frame');
+    var doc = frame.contentDocument || frame.contentWindow.document;
+    if (doc && doc.body) {
+      if (selectMode) {
+        injectSelectMode(doc);
       } else {
-        typeSelect.value = 'text';
-        document.getElementById('edit-value').value = text;
-      }
-      onTypeChange();
-      switchTab('edit');
-    }
-
-    function onTypeChange() {
-      const type = document.getElementById('edit-type').value;
-      const label = document.getElementById('edit-value-label');
-      const uploadGroup = document.getElementById('edit-upload-group');
-
-      const labels = { text: 'New Text', html: 'HTML Content', image: 'Image URL', background: 'Background URL', style: 'CSS Styles', attribute: 'Attribute (name=value)' };
-      label.textContent = labels[type] || 'Value';
-      uploadGroup.style.display = (type === 'image' || type === 'background') ? '' : 'none';
-    }
-
-    function clearSelection() {
-      selectedSelector = null;
-      document.getElementById('edit-empty').style.display = '';
-      document.getElementById('edit-form').style.display = 'none';
-      document.getElementById('edit-value').value = '';
-      try {
-        const doc = document.getElementById('preview-frame').contentDocument;
-        doc.querySelectorAll('.br-editor-selected').forEach(s => s.classList.remove('br-editor-selected'));
-      } catch(e) {}
-    }
-
-    // ─── Save Override ────────────────────────
-    async function saveOverride() {
-      if (!currentPage || !selectedSelector) {
-        showToast('Select a page and element first', 'error');
-        return;
-      }
-      const type = document.getElementById('edit-type').value;
-      const value = document.getElementById('edit-value').value.trim();
-      if (!value) { showToast('Value cannot be empty', 'error'); return; }
-
-      try {
-        await brUpsertContent(currentPage, selectedSelector, type, value);
-        showToast('Change saved! Refreshing preview…', 'success');
-        clearSelection();
-        await loadOverrides();
-        setTimeout(reloadPreview, 500);
-      } catch(err) {
-        showToast('Error: ' + err.message, 'error');
+        removeSelectMode(doc);
       }
     }
+  } catch(e) { console.warn('Cannot access iframe for select mode:', e); }
+}
 
-    // ─── Upload ───────────────────────────────
-    async function handleEditUpload(input) {
-      const file = input.files[0];
-      if (!file) return;
-      const status = document.getElementById('edit-upload-status');
-      status.textContent = 'Uploading…';
-      try {
-        const result = await brUploadFile('media', file, 'pages');
-        document.getElementById('edit-value').value = result.url;
-        status.textContent = '✅ Uploaded!';
-        await db.from('media').insert({
-          file_name: file.name, file_path: result.path, file_url: result.url,
-          file_size: file.size, mime_type: file.type, bucket: 'media'
-        });
-      } catch(err) {
-        status.textContent = '❌ ' + err.message;
-      }
-      input.value = '';
+function injectSelectMode(doc) {
+  var style = doc.getElementById('br-editor-style');
+  if (!style) {
+    style = doc.createElement('style');
+    style.id = 'br-editor-style';
+    doc.head.appendChild(style);
+  }
+  style.textContent =
+    '.br-editor-hover { outline: 2px dashed #C7065C !important; outline-offset: 2px; cursor: crosshair !important; }' +
+    '.br-editor-selected { outline: 3px solid #C7065C !important; outline-offset: 2px; }' +
+    '* { cursor: crosshair !important; }';
+  doc.body.addEventListener('mouseover', editorMouseOver, true);
+  doc.body.addEventListener('mouseout', editorMouseOut, true);
+  doc.body.addEventListener('click', editorClick, true);
+}
+
+function removeSelectMode(doc) {
+  doc.body.removeEventListener('mouseover', editorMouseOver, true);
+  doc.body.removeEventListener('mouseout', editorMouseOut, true);
+  doc.body.removeEventListener('click', editorClick, true);
+  doc.querySelectorAll('.br-editor-hover').forEach(function(el) { el.classList.remove('br-editor-hover'); });
+  var style = doc.getElementById('br-editor-style');
+  if (style) style.textContent = '.br-editor-selected { outline: 3px solid #C7065C !important; outline-offset: 2px; }';
+}
+
+function editorMouseOver(e) { e.target.classList.add('br-editor-hover'); }
+function editorMouseOut(e) { e.target.classList.remove('br-editor-hover'); }
+
+function editorClick(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  e.stopImmediatePropagation();
+
+  var el = e.target;
+  el.classList.remove('br-editor-hover');
+
+  var doc = document.getElementById('preview-frame').contentDocument;
+  doc.querySelectorAll('.br-editor-selected').forEach(function(s) { s.classList.remove('br-editor-selected'); });
+  el.classList.add('br-editor-selected');
+
+  selectElement(el, buildSelector(el));
+  setMode('preview');
+}
+
+// ─── Build Selector ──────────────────────
+function buildSelector(el) {
+  if (el.id && el.id.indexOf('br-editor') !== 0) return '#' + CSS.escape(el.id);
+  if (el.tagName === 'IMG') {
+    if (el.id) return 'img#' + CSS.escape(el.id);
+    if (el.alt) return 'img[alt="' + el.alt.replace(/"/g, '\\"') + '"]';
+  }
+  var path = [];
+  var cur = el;
+  while (cur && cur !== cur.ownerDocument.body) {
+    if (cur.id && cur.id.indexOf('br-editor') !== 0) {
+      path.unshift('#' + CSS.escape(cur.id));
+      break;
     }
-
-    // ─── Overrides List ───────────────────────
-    async function loadOverrides() {
-      if (!currentPage) return;
-      try {
-        const { data, error } = await db.from('page_content')
-          .select('*').eq('page_name', currentPage)
-          .order('updated_at', { ascending: false });
-        if (error) throw error;
-        overrides = data || [];
-        renderOverrides();
-      } catch(err) { console.error(err); }
+    var tag = cur.tagName.toLowerCase();
+    var parent = cur.parentElement;
+    if (parent) {
+      var siblings = Array.from(parent.children).filter(function(c) { return c.tagName === cur.tagName; });
+      if (siblings.length > 1) tag += ':nth-of-type(' + (siblings.indexOf(cur) + 1) + ')';
     }
+    path.unshift(tag);
+    cur = cur.parentElement;
+  }
+  return path.join(' > ');
+}
 
-    function renderOverrides() {
-      document.getElementById('ov-count').textContent = '(' + overrides.length + ')';
-      const wrap = document.getElementById('overrides-list');
-      if (!overrides.length) {
-        wrap.innerHTML = '<p style="font-size:12px;color:#aaa;text-align:center;padding:20px;">No overrides for this page yet.</p>';
-        return;
-      }
-      wrap.innerHTML = overrides.map(o => `
-        <div class="override-item">
-          <div class="oi-info">
-            <div class="oi-selector">${brEscapeHtml(o.element_selector)}</div>
-            <div class="oi-type">${o.content_type}</div>
-            <div class="oi-value">${brEscapeHtml((o.content_value||'').substring(0, 60))}</div>
-          </div>
-          <div class="oi-actions">
-            <button title="Edit" onclick="editExisting('${o.id}')">✏️</button>
-            <button title="Delete" onclick="deleteOverride('${o.id}')">🗑️</button>
-          </div>
-        </div>
-      `).join('');
+// ─── Select Element ──────────────────────
+function selectElement(el, selector) {
+  selectedSelector = selector;
+  selectedElement = el;
+  var tag = el.tagName.toLowerCase();
+  var isImg = tag === 'img';
+  var isLink = tag === 'a' || !!el.closest('a');
+  var isButton = tag === 'button' || el.getAttribute('role') === 'button';
+  var text = el.textContent ? el.textContent.trim().substring(0, 100) : '';
+
+  document.getElementById('edit-empty').style.display = 'none';
+  document.getElementById('edit-form').style.display = '';
+
+  var shortClass = el.className ? ('.' + String(el.className).split(' ')[0].substring(0, 20)) : '';
+  document.getElementById('sel-tag').textContent = tag + shortClass;
+  document.getElementById('sel-path').textContent = selector;
+  document.getElementById('sel-dims').textContent = Math.round(el.offsetWidth) + ' × ' + Math.round(el.offsetHeight) + 'px';
+
+  // Auto-detect type
+  var typeSelect = document.getElementById('edit-type');
+  if (isImg) {
+    typeSelect.value = 'image';
+    document.getElementById('edit-value').value = el.src || '';
+  } else if (isLink || isButton) {
+    typeSelect.value = 'text';
+    document.getElementById('edit-value').value = text;
+  } else if (el.style.backgroundImage && el.style.backgroundImage !== 'none') {
+    typeSelect.value = 'background';
+    document.getElementById('edit-value').value = el.style.backgroundImage.replace(/url\(['"]?|['"]?\)/g, '');
+  } else {
+    typeSelect.value = 'text';
+    document.getElementById('edit-value').value = text;
+  }
+  onTypeChange();
+
+  // Show link section
+  var linkSection = document.getElementById('section-link');
+  if (isLink || isButton) {
+    linkSection.style.display = '';
+    var anchor = (tag === 'a') ? el : el.closest('a');
+    document.getElementById('edit-link-href').value = anchor ? (anchor.getAttribute('href') || '') : '';
+    document.getElementById('edit-link-text').value = text;
+    document.getElementById('edit-link-target').value = anchor ? (anchor.getAttribute('target') || '') : '';
+  } else {
+    linkSection.style.display = 'none';
+  }
+
+  // Pre-fill styles
+  try {
+    var cs = el.ownerDocument.defaultView.getComputedStyle(el);
+    document.getElementById('edit-color').value = rgbToHex(cs.color) || '#333333';
+    document.getElementById('edit-bg-color').value = rgbToHex(cs.backgroundColor) || '#ffffff';
+    document.getElementById('edit-font-size').value = cs.fontSize || '';
+    document.getElementById('edit-font-weight').value = cs.fontWeight || '';
+  } catch(e) {}
+
+  switchTab('edit');
+}
+
+function onTypeChange() {
+  var type = document.getElementById('edit-type').value;
+  var label = document.getElementById('edit-value-label');
+  var uploadGroup = document.getElementById('edit-upload-group');
+  var valueGroup = document.getElementById('edit-value-group');
+
+  var labels = {
+    text: 'New Text', html: 'HTML Content', image: 'Image URL',
+    background: 'Background URL', href: 'Link URL', style: 'CSS Styles',
+    attribute: 'Attribute (name=value)', hide: 'Hidden', show: 'Display value'
+  };
+  label.textContent = labels[type] || 'Value';
+  uploadGroup.style.display = (type === 'image' || type === 'background') ? '' : 'none';
+  valueGroup.style.display = (type === 'hide') ? 'none' : '';
+
+  if (type === 'hide') document.getElementById('edit-value').value = 'none';
+  else if (type === 'show' && !document.getElementById('edit-value').value) document.getElementById('edit-value').value = 'block';
+}
+
+function clearSelection() {
+  selectedSelector = null;
+  selectedElement = null;
+  document.getElementById('edit-empty').style.display = '';
+  document.getElementById('edit-form').style.display = 'none';
+  document.getElementById('edit-value').value = '';
+  try {
+    var doc = document.getElementById('preview-frame').contentDocument;
+    if (doc) doc.querySelectorAll('.br-editor-selected').forEach(function(s) { s.classList.remove('br-editor-selected'); });
+  } catch(e) {}
+}
+
+// ─── Save Override ────────────────────────
+async function saveOverride() {
+  if (!currentPage || !selectedSelector) { showToast('Select a page and element first', 'error'); return; }
+  var type = document.getElementById('edit-type').value;
+  var value = document.getElementById('edit-value').value.trim();
+  if (!value && type !== 'hide') { showToast('Value cannot be empty', 'error'); return; }
+  var saveValue = type === 'hide' ? 'none' : value;
+
+  try {
+    await brUpsertContent(currentPage, selectedSelector, type, saveValue);
+    showToast('Saved! Refreshing…', 'success');
+    clearSelection();
+    await loadOverrides();
+    setTimeout(reloadPreview, 500);
+  } catch(err) {
+    showToast('Error: ' + err.message, 'error');
+  }
+}
+
+// ─── Save Link ────────────────────────────
+async function saveLinkChanges() {
+  if (!currentPage || !selectedSelector) { showToast('No element selected', 'error'); return; }
+  var href = document.getElementById('edit-link-href').value.trim();
+  var text = document.getElementById('edit-link-text').value.trim();
+  var target = document.getElementById('edit-link-target').value;
+
+  try {
+    if (href) await brUpsertContent(currentPage, selectedSelector, 'href', href);
+    if (text) await brUpsertContent(currentPage, selectedSelector, 'text', text);
+    if (target) await brUpsertContent(currentPage, selectedSelector, 'attribute', 'target=' + target);
+    showToast('Link updated!', 'success');
+    clearSelection();
+    await loadOverrides();
+    setTimeout(reloadPreview, 500);
+  } catch(err) {
+    showToast('Error: ' + err.message, 'error');
+  }
+}
+
+// ─── Save Style ───────────────────────────
+async function saveQuickStyle() {
+  if (!currentPage || !selectedSelector) { showToast('No element selected', 'error'); return; }
+  var parts = [];
+  var color = document.getElementById('edit-color').value;
+  var bg = document.getElementById('edit-bg-color').value;
+  var fs = document.getElementById('edit-font-size').value.trim();
+  var fw = document.getElementById('edit-font-weight').value;
+
+  if (color && color !== '#333333') parts.push('color:' + color);
+  if (bg && bg !== '#ffffff') parts.push('background-color:' + bg);
+  if (fs) parts.push('font-size:' + fs);
+  if (fw) parts.push('font-weight:' + fw);
+
+  if (!parts.length) { showToast('No style changes', 'info'); return; }
+
+  try {
+    await brUpsertContent(currentPage, selectedSelector, 'style', parts.join(';'));
+    showToast('Style applied!', 'success');
+    clearSelection();
+    await loadOverrides();
+    setTimeout(reloadPreview, 500);
+  } catch(err) {
+    showToast('Error: ' + err.message, 'error');
+  }
+}
+
+// ─── Upload ───────────────────────────────
+async function handleEditUpload(input) {
+  var file = input.files[0];
+  if (!file) return;
+  var status = document.getElementById('edit-upload-status');
+  status.textContent = 'Uploading…';
+  try {
+    var result = await brUploadFile('media', file, 'pages');
+    document.getElementById('edit-value').value = result.url;
+    status.textContent = '✅ Uploaded!';
+    await db.from('media').insert({
+      file_name: file.name, file_path: result.path, file_url: result.url,
+      file_size: file.size, mime_type: file.type, bucket: 'media'
+    });
+  } catch(err) {
+    status.textContent = '❌ ' + err.message;
+  }
+  input.value = '';
+}
+
+// ─── Overrides ────────────────────────────
+async function loadOverrides() {
+  if (!currentPage) return;
+  try {
+    var res = await db.from('page_content').select('*').eq('page_name', currentPage).order('updated_at', { ascending: false });
+    if (res.error) throw res.error;
+    overrides = res.data || [];
+    renderOverrides();
+  } catch(err) { console.error(err); }
+}
+
+function renderOverrides() {
+  document.getElementById('ov-count').textContent = '(' + overrides.length + ')';
+  var wrap = document.getElementById('overrides-list');
+  if (!overrides.length) {
+    wrap.innerHTML = '<p style="font-size:12px;color:#aaa;text-align:center;padding:20px;">No overrides for this page yet.</p>';
+    return;
+  }
+  wrap.innerHTML = overrides.map(function(o) {
+    return '<div class="override-item">' +
+      '<div class="oi-info">' +
+      '<div class="oi-selector">' + brEscapeHtml(o.element_selector) + '</div>' +
+      '<div class="oi-type">' + o.content_type + '</div>' +
+      '<div class="oi-value">' + brEscapeHtml((o.content_value || '').substring(0, 60)) + '</div>' +
+      '</div>' +
+      '<div class="oi-actions">' +
+      '<button title="Edit" onclick="editExisting(\'' + o.id + '\')">✏️</button>' +
+      '<button title="Highlight" onclick="highlightOverride(\'' + escAttr(o.element_selector) + '\')">🎯</button>' +
+      '<button title="Delete" onclick="deleteOverride(\'' + o.id + '\')">🗑️</button>' +
+      '</div></div>';
+  }).join('');
+}
+
+function editExisting(id) {
+  var o = overrides.find(function(x) { return x.id == id; });
+  if (!o) return;
+  selectedSelector = o.element_selector;
+  document.getElementById('edit-empty').style.display = 'none';
+  document.getElementById('edit-form').style.display = '';
+  document.getElementById('sel-tag').textContent = 'override';
+  document.getElementById('sel-path').textContent = o.element_selector;
+  document.getElementById('sel-dims').textContent = 'Editing existing override';
+  document.getElementById('edit-type').value = o.content_type;
+  document.getElementById('edit-value').value = o.content_value || '';
+  document.getElementById('section-link').style.display = 'none';
+  onTypeChange();
+  switchTab('edit');
+}
+
+function highlightOverride(selector) {
+  try {
+    var doc = document.getElementById('preview-frame').contentDocument;
+    doc.querySelectorAll('.br-editor-selected').forEach(function(s) { s.classList.remove('br-editor-selected'); });
+    ensureEditorStyle(doc);
+    var el = doc.querySelector(selector);
+    if (el) {
+      el.classList.add('br-editor-selected');
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else {
+      showToast('Element not found', 'info');
     }
+  } catch(e) {}
+}
 
-    function editExisting(id) {
-      const o = overrides.find(x => x.id === id);
-      if (!o) return;
-      selectedSelector = o.element_selector;
-      document.getElementById('edit-empty').style.display = 'none';
-      document.getElementById('edit-form').style.display = '';
-      document.getElementById('sel-tag').textContent = 'override';
-      document.getElementById('sel-path').textContent = o.element_selector;
-      document.getElementById('sel-dims').textContent = 'Existing override — editing';
-      document.getElementById('edit-type').value = o.content_type;
-      document.getElementById('edit-value').value = o.content_value || '';
-      onTypeChange();
-      switchTab('edit');
-    }
+async function deleteOverride(id) {
+  if (!confirm('Delete this override?')) return;
+  try {
+    await db.from('page_content').delete().eq('id', id);
+    showToast('Deleted', 'success');
+    await loadOverrides();
+    setTimeout(reloadPreview, 300);
+  } catch(err) { showToast('Error: ' + err.message, 'error'); }
+}
 
-    async function deleteOverride(id) {
-      if (!confirm('Delete this override?')) return;
-      try {
-        await db.from('page_content').delete().eq('id', id);
-        showToast('Deleted', 'success');
-        await loadOverrides();
-        setTimeout(reloadPreview, 300);
-      } catch(err) { showToast('Error: ' + err.message, 'error'); }
-    }
+// ─── Guide ────────────────────────────────
+function renderGuide() {
+  var list = document.getElementById('guide-list');
+  var items = (EDIT_GUIDE['_common'] || []).concat(EDIT_GUIDE[currentPage] || []);
+  if (!items.length) {
+    list.innerHTML = '<p style="font-size:12px;color:#aaa;">No specific guides. Use Elements tab or Select Element.</p>';
+    return;
+  }
+  list.innerHTML = items.map(function(g) {
+    return '<div class="guide-item" onclick="selectDetected(\'' + escAttr(g.selector) + '\', \'' + g.type + '\')">' +
+      '<div class="gi-title">' + g.title + '</div>' +
+      '<div class="gi-desc">' + g.desc + '</div>' +
+      '<div class="gi-selector">' + g.selector + '</div></div>';
+  }).join('');
+}
 
-    // ─── Guide ────────────────────────────────
-    function renderGuide() {
-      const list = document.getElementById('guide-list');
-      const items = [...(EDIT_GUIDE['_common'] || []), ...(EDIT_GUIDE[currentPage] || [])];
-      if (!items.length) {
-        list.innerHTML = '<p style="font-size:12px;color:#aaa;">No specific guides for this page.</p>';
-        return;
-      }
-      list.innerHTML = items.map(g => `
-        <div class="guide-item" onclick="useGuide('${g.selector.replace(/'/g,"\\'")}', '${g.type}')">
-          <div class="gi-title">${g.title}</div>
-          <div class="gi-desc">${g.desc}</div>
-          <div class="gi-selector">${g.selector}</div>
-        </div>
-      `).join('');
-    }
+function reloadPreview() {
+  if (currentPage) selectPage(currentPage);
+}
 
-    function useGuide(selector, type) {
-      selectedSelector = selector;
-      document.getElementById('edit-empty').style.display = 'none';
-      document.getElementById('edit-form').style.display = '';
-      document.getElementById('sel-tag').textContent = 'guide';
-      document.getElementById('sel-path').textContent = selector;
-      document.getElementById('sel-dims').textContent = 'From guide — fill value below';
-      document.getElementById('edit-type').value = type;
-      document.getElementById('edit-value').value = '';
-      onTypeChange();
-      switchTab('edit');
+// ─── Utility ──────────────────────────────
+function escAttr(str) { return (str || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'"); }
+function escHtml(str) { var d = document.createElement('div'); d.textContent = str || ''; return d.innerHTML; }
 
-      // Try to highlight in preview
-      try {
-        const doc = document.getElementById('preview-frame').contentDocument;
-        doc.querySelectorAll('.br-editor-selected').forEach(s => s.classList.remove('br-editor-selected'));
-        const el = doc.querySelector(selector);
-        if (el) {
-          el.classList.add('br-editor-selected');
-          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-      } catch(e) {}
-    }
+function rgbToHex(rgb) {
+  if (!rgb || rgb === 'transparent' || rgb === 'rgba(0, 0, 0, 0)') return '#ffffff';
+  var m = rgb.match(/(\d+),\s*(\d+),\s*(\d+)/);
+  if (!m) return '#333333';
+  return '#' + [m[1], m[2], m[3]].map(function(x) { return parseInt(x).toString(16).padStart(2, '0'); }).join('');
+}
 
-    function reloadPreview() {
-      const f = document.getElementById('preview-frame');
-      if (f.src && f.src !== 'about:blank') f.src = f.src;
-    }
-
-    // ─── Init ─────────────────────────────────
-    (async () => {
-      try {
-        const user = await brRequireAdmin();
-        const name = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Admin';
-        document.getElementById('user-name').textContent = name;
-        document.getElementById('user-email').textContent = user.email;
-        document.getElementById('user-avatar').textContent = name.charAt(0).toUpperCase();
-        renderPagePills();
-        renderGuide();
-      } catch(err) {
-        if (err.message !== 'Not authenticated' && err.message !== 'Admin access required') console.error(err);
-      }
-    })();
-  </script>
+// ─── Init ─────────────────────────────────
+(async function() {
+  try {
+    var user = await brRequireAdmin();
+    var name = user.user_metadata && user.user_metadata.full_name ? user.user_metadata.full_name : (user.email ? user.email.split('@')[0] : 'Admin');
+    document.getElementById('user-name').textContent = name;
+    document.getElementById('user-email').textContent = user.email;
+    document.getElementById('user-avatar').textContent = name.charAt(0).toUpperCase();
+    renderPagePills();
+    renderGuide();
+  } catch(err) {
+    if (err.message !== 'Not authenticated' && err.message !== 'Admin access required') console.error(err);
+  }
+})();
+</script>
 </body>
 </html>
