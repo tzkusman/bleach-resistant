@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Page Editor — Bleach Resistant Admin</title>
+  <link rel="icon" href="https://static.wixstatic.com/media/926a36_bea70e48de2b461ebaae685fdbb3be76%7Emv2.png/v1/fill/w_32%2Ch_32%2Clg_1%2Cusm_0.66_1.00_0.01/926a36_bea70e48de2b461ebaae685fdbb3be76%7Emv2.png" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <style>
+    /* ===== VISUAL EDITOR STYLES ===== */
+    .editor-layout { display: flex; height: calc(100vh - 60px); overflow: hidden; }
+    .editor-sidebar-panel {
+      width: 380px; min-width: 320px; background: #fff; border-right: 1px solid #e5e5e5;
+      display: flex; flex-direction: column; overflow: hidden;
+    }
+    .editor-preview-panel { flex: 1; display: flex; flex-direction: column; background: #f0f0f0; }
+    .editor-preview-toolbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 16px; background: #fff; border-bottom: 1px solid #e5e5e5;
+      gap: 12px; flex-shrink: 0;
+    }
+    .editor-preview-toolbar select { padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; }
+    .editor-preview-toolbar .btn { font-size: 11px; }
+    .preview-frame-wrap { flex: 1; position: relative; overflow: hidden; }
+    .preview-frame-wrap iframe { width: 100%; height: 100%; border: none; }
+    .editor-mode-toggle {
+      display: flex; background: #f4f4f4; border-radius: 6px; overflow: hidden; border: 1px solid #ddd;
+    }
+    .editor-mode-toggle button {
+      padding: 5px 14px; border: none; background: none; cursor: pointer;
+      font-size: 11px; font-weight: 600; color: #666; transition: all 0.2s;
+    }
+    .editor-mode-toggle button.active { background: #C7065C; color: #fff; }
+
+    /* Sidebar sections */
+    .panel-header {
+      padding: 16px 20px; border-bottom: 1px solid #eee; flex-shrink: 0;
+    }
+    .panel-header h3 { font-size: 14px; font-weight: 700; margin: 0; }
+    .panel-header p { font-size: 11px; color: #888; margin: 4px 0 0; }
+    .panel-body { flex: 1; overflow-y: auto; padding: 0; }
+    .panel-section { padding: 16px 20px; border-bottom: 1px solid #f0f0f0; }
+    .panel-section h4 { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #999; margin: 0 0 12px; }
+
+    /* Selected element info */
+    .selected-info {
+      background: #fef7fa; border: 1px solid #f0d0de; border-radius: 8px;
+      padding: 14px; margin-bottom: 16px;
+    }
+    .selected-info .tag-name {
+      display: inline-block; background: #C7065C; color: #fff; padding: 2px 8px;
+      border-radius: 3px; font-size: 10px; font-weight: 700; text-transform: uppercase;
+      font-family: monospace; letter-spacing: 0.5px;
+    }
+    .selected-info .sel-path {
+      font-family: monospace; font-size: 11px; color: #666; margin-top: 6px;
+      word-break: break-all; background: #f8f8f8; padding: 6px 8px; border-radius: 4px;
+    }
+    .selected-info .sel-dims {
+      font-size: 10px; color: #aaa; margin-top: 4px;
+    }
+
+    /* Edit fields */
+    .edit-field { margin-bottom: 14px; }
+    .edit-field label {
+      display: block; font-size: 11px; font-weight: 600; color: #555;
+      margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.3px;
+    }
+    .edit-field input, .edit-field textarea, .edit-field select {
+      width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 5px;
+      font-size: 13px; font-family: inherit; box-sizing: border-box;
+    }
+    .edit-field textarea { resize: vertical; min-height: 80px; }
+    .edit-field input:focus, .edit-field textarea:focus { border-color: #C7065C; outline: none; box-shadow: 0 0 0 2px rgba(199,6,92,0.1); }
+
+    /* Override list items */
+    .override-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 12px; border: 1px solid #eee; border-radius: 6px;
+      margin-bottom: 8px; background: #fafafa; transition: all 0.15s;
+    }
+    .override-item:hover { background: #f5f5f5; border-color: #ddd; }
+    .override-item .oi-info { flex: 1; min-width: 0; }
+    .override-item .oi-selector { font-family: monospace; font-size: 11px; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .override-item .oi-type { font-size: 10px; color: #C7065C; font-weight: 600; text-transform: uppercase; }
+    .override-item .oi-value { font-size: 10px; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
+    .override-item .oi-actions { display: flex; gap: 4px; flex-shrink: 0; margin-left: 8px; }
+    .override-item .oi-actions button {
+      width: 24px; height: 24px; border: 1px solid #ddd; border-radius: 4px;
+      background: #fff; cursor: pointer; font-size: 11px; display: flex;
+      align-items: center; justify-content: center; transition: all 0.15s;
+    }
+    .override-item .oi-actions button:hover { background: #C7065C; color: #fff; border-color: #C7065C; }
+
+    /* Guide panel */
+    .guide-item {
+      padding: 10px 14px; border: 1px solid #e8e8e8; border-radius: 6px;
+      margin-bottom: 8px; cursor: pointer; transition: all 0.15s;
+    }
+    .guide-item:hover { background: #fef7fa; border-color: #C7065C; }
+    .guide-item .gi-title { font-size: 12px; font-weight: 600; color: #333; }
+    .guide-item .gi-desc { font-size: 10px; color: #888; margin-top: 2px; }
+    .guide-item .gi-selector { font-family: monospace; font-size: 10px; color: #C7065C; margin-top: 4px; }
+
+    /* Empty / placeholder states */
+    .empty-panel { text-align: center; padding: 40px 20px; color: #aaa; }
+    .empty-panel .ep-icon { font-size: 48px; margin-bottom: 12px; }
+    .empty-panel p { font-size: 12px; line-height: 1.6; }
+
+    /* Page selector buttons */
+    .page-pills { display: flex; flex-wrap: wrap; gap: 6px; padding: 12px 20px; border-bottom: 1px solid #eee; flex-shrink: 0; }
+    .page-pill {
+      padding: 5px 12px; border: 1px solid #ddd; border-radius: 20px;
+      background: #fff; cursor: pointer; font-size: 11px; font-weight: 500;
+      transition: all 0.15s; color: #555;
+    }
+    .page-pill:hover { border-color: #C7065C; color: #C7065C; }
+    .page-pill.active { background: #C7065C; color: #fff; border-color: #C7065C; }
+
+    /* Tabs */
+    .panel-tabs {
+      display: flex; border-bottom: 2px solid #eee; flex-shrink: 0;
+    }
+    .panel-tab {
+      flex: 1; padding: 10px; text-align: center; font-size: 11px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer;
+      color: #888; border-bottom: 2px solid transparent; margin-bottom: -2px;
+      transition: all 0.15s;
+    }
+    .panel-tab:hover { color: #333; }
+    .panel-tab.active { color: #C7065C; border-bottom-color: #C7065C; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* Click-mode indicator */
+    .click-mode-banner {
+      background: #C7065C; color: #fff; text-align: center; padding: 8px;
+      font-size: 12px; font-weight: 600; display: none; flex-shrink: 0;
+      animation: pulse-bg 1.5s ease infinite;
+    }
+    @keyframes pulse-bg { 0%,100%{ opacity: 1; } 50%{ opacity: 0.85; } }
+
+    /* Save button group */
+    .save-bar {
+      padding: 12px 20px; border-top: 1px solid #eee; flex-shrink: 0;
+      display: flex; gap: 8px;
+    }
+    .save-bar .btn { flex: 1; }
+  </style>
+</head>
+<body>
+
+  <!-- ===== SIDEBAR NAV ===== -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-brand"><h2>Bleach Resistant</h2><small>Admin Panel</small></div>
+    <div class="sidebar-nav">
+      <div class="nav-section">Main</div>
+      <a href="admin.html"><span class="icon">📊</span> Dashboard</a>
+      <a href="admin-orders.html"><span class="icon">📦</span> Orders</a>
+      <a href="admin-contacts.html"><span class="icon">💬</span> Contacts</a>
+      <div class="nav-section">Content</div>
+      <a href="admin-pages.html" class="active"><span class="icon">📄</span> Pages</a>
+      <a href="admin-media.html"><span class="icon">🖼️</span> Media Library</a>
+      <div class="nav-section">Website</div>
+      <a href="home.html" target="_blank"><span class="icon">🌐</span> View Site</a>
+    </div>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" id="user-avatar">A</div>
+        <div>
+          <div style="font-size:12px;font-weight:600;" id="user-name">Admin</div>
+          <div class="user-email" id="user-email">loading…</div>
+        </div>
+      </div>
+      <button class="btn btn-secondary btn-sm btn-block" onclick="brSignOut()">Sign Out</button>
+    </div>
+  </nav>
+
+  <!-- ===== MAIN EDITOR ===== -->
+  <div class="main-content" style="padding:0;overflow:hidden;">
+    <div class="editor-layout">
+
+      <!-- LEFT: Editor sidebar panel -->
+      <div class="editor-sidebar-panel">
+        <!-- Page pills -->
+        <div class="page-pills" id="page-pills"></div>
+
+        <!-- Tabs -->
+        <div class="panel-tabs">
+          <div class="panel-tab active" data-tab="edit" onclick="switchTab('edit')">✏️ Edit</div>
+          <div class="panel-tab" data-tab="overrides" onclick="switchTab('overrides')">📋 Overrides</div>
+          <div class="panel-tab" data-tab="guide" onclick="switchTab('guide')">💡 Guide</div>
+        </div>
+
+        <div class="click-mode-banner" id="click-banner">🎯 Click any element in the preview to select it</div>
+
+        <!-- Tab: Edit -->
+        <div class="panel-body">
+          <div class="tab-content active" id="tab-edit">
+            <div class="empty-panel" id="edit-empty">
+              <div class="ep-icon">👆</div>
+              <p>Select a page above, then click<br><strong>"Select Element"</strong> and click any<br>element in the preview to edit it.</p>
+            </div>
+            <div id="edit-form" style="display:none;">
+              <div class="panel-section">
+                <div class="selected-info">
+                  <span class="tag-name" id="sel-tag"></span>
+                  <div class="sel-path" id="sel-path"></div>
+                  <div class="sel-dims" id="sel-dims"></div>
+                </div>
+
+                <div class="edit-field">
+                  <label>Content Type</label>
+                  <select id="edit-type" onchange="onTypeChange()">
+                    <option value="text">Text Content</option>
+                    <option value="html">HTML Content</option>
+                    <option value="image">Image Source (src)</option>
+                    <option value="background">Background Image</option>
+                    <option value="style">Custom CSS Style</option>
+                    <option value="attribute">Attribute</option>
+                  </select>
+                </div>
+
+                <div class="edit-field" id="edit-value-group">
+                  <label id="edit-value-label">New Text</label>
+                  <textarea id="edit-value" placeholder="Enter new content…"></textarea>
+                </div>
+
+                <div class="edit-field" id="edit-upload-group" style="display:none;">
+                  <label>Or Upload Image</label>
+                  <input type="file" id="edit-upload" accept="image/*" onchange="handleEditUpload(this)">
+                  <span id="edit-upload-status" style="font-size:10px;color:#888;"></span>
+                </div>
+              </div>
+
+              <div class="save-bar">
+                <button class="btn btn-primary" onclick="saveOverride()">💾 Save Change</button>
+                <button class="btn btn-secondary" onclick="clearSelection()">Cancel</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab: Overrides -->
+          <div class="tab-content" id="tab-overrides">
+            <div class="panel-section">
+              <h4>Active Overrides <span id="ov-count"></span></h4>
+              <div id="overrides-list"></div>
+            </div>
+          </div>
+
+          <!-- Tab: Guide -->
+          <div class="tab-content" id="tab-guide">
+            <div class="panel-section">
+              <h4>Common Editable Elements</h4>
+              <p style="font-size:11px;color:#888;margin-bottom:12px;">Click any item below to auto-fill the selector. Then click "Select Element" to find it on the page.</p>
+              <div id="guide-list"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Preview panel -->
+      <div class="editor-preview-panel">
+        <div class="editor-preview-toolbar">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <strong id="preview-title" style="font-size:13px;">Select a page</strong>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div class="editor-mode-toggle">
+              <button id="mode-preview" class="active" onclick="setMode('preview')">Preview</button>
+              <button id="mode-select" onclick="setMode('select')">Select Element</button>
+            </div>
+            <button class="btn btn-sm btn-secondary" onclick="reloadPreview()">🔄</button>
+            <a id="open-page-link" href="#" target="_blank" class="btn btn-sm btn-secondary">↗ Open</a>
+          </div>
+        </div>
+        <div class="preview-frame-wrap">
+          <iframe id="preview-frame" src="about:blank" sandbox="allow-same-origin allow-scripts"></iframe>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast"></div>
+
+  <script>
+    /* ========================================================
+       VISUAL PAGE EDITOR — WordPress-like Click-to-Edit
+       ======================================================== */
+
+    const SITE_PAGES = [
+      { file: 'home.html', name: 'Home' },
+      { file: 'finprint.html', name: 'Showcase' },
+      { file: 'About.html', name: 'About' },
+      { file: 'services.html', name: 'Services' },
+      { file: 'product.html', name: 'Products' },
+      { file: 'Pricelist.html', name: 'Price List' },
+      { file: 'headgear.html', name: 'Head Gear' },
+      { file: 'basicpoly.html', name: 'Basics' },
+      { file: 'stockdesigns.html', name: 'Stock Designs' },
+      { file: 'fabricdescriptions.html', name: 'Fabrics' },
+      { file: 'sublimationprinting.html', name: 'Sublimation' },
+      { file: 'grapicdesign.html', name: 'Graphic Design' },
+      { file: 'customlogos.html', name: 'Custom Logos' },
+      { file: 'wrapdesign.html', name: 'Wrap Design' },
+      { file: 'copyofwashingsamples.html', name: 'Showcase' },
+      { file: 'sizechart.html', name: 'Size Chart' },
+      { file: 'order.html', name: 'Order' },
+      { file: 'FAQs.html', name: 'FAQs' },
+      { file: 'privacypolicy.html', name: 'Privacy' },
+      { file: 'termsconditions.html', name: 'Terms' }
+    ];
+
+    // Known editable elements guide (per-page suggestions)
+    const EDIT_GUIDE = {
+      '_common': [
+        { selector: '.br-auth-logo', type: 'text', title: 'Brand Name (Auth Bar)', desc: 'The "BLEACH RESISTANT" text in the top bar' },
+        { selector: '#img_comp-ky0cyl68', type: 'image', title: 'Site Logo Image', desc: 'The main logo in the header navigation' },
+      ],
+      'home.html': [
+        { selector: '#img_comp-m4k7zp59', type: 'image', title: 'Feature Image 1 (Slider)', desc: 'First image in the rotating slider' },
+        { selector: '#img_comp-m4k7zp5d', type: 'image', title: 'Feature Image 2 (Slider)', desc: 'Second image in the rotating slider' },
+        { selector: '#img_comp-m4k7zp5h', type: 'image', title: 'Feature Image 3 (Slider)', desc: 'Third image in the rotating slider' },
+        { selector: '#comp-m4k7xime', type: 'text', title: 'Hero Text Block', desc: 'Main description text on the home page' },
+        { selector: '#comp-jqcejn7e', type: 'text', title: 'Tagline / CTA Block', desc: 'Call-to-action section text' },
+      ],
+      'About.html': [
+        { selector: '#comp-jqdibrfp', type: 'text', title: 'About Text', desc: 'Main about description paragraph' },
+      ],
+      'order.html': [
+        { selector: '#br-order-form-wrapper h2', type: 'text', title: 'Order Form Title', desc: 'Title above the order form' },
+      ],
+      'FAQs.html': [
+        { selector: '#br-contact-wrapper h2', type: 'text', title: 'Contact Form Title', desc: 'Title above the contact form' },
+      ]
+    };
+
+    let currentPage = null;
+    let selectMode = false;
+    let selectedSelector = null;
+    let overrides = [];
+
+    // ─── Toast ────────────────────────────────
+    function showToast(msg, type) {
+      const t = document.getElementById('toast');
+      t.className = 'toast toast-' + (type || 'info');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    // ─── Tabs ─────────────────────────────────
+    function switchTab(name) {
+      document.querySelectorAll('.panel-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === 'tab-' + name));
+    }
+
+    // ─── Page Selection ───────────────────────
+    function renderPagePills() {
+      document.getElementById('page-pills').innerHTML = SITE_PAGES.map(p =>
+        `<div class="page-pill${currentPage === p.file ? ' active' : ''}" onclick="selectPage('${p.file}')">${p.name}</div>`
+      ).join('');
+    }
+
+    function selectPage(file) {
+      currentPage = file;
+      renderPagePills();
+      const page = SITE_PAGES.find(p => p.file === file);
+      document.getElementById('preview-title').textContent = page ? page.name : file;
+      document.getElementById('open-page-link').href = file;
+      document.getElementById('preview-frame').src = file;
+      clearSelection();
+      loadOverrides();
+      renderGuide();
+      setMode('preview');
+    }
+
+    // ─── Preview Mode ─────────────────────────
+    function setMode(mode) {
+      selectMode = (mode === 'select');
+      document.getElementById('mode-preview').classList.toggle('active', !selectMode);
+      document.getElementById('mode-select').classList.toggle('active', selectMode);
+      document.getElementById('click-banner').style.display = selectMode ? 'block' : 'none';
+
+      const frame = document.getElementById('preview-frame');
+      try {
+        const doc = frame.contentDocument || frame.contentWindow.document;
+        if (selectMode) {
+          injectSelectMode(doc);
+        } else {
+          removeSelectMode(doc);
+        }
+      } catch(e) { console.warn('Cannot access iframe:', e); }
+    }
+
+    function injectSelectMode(doc) {
+      // Add hover highlight CSS
+      let style = doc.getElementById('br-editor-style');
+      if (!style) {
+        style = doc.createElement('style');
+        style.id = 'br-editor-style';
+        style.textContent = `
+          .br-editor-hover { outline: 2px dashed #C7065C !important; outline-offset: 2px; cursor: crosshair !important; }
+          .br-editor-selected { outline: 3px solid #C7065C !important; outline-offset: 2px; }
+          * { cursor: crosshair !important; }
+        `;
+        doc.head.appendChild(style);
+      }
+
+      // Add hover/click handlers
+      doc.body.addEventListener('mouseover', editorMouseOver, true);
+      doc.body.addEventListener('mouseout', editorMouseOut, true);
+      doc.body.addEventListener('click', editorClick, true);
+    }
+
+    function removeSelectMode(doc) {
+      const style = doc.getElementById('br-editor-style');
+      if (style) style.remove();
+      doc.body.removeEventListener('mouseover', editorMouseOver, true);
+      doc.body.removeEventListener('mouseout', editorMouseOut, true);
+      doc.body.removeEventListener('click', editorClick, true);
+      doc.querySelectorAll('.br-editor-hover').forEach(el => el.classList.remove('br-editor-hover'));
+    }
+
+    function editorMouseOver(e) {
+      e.target.classList.add('br-editor-hover');
+    }
+
+    function editorMouseOut(e) {
+      e.target.classList.remove('br-editor-hover');
+    }
+
+    function editorClick(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+
+      const el = e.target;
+      el.classList.remove('br-editor-hover');
+
+      // Remove previous selection highlight
+      const frame = document.getElementById('preview-frame');
+      const doc = frame.contentDocument || frame.contentWindow.document;
+      doc.querySelectorAll('.br-editor-selected').forEach(s => s.classList.remove('br-editor-selected'));
+      el.classList.add('br-editor-selected');
+
+      // Build a unique CSS selector for this element
+      const selector = buildSelector(el);
+      selectElement(el, selector);
+      setMode('preview'); // Exit select mode
+    }
+
+    // ─── Build CSS Selector ───────────────────
+    function buildSelector(el) {
+      // Prefer ID
+      if (el.id && !el.id.startsWith('br-editor')) {
+        return '#' + CSS.escape(el.id);
+      }
+      // For images, use img#id or img[alt]
+      if (el.tagName === 'IMG') {
+        if (el.id) return 'img#' + CSS.escape(el.id);
+        if (el.alt) return 'img[alt="' + el.alt.replace(/"/g, '\\"') + '"]';
+      }
+      // Build path from parent with ID
+      let path = [];
+      let cur = el;
+      while (cur && cur !== cur.ownerDocument.body) {
+        if (cur.id && !cur.id.startsWith('br-editor')) {
+          path.unshift('#' + CSS.escape(cur.id));
+          break;
+        }
+        let tag = cur.tagName.toLowerCase();
+        let parent = cur.parentElement;
+        if (parent) {
+          let siblings = Array.from(parent.children).filter(c => c.tagName === cur.tagName);
+          if (siblings.length > 1) {
+            let idx = siblings.indexOf(cur) + 1;
+            tag += ':nth-of-type(' + idx + ')';
+          }
+        }
+        path.unshift(tag);
+        cur = cur.parentElement;
+      }
+      return path.join(' > ');
+    }
+
+    // ─── Select Element ───────────────────────
+    function selectElement(el, selector) {
+      selectedSelector = selector;
+      const tag = el.tagName.toLowerCase();
+      const isImg = tag === 'img';
+      const text = el.textContent ? el.textContent.trim().substring(0, 100) : '';
+
+      document.getElementById('edit-empty').style.display = 'none';
+      document.getElementById('edit-form').style.display = '';
+      document.getElementById('sel-tag').textContent = tag + (el.className ? '.' + el.className.split(' ')[0] : '');
+      document.getElementById('sel-path').textContent = selector;
+      document.getElementById('sel-dims').textContent = Math.round(el.offsetWidth) + ' × ' + Math.round(el.offsetHeight) + 'px';
+
+      // Auto-detect type
+      const typeSelect = document.getElementById('edit-type');
+      if (isImg) {
+        typeSelect.value = 'image';
+        document.getElementById('edit-value').value = el.src || '';
+      } else if (el.style.backgroundImage) {
+        typeSelect.value = 'background';
+        document.getElementById('edit-value').value = el.style.backgroundImage.replace(/url\(['"]?|['"]?\)/g, '');
+      } else {
+        typeSelect.value = 'text';
+        document.getElementById('edit-value').value = text;
+      }
+      onTypeChange();
+      switchTab('edit');
+    }
+
+    function onTypeChange() {
+      const type = document.getElementById('edit-type').value;
+      const label = document.getElementById('edit-value-label');
+      const uploadGroup = document.getElementById('edit-upload-group');
+
+      const labels = { text: 'New Text', html: 'HTML Content', image: 'Image URL', background: 'Background URL', style: 'CSS Styles', attribute: 'Attribute (name=value)' };
+      label.textContent = labels[type] || 'Value';
+      uploadGroup.style.display = (type === 'image' || type === 'background') ? '' : 'none';
+    }
+
+    function clearSelection() {
+      selectedSelector = null;
+      document.getElementById('edit-empty').style.display = '';
+      document.getElementById('edit-form').style.display = 'none';
+      document.getElementById('edit-value').value = '';
+      try {
+        const doc = document.getElementById('preview-frame').contentDocument;
+        doc.querySelectorAll('.br-editor-selected').forEach(s => s.classList.remove('br-editor-selected'));
+      } catch(e) {}
+    }
+
+    // ─── Save Override ────────────────────────
+    async function saveOverride() {
+      if (!currentPage || !selectedSelector) {
+        showToast('Select a page and element first', 'error');
+        return;
+      }
+      const type = document.getElementById('edit-type').value;
+      const value = document.getElementById('edit-value').value.trim();
+      if (!value) { showToast('Value cannot be empty', 'error'); return; }
+
+      try {
+        await brUpsertContent(currentPage, selectedSelector, type, value);
+        showToast('Change saved! Refreshing preview…', 'success');
+        clearSelection();
+        await loadOverrides();
+        setTimeout(reloadPreview, 500);
+      } catch(err) {
+        showToast('Error: ' + err.message, 'error');
+      }
+    }
+
+    // ─── Upload ───────────────────────────────
+    async function handleEditUpload(input) {
+      const file = input.files[0];
+      if (!file) return;
+      const status = document.getElementById('edit-upload-status');
+      status.textContent = 'Uploading…';
+      try {
+        const result = await brUploadFile('media', file, 'pages');
+        document.getElementById('edit-value').value = result.url;
+        status.textContent = '✅ Uploaded!';
+        await db.from('media').insert({
+          file_name: file.name, file_path: result.path, file_url: result.url,
+          file_size: file.size, mime_type: file.type, bucket: 'media'
+        });
+      } catch(err) {
+        status.textContent = '❌ ' + err.message;
+      }
+      input.value = '';
+    }
+
+    // ─── Overrides List ───────────────────────
+    async function loadOverrides() {
+      if (!currentPage) return;
+      try {
+        const { data, error } = await db.from('page_content')
+          .select('*').eq('page_name', currentPage)
+          .order('updated_at', { ascending: false });
+        if (error) throw error;
+        overrides = data || [];
+        renderOverrides();
+      } catch(err) { console.error(err); }
+    }
+
+    function renderOverrides() {
+      document.getElementById('ov-count').textContent = '(' + overrides.length + ')';
+      const wrap = document.getElementById('overrides-list');
+      if (!overrides.length) {
+        wrap.innerHTML = '<p style="font-size:12px;color:#aaa;text-align:center;padding:20px;">No overrides for this page yet.</p>';
+        return;
+      }
+      wrap.innerHTML = overrides.map(o => `
+        <div class="override-item">
+          <div class="oi-info">
+            <div class="oi-selector">${brEscapeHtml(o.element_selector)}</div>
+            <div class="oi-type">${o.content_type}</div>
+            <div class="oi-value">${brEscapeHtml((o.content_value||'').substring(0, 60))}</div>
+          </div>
+          <div class="oi-actions">
+            <button title="Edit" onclick="editExisting('${o.id}')">✏️</button>
+            <button title="Delete" onclick="deleteOverride('${o.id}')">🗑️</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function editExisting(id) {
+      const o = overrides.find(x => x.id === id);
+      if (!o) return;
+      selectedSelector = o.element_selector;
+      document.getElementById('edit-empty').style.display = 'none';
+      document.getElementById('edit-form').style.display = '';
+      document.getElementById('sel-tag').textContent = 'override';
+      document.getElementById('sel-path').textContent = o.element_selector;
+      document.getElementById('sel-dims').textContent = 'Existing override — editing';
+      document.getElementById('edit-type').value = o.content_type;
+      document.getElementById('edit-value').value = o.content_value || '';
+      onTypeChange();
+      switchTab('edit');
+    }
+
+    async function deleteOverride(id) {
+      if (!confirm('Delete this override?')) return;
+      try {
+        await db.from('page_content').delete().eq('id', id);
+        showToast('Deleted', 'success');
+        await loadOverrides();
+        setTimeout(reloadPreview, 300);
+      } catch(err) { showToast('Error: ' + err.message, 'error'); }
+    }
+
+    // ─── Guide ────────────────────────────────
+    function renderGuide() {
+      const list = document.getElementById('guide-list');
+      const items = [...(EDIT_GUIDE['_common'] || []), ...(EDIT_GUIDE[currentPage] || [])];
+      if (!items.length) {
+        list.innerHTML = '<p style="font-size:12px;color:#aaa;">No specific guides for this page.</p>';
+        return;
+      }
+      list.innerHTML = items.map(g => `
+        <div class="guide-item" onclick="useGuide('${g.selector.replace(/'/g,"\\'")}', '${g.type}')">
+          <div class="gi-title">${g.title}</div>
+          <div class="gi-desc">${g.desc}</div>
+          <div class="gi-selector">${g.selector}</div>
+        </div>
+      `).join('');
+    }
+
+    function useGuide(selector, type) {
+      selectedSelector = selector;
+      document.getElementById('edit-empty').style.display = 'none';
+      document.getElementById('edit-form').style.display = '';
+      document.getElementById('sel-tag').textContent = 'guide';
+      document.getElementById('sel-path').textContent = selector;
+      document.getElementById('sel-dims').textContent = 'From guide — fill value below';
+      document.getElementById('edit-type').value = type;
+      document.getElementById('edit-value').value = '';
+      onTypeChange();
+      switchTab('edit');
+
+      // Try to highlight in preview
+      try {
+        const doc = document.getElementById('preview-frame').contentDocument;
+        doc.querySelectorAll('.br-editor-selected').forEach(s => s.classList.remove('br-editor-selected'));
+        const el = doc.querySelector(selector);
+        if (el) {
+          el.classList.add('br-editor-selected');
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      } catch(e) {}
+    }
+
+    function reloadPreview() {
+      const f = document.getElementById('preview-frame');
+      if (f.src && f.src !== 'about:blank') f.src = f.src;
+    }
+
+    // ─── Init ─────────────────────────────────
+    (async () => {
+      try {
+        const user = await brRequireAdmin();
+        const name = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Admin';
+        document.getElementById('user-name').textContent = name;
+        document.getElementById('user-email').textContent = user.email;
+        document.getElementById('user-avatar').textContent = name.charAt(0).toUpperCase();
+        renderPagePills();
+        renderGuide();
+      } catch(err) {
+        if (err.message !== 'Not authenticated' && err.message !== 'Admin access required') console.error(err);
+      }
+    })();
+  </script>
+</body>
+</html>

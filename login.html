@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign In — Bleach Resistant</title>
+  <link rel="icon" href="https://static.wixstatic.com/media/926a36_bea70e48de2b461ebaae685fdbb3be76%7Emv2.png/v1/fill/w_32%2Ch_32%2Clg_1%2Cusm_0.66_1.00_0.01/926a36_bea70e48de2b461ebaae685fdbb3be76%7Emv2.png" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+</head>
+<body>
+  <div class="auth-wrapper">
+    <div class="auth-card">
+      <div class="logo">
+        <h1>Bleach Resistant</h1>
+        <p>Sign In</p>
+      </div>
+
+      <h2>Sign In</h2>
+
+      <div id="alert" class="alert alert-error" style="display:none;"></div>
+
+      <form id="login-form" autocomplete="on">
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input id="email" name="email" type="email" required placeholder="admin@example.com" autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input id="password" name="password" type="password" required placeholder="••••••••" autocomplete="current-password" minlength="6">
+        </div>
+        <button type="submit" class="btn btn-primary btn-block" id="submit-btn">
+          Sign In
+        </button>
+      </form>
+
+      <div style="text-align:center;margin-top:20px;font-size:12px;color:#888;">
+        Don't have an account? <a href="signup.html">Create one</a>
+      </div>
+      <div style="text-align:center;margin-top:12px;">
+        <a href="home.html" style="font-size:11px;color:#aaa;text-decoration:none;">← Back to Website</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // If already logged in, redirect accordingly
+    (async () => {
+      const user = await brGetUser();
+      if (user) {
+        window.location.href = brIsAdmin(user) ? 'admin.html' : 'home.html';
+      }
+    })();
+
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('submit-btn');
+      const alert = document.getElementById('alert');
+      alert.style.display = 'none';
+
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      if (!email || !password) {
+        alert.textContent = 'Please fill in both fields.';
+        alert.style.display = 'block';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Signing in…';
+
+      try {
+        const { data, error } = await db.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        // Admin goes to dashboard, regular users go to home
+        window.location.href = brIsAdmin(data.user) ? 'admin.html' : 'home.html';
+      } catch (err) {
+        alert.textContent = err.message || 'Login failed. Check your credentials.';
+        alert.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'Sign In';
+      }
+    });
+  </script>
+</body>
+</html>

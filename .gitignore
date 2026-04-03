@@ -1,0 +1,19 @@
+# Python scripts (build tools, not deployed)
+*.py
+__pycache__/
+
+# Raw/backup files
+*.txt
+*.md
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor
+.vscode/
+.idea/
+
+# Supabase SQL (already executed)
+supabase-setup.sql

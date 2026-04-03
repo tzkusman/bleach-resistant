@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Media Library — Bleach Resistant Admin</title>
+  <link rel="icon" href="https://static.wixstatic.com/media/926a36_bea70e48de2b461ebaae685fdbb3be76%7Emv2.png/v1/fill/w_32%2Ch_32%2Clg_1%2Cusm_0.66_1.00_0.01/926a36_bea70e48de2b461ebaae685fdbb3be76%7Emv2.png" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+</head>
+<body>
+
+  <!-- ===== SIDEBAR ===== -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <h2>Bleach Resistant</h2>
+      <small>Admin Panel</small>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-section">Main</div>
+      <a href="admin.html"><span class="icon">📊</span> Dashboard</a>
+      <a href="admin-orders.html"><span class="icon">📦</span> Orders</a>
+      <a href="admin-contacts.html"><span class="icon">💬</span> Contacts</a>
+      <div class="nav-section">Content</div>
+      <a href="admin-pages.html"><span class="icon">📄</span> Pages</a>
+      <a href="admin-media.html" class="active"><span class="icon">🖼️</span> Media Library</a>
+      <div class="nav-section">Website</div>
+      <a href="home.html" target="_blank"><span class="icon">🌐</span> View Site</a>
+      <a href="order.html" target="_blank"><span class="icon">🛒</span> Order Page</a>
+    </div>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" id="user-avatar">A</div>
+        <div>
+          <div style="font-size:12px;font-weight:600;" id="user-name">Admin</div>
+          <div class="user-email" id="user-email">loading…</div>
+        </div>
+      </div>
+      <button class="btn btn-secondary btn-sm btn-block" onclick="brSignOut()">Sign Out</button>
+    </div>
+  </nav>
+
+  <!-- ===== MAIN ===== -->
+  <div class="main-content">
+    <div class="topbar">
+      <div>
+        <h1>Media Library</h1>
+        <div class="breadcrumb">Upload and manage images for your site</div>
+      </div>
+      <div class="topbar-actions">
+        <span id="media-count" style="font-size:12px;color:#888;margin-right:12px;"></span>
+      </div>
+    </div>
+
+    <div class="content-area">
+
+      <!-- Upload Zone -->
+      <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()">
+        <div class="upload-icon">📤</div>
+        <div class="upload-text">
+          <strong>Click to upload</strong> or drag and drop images here<br>
+          <span style="font-size:11px;color:#aaa;">PNG, JPG, GIF, WEBP, SVG — Max 10MB per file</span>
+        </div>
+        <input type="file" id="file-input" multiple accept="image/*" style="display:none;" onchange="handleFileSelect(this.files)">
+      </div>
+
+      <!-- Upload Progress -->
+      <div id="upload-progress" style="display:none;margin-bottom:24px;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span class="spinner"></span>
+          <span id="upload-status" style="font-size:13px;color:#888;">Uploading…</span>
+        </div>
+      </div>
+
+      <!-- Search & Filter -->
+      <div class="table-card" style="margin-bottom:24px;">
+        <div style="padding:16px 20px;display:flex;align-items:center;gap:12px;">
+          <input type="text" class="search-input" id="search-input" placeholder="Search by filename…" style="flex:1;">
+          <button class="btn btn-sm btn-secondary" onclick="loadMedia()">🔄 Refresh</button>
+        </div>
+      </div>
+
+      <!-- Media Grid -->
+      <div class="media-grid" id="media-grid">
+        <div style="grid-column:1/-1;text-align:center;padding:60px;color:#aaa;">
+          <span class="spinner"></span><br><br>Loading media…
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===== IMAGE PREVIEW MODAL ===== -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal" style="max-width:800px;">
+      <div class="modal-header">
+        <h3 id="modal-title">Image Details</h3>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="modal-body"></div>
+      <div class="modal-footer" id="modal-footer"></div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast"></div>
+
+  <script>
+    let allMedia = [];
+
+    function showToast(msg, type) {
+      const t = document.getElementById('toast');
+      t.className = 'toast toast-' + (type || 'info');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    function closeModal() {
+      document.getElementById('modal-overlay').classList.remove('active');
+    }
+
+    function formatBytes(bytes) {
+      if (!bytes) return '—';
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / 1048576).toFixed(1) + ' MB';
+    }
+
+    // ---------- Drag & Drop ----------
+    const zone = document.getElementById('upload-zone');
+    zone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      zone.classList.add('drag-over');
+    });
+    zone.addEventListener('dragleave', () => {
+      zone.classList.remove('drag-over');
+    });
+    zone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      zone.classList.remove('drag-over');
+      if (e.dataTransfer.files.length) {
+        handleFileSelect(e.dataTransfer.files);
+      }
+    });
+
+    // ---------- Upload ----------
+    async function handleFileSelect(files) {
+      if (!files || files.length === 0) return;
+
+      const prog = document.getElementById('upload-progress');
+      const status = document.getElementById('upload-status');
+      prog.style.display = 'block';
+
+      let uploaded = 0;
+      let failed = 0;
+
+      for (const file of files) {
+        // Validate
+        if (file.size > 10 * 1024 * 1024) {
+          showToast(file.name + ' is too large (max 10MB)', 'error');
+          failed++;
+          continue;
+        }
+
+        status.textContent = 'Uploading ' + file.name + '…';
+
+        try {
+          const result = await brUploadFile('media', file, 'uploads');
+
+          // Save to media table for tracking
+          await db.from('media').insert({
+            file_name: file.name,
+            file_path: result.path,
+            file_url: result.url,
+            file_size: file.size,
+            mime_type: file.type,
+            bucket: 'media'
+          });
+
+          uploaded++;
+        } catch (err) {
+          console.error('Upload error:', err);
+          showToast('Failed to upload ' + file.name + ': ' + err.message, 'error');
+          failed++;
+        }
+      }
+
+      prog.style.display = 'none';
+      document.getElementById('file-input').value = '';
+
+      if (uploaded > 0) {
+        showToast(uploaded + ' file(s) uploaded successfully', 'success');
+        loadMedia();
+      }
+      if (failed > 0 && uploaded === 0) {
+        showToast('All uploads failed', 'error');
+      }
+    }
+
+    // ---------- Load Media ----------
+    async function loadMedia() {
+      try {
+        const { data, error } = await db.from('media')
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (error) throw error;
+        allMedia = data || [];
+        renderMedia();
+      } catch (err) {
+        console.error(err);
+        document.getElementById('media-grid').innerHTML =
+          '<div style="grid-column:1/-1;" class="empty-state"><p>Error loading media</p></div>';
+      }
+    }
+
+    function getFiltered() {
+      const search = document.getElementById('search-input').value.toLowerCase();
+      return allMedia.filter(m => {
+        if (!search) return true;
+        return m.file_name?.toLowerCase().includes(search);
+      });
+    }
+
+    function renderMedia() {
+      const filtered = getFiltered();
+      document.getElementById('media-count').textContent = filtered.length + ' of ' + allMedia.length + ' files';
+
+      const grid = document.getElementById('media-grid');
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '<div style="grid-column:1/-1;" class="empty-state"><div class="empty-icon">🖼️</div><p>No images uploaded yet.<br>Drag and drop files above to get started.</p></div>';
+        return;
+      }
+
+      grid.innerHTML = filtered.map(m => `
+        <div class="media-item">
+          <div class="media-actions">
+            <button class="btn-icon" title="Copy URL" onclick="event.stopPropagation();copyUrl('${brEscapeHtml(m.file_url)}')">📋</button>
+            <button class="btn-icon" title="Delete" onclick="event.stopPropagation();deleteMedia('${m.id}','${brEscapeHtml(m.file_path)}')">🗑</button>
+          </div>
+          <img src="${brEscapeHtml(m.file_url)}" alt="${brEscapeHtml(m.file_name)}"
+               onerror="this.style.display='none';this.parentElement.querySelector('.img-fallback').style.display='flex';"
+               onclick="viewMedia('${m.id}')">
+          <div class="img-fallback" style="display:none;width:100%;height:140px;background:#f4f4f4;align-items:center;justify-content:center;color:#ccc;font-size:32px;">🖼️</div>
+          <div class="media-info">
+            <div class="filename" title="${brEscapeHtml(m.file_name)}">${brEscapeHtml(m.file_name)}</div>
+            <div class="filesize">${formatBytes(m.file_size)} · ${brFormatDate(m.created_at)}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // ---------- View ----------
+    function viewMedia(id) {
+      const m = allMedia.find(x => x.id === id);
+      if (!m) return;
+
+      document.getElementById('modal-title').textContent = m.file_name;
+      document.getElementById('modal-body').innerHTML = `
+        <div style="text-align:center;margin-bottom:20px;">
+          <img src="${brEscapeHtml(m.file_url)}" alt="${brEscapeHtml(m.file_name)}"
+               style="max-width:100%;max-height:400px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div class="form-group">
+            <label>File Name</label>
+            <input type="text" value="${brEscapeHtml(m.file_name)}" readonly style="background:#f9f9f9;">
+          </div>
+          <div class="form-group">
+            <label>File Size</label>
+            <input type="text" value="${formatBytes(m.file_size)}" readonly style="background:#f9f9f9;">
+          </div>
+          <div class="form-group">
+            <label>MIME Type</label>
+            <input type="text" value="${brEscapeHtml(m.mime_type || 'Unknown')}" readonly style="background:#f9f9f9;">
+          </div>
+          <div class="form-group">
+            <label>Uploaded</label>
+            <input type="text" value="${brFormatDate(m.created_at)}" readonly style="background:#f9f9f9;">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Public URL (click to copy)</label>
+          <input type="text" value="${brEscapeHtml(m.file_url)}" readonly style="background:#f9f9f9;cursor:pointer;"
+                 onclick="this.select();document.execCommand('copy');showToast('URL copied!','success');">
+        </div>
+      `;
+      document.getElementById('modal-footer').innerHTML = `
+        <button class="btn btn-secondary" onclick="closeModal()">Close</button>
+        <button class="btn btn-primary" onclick="copyUrl('${brEscapeHtml(m.file_url)}');closeModal();">📋 Copy URL</button>
+        <button class="btn btn-danger" onclick="deleteMedia('${m.id}','${brEscapeHtml(m.file_path)}');closeModal();">🗑 Delete</button>
+      `;
+      document.getElementById('modal-overlay').classList.add('active');
+    }
+
+    // ---------- Copy URL ----------
+    function copyUrl(url) {
+      navigator.clipboard.writeText(url).then(() => {
+        showToast('URL copied to clipboard', 'success');
+      }).catch(() => {
+        // Fallback
+        const inp = document.createElement('input');
+        inp.value = url;
+        document.body.appendChild(inp);
+        inp.select();
+        document.execCommand('copy');
+        document.body.removeChild(inp);
+        showToast('URL copied', 'success');
+      });
+    }
+
+    // ---------- Delete ----------
+    async function deleteMedia(id, path) {
+      if (!confirm('Delete this image permanently? This cannot be undone.')) return;
+      try {
+        // Delete from storage
+        await brDeleteFile('media', path);
+        // Delete from tracking table
+        const { error } = await db.from('media').delete().eq('id', id);
+        if (error) throw error;
+        showToast('Image deleted', 'success');
+        loadMedia();
+      } catch (err) {
+        showToast('Error: ' + err.message, 'error');
+      }
+    }
+
+    // ---------- Search ----------
+    document.getElementById('search-input').addEventListener('input', renderMedia);
+
+    // ---------- Init ----------
+    (async () => {
+      try {
+        const user = await brRequireAdmin();
+        const name = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Admin';
+        document.getElementById('user-name').textContent = name;
+        document.getElementById('user-email').textContent = user.email;
+        document.getElementById('user-avatar').textContent = name.charAt(0).toUpperCase();
+        await loadMedia();
+      } catch (err) {
+        if (err.message !== 'Not authenticated') console.error(err);
+      }
+    })();
+  </script>
+</body>
+</html>

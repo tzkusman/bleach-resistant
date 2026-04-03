@@ -1,0 +1,2595 @@
+/* =======================================================================
+   BLEACH RESISTANT — BOLD INDUSTRIAL THEME OVERHAUL
+   Complete Visual & Typography System for All 20 Pages
+   Version 2.0 | April 2026
+   ======================================================================= */
+
+/* Google Fonts — Industrial Typography Stack */
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Barlow+Condensed:ital,wght@0,300;0,400;0,600;0,700;0,900;1,400&family=Bebas+Neue&family=Montserrat:wght@400;500;600;700&display=swap');
+
+/* =======================================================================
+   1. DESIGN TOKENS
+   ======================================================================= */
+:root {
+  --br-bg-00:          #080808;    /* deepest black */
+  --br-bg-10:          #111111;    /* near black */
+  --br-bg-20:          #1a1a1a;    /* main dark bg */
+  --br-bg-30:          #222222;    /* card bg */
+  --br-bg-40:          #2a2a2a;    /* elevated card */
+  --br-border:         #2e2e2e;
+  --br-border-mid:     #383838;
+  --br-green:          #C7065C;
+  --br-green-dark:     #9a0447;
+  --br-green-glow:     rgba(199, 6, 92, 0.18);
+  --br-green-dim:      rgba(199, 6, 92, 0.08);
+  --br-red:            #BB2423;
+  --br-text-100:       #f0eeeb;    /* headings */
+  --br-text-80:        #c8c5c0;    /* body text */
+  --br-text-50:        #888884;    /* muted text */
+  --br-shadow-sm:      0 2px 8px rgba(0,0,0,0.6);
+  --br-shadow-md:      0 4px 20px rgba(0,0,0,0.75);
+  --br-shadow-lg:      0 8px 40px rgba(0,0,0,0.85);
+  --br-shadow-green:   0 0 24px rgba(199,6,92,0.12);
+  --br-font-heading:   'Oswald', 'Barlow Condensed', Montserrat, sans-serif;
+  --br-font-body:      'Barlow Condensed', Montserrat, sans-serif;
+  --br-font-display:   'Bebas Neue', 'Oswald', sans-serif;
+  --br-radius:         0px;
+  --br-transition:     0.22s ease;
+
+  /* ── Override Wix color vars that were designed for dark bg ──────── */
+  /* These were light colors (grays/white) meant for dark backgrounds.  */
+  /* We remapped them to dark values so text is readable on white bg.   */
+  --color_7:  88,88,88;        /* was 176,176,176 light gray            */
+  --color_8:  30,30,30;        /* was 255,255,255 white                 */
+  --color_9:  88,88,88;        /* was 114,114,114 medium gray           */
+  --color_10: 100,100,100;     /* was 176,176,176 light gray            */
+  --color_39: 44,44,44;        /* was 199,199,199 light gray — BODY TEXT */
+  --color_40: 80,80,80;        /* was 117,117,117 medium gray           */
+  --color_36: 44,44,44;        /* was 255,255,255 white — FAQ answer text */
+  --color_11: 44,44,44;        /* was 255,255,255 white                  */
+  --color_12: 60,60,60;        /* was 232,230,230 light gray             */
+  --color_13: 70,70,70;        /* was 199,199,199 light gray             */
+}
+
+/* =======================================================================
+   2. HTML / BODY — WHITE BASE
+   ======================================================================= */
+html {
+  background-color: #ffffff !important;
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: #ffffff !important;
+}
+
+#masterPage,
+#SITE_CONTAINER {
+  background-color: #ffffff !important;
+}
+
+/* Restore Wix page background to white */
+[id^="pageBackground_"] {
+  --bg-overlay-color: #ffffff !important;
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+}
+
+[id^="pageBackground_"] .LWbAav,
+[id^="pageBackground_"] [data-testid="colorUnderlay"] {
+  background-color: #ffffff !important;
+}
+
+/* bgLayers inside page background */
+[id^="bgLayers_pageBackground_"] {
+  opacity: 1 !important;
+}
+
+/* =======================================================================
+   3. SITE HEADER — CLEAN WHITE WITH PINK ACCENT
+   ======================================================================= */
+#SITE_HEADER_WRAPPER {
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+  position: relative !important;
+  z-index: 900 !important;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08) !important;
+}
+
+#SITE_HEADER {
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+  border-bottom: 3px solid #C7065C !important;
+  position: relative !important;
+  overflow: visible !important;
+}
+
+/* All header mesh containers must allow dropdown overflow */
+[data-mesh-id=SITE_HEADERinlineContent],
+[data-mesh-id=SITE_HEADERinlineContent-gridContainer],
+#SITE_HEADER_WRAPPER {
+  overflow: visible !important;
+}
+
+/* Constrain header grid rows so logo row doesn't stretch */
+[data-mesh-id=SITE_HEADERinlineContent-gridContainer] {
+  grid-template-rows: min-content min-content !important;
+  padding-bottom: 0 !important;
+}
+
+/* Tighten logo row margins */
+[data-mesh-id=SITE_HEADERinlineContent-gridContainer] > [id="comp-ky0cyl68"],
+[data-mesh-id=SITE_HEADERinlineContent-gridContainer] > interact-element > [id="comp-ky0cyl68"] {
+  margin-top: 8px !important;
+  margin-bottom: 8px !important;
+}
+
+/* Tighten nav row margins */
+[data-mesh-id=SITE_HEADERinlineContent-gridContainer] > [id="comp-jqcd41er"],
+[data-mesh-id=SITE_HEADERinlineContent-gridContainer] > interact-element > [id="comp-jqcd41er"] {
+  margin-top: 8px !important;
+  margin-bottom: 8px !important;
+}
+
+/* Tighten top bar row margins (SINCE 1995 bar) */
+[data-mesh-id=SITE_HEADERinlineContent-gridContainer] > [id="comp-krdkqkw3"],
+[data-mesh-id=SITE_HEADERinlineContent-gridContainer] > interact-element > [id="comp-krdkqkw3"],
+[data-mesh-id=SITE_HEADERinlineContent-gridContainer] > [id="comp-lh55zcgi"],
+[data-mesh-id=SITE_HEADERinlineContent-gridContainer] > interact-element > [id="comp-lh55zcgi"],
+[data-mesh-id=SITE_HEADERinlineContent-gridContainer] > [id="comp-jqchso4e"],
+[data-mesh-id=SITE_HEADERinlineContent-gridContainer] > interact-element > [id="comp-jqchso4e"] {
+  margin-top: 5px !important;
+  margin-bottom: 5px !important;
+}
+
+/* Kill any fill layer rendering inside SITE_HEADER */
+#SITE_HEADER [data-testid="fillLayers"],
+#SITE_HEADER [class*="fillLayers"],
+#SITE_HEADER > div[class*="P5y"],
+#SITE_HEADER > div[class*="lXiMB"],
+#SITE_HEADER > div[class*="UHqkh"],
+#SITE_HEADER .lvxhkV,
+#SITE_HEADER [data-testid="colorUnderlay"],
+#SITE_HEADER .LWbAav,
+#SITE_HEADER > div:first-child:not([data-mesh-id]):not([id]) {
+  background-color: transparent !important;
+  background: transparent !important;
+  opacity: 0 !important;
+}
+
+/* Fine-print branding text above logo */
+#comp-krdkqkw3 .wixui-rich-text__text,
+#comp-krdkqkw3 span,
+#comp-krdkqkw3 h1,
+#comp-krdkqkw3 p {
+  font-family: var(--br-font-body) !important;
+  font-size: 11px !important;
+  letter-spacing: 3px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  color: #666666 !important;
+}
+
+#comp-lh55zcgi .wixui-rich-text__text,
+#comp-lh55zcgi span,
+#comp-lh55zcgi p {
+  font-family: var(--br-font-body) !important;
+  font-size: 11px !important;
+  letter-spacing: 3px !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  color: #C7065C !important;
+}
+
+/* =======================================================================
+   4. LOGO — COMPACT & POLISHED
+   ======================================================================= */
+#comp-ky0cyl68,
+div#comp-ky0cyl68,
+.comp-ky0cyl68 {
+  overflow: visible !important;
+  clip: auto !important;
+  clip-path: none !important;
+  width: 65px !important;
+  height: 65px !important;
+  min-width: 40px !important;
+  min-height: 40px !important;
+  max-width: 65px !important;
+  max-height: 65px !important;
+}
+
+img#img_comp-ky0cyl68,
+#img_comp-ky0cyl68 {
+  width: 65px !important;
+  height: 65px !important;
+  max-width: 65px !important;
+  max-height: 65px !important;
+  min-width: 40px !important;
+  min-height: 40px !important;
+  object-fit: contain !important;
+  object-position: center center !important;
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  filter: drop-shadow(0 1px 4px rgba(0,0,0,0.15)) !important;
+  transform: none !important;
+  transition: filter 0.2s ease !important;
+}
+
+img#img_comp-ky0cyl68:hover,
+#img_comp-ky0cyl68:hover {
+  filter: drop-shadow(0 2px 10px rgba(199,6,92,0.30)) brightness(1.04) !important;
+}
+
+/* =======================================================================
+   5. NAVIGATION — REFINED CLEAN STYLE
+   ======================================================================= */
+/* Ensure custom element renders as block even without Wix JS */
+wix-dropdown-menu {
+  display: block !important;
+  background: transparent !important;
+  position: relative !important;
+  overflow: visible !important;
+}
+#comp-jqcd41er {
+  background: transparent !important;
+  overflow: visible !important;
+}
+
+/* Main nav links */
+#comp-jqcd41er li.Tg1gOB > a.UiHgGh,
+#comp-jqcd41er .Tg1gOB .UiHgGh,
+#comp-jqcd41er a.UiHgGh {
+  font-family: 'Oswald', sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  letter-spacing: 2px !important;
+  text-transform: uppercase !important;
+  color: #333333 !important;
+  border-bottom: 2px solid transparent !important;
+  padding-bottom: 4px !important;
+  transition: color 0.2s ease, border-color 0.2s ease !important;
+}
+
+#comp-jqcd41er li.Tg1gOB > a.UiHgGh:hover,
+#comp-jqcd41er .Tg1gOB:hover > a.UiHgGh {
+  color: #C7065C !important;
+  border-bottom-color: #C7065C !important;
+}
+
+/* Active / current page link */
+#comp-jqcd41er li.Tg1gOB.current > a.UiHgGh {
+  color: #C7065C !important;
+  border-bottom-color: #C7065C !important;
+}
+
+/* Nav item text — target JS76Uv which is the actual text node */
+#comp-jqcd41er .JS76Uv {
+  color: rgb(var(--txt, 51,51,51)) !important;
+  transition: color 0.2s ease !important;
+}
+#comp-jqcd41er li.Tg1gOB:hover > a .JS76Uv,
+#comp-jqcd41er li.Tg1gOB:hover .JS76Uv {
+  color: #C7065C !important;
+}
+
+/* Toggle button (arrow) — make visible but not obtrusive */
+#comp-jqcd41er ._pfxlW {
+  display: none !important;
+}
+
+/* Dropdown container */
+#comp-jqcd41er li.Tg1gOB > ul {
+  background: #ffffff !important;
+  border: 1px solid #e8e8e8 !important;
+  border-top: 3px solid #C7065C !important;
+  border-radius: 0 0 4px 4px !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06) !important;
+  min-width: 200px !important;
+  padding: 6px 0 !important;
+}
+
+/* Dropdown items */
+#comp-jqcd41er li.Tg1gOB > ul li a {
+  font-family: 'Oswald', sans-serif !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  letter-spacing: 1.5px !important;
+  text-transform: uppercase !important;
+  color: #444444 !important;
+  padding: 10px 20px !important;
+  border-left: 3px solid transparent !important;
+  transition: all 0.18s ease !important;
+  display: block !important;
+  background: transparent !important;
+}
+
+#comp-jqcd41er li.Tg1gOB > ul li a:hover {
+  color: #C7065C !important;
+  background: rgba(199,6,92,0.05) !important;
+  border-left-color: #C7065C !important;
+}
+
+/* =======================================================================
+   6. PAGE CONTENT CONTAINER
+   ======================================================================= */
+#PAGES_CONTAINER,
+#SITE_PAGES,
+main#PAGES_CONTAINER {
+  background: transparent !important;
+}
+
+/* Wix page-level wrapper */
+[id^="k42v9"],
+[id^="ktxuy"],
+[id^="hrfk4"],
+[id^="n178a"],
+[id^="nwwll"] {
+  background: transparent !important;
+}
+
+/* =======================================================================
+   6b. TEXT COLOR SAFEGUARD — Force all content text dark on white bg
+   ======================================================================= */
+/* The original Wix theme had dark backgrounds; color_39, color_7 etc.
+   were light grays that showed on dark. We override them here so they're
+   readable on our white background. CSS variable overrides are in :root.  */
+
+/* Body paragraphs — no !important so explicit inline colors still win  */
+#SITE_PAGES .wixui-rich-text p,
+#SITE_PAGES .wixui-rich-text__text,
+#SITE_PAGES .font_5,
+#SITE_PAGES .font_7,
+#SITE_PAGES .font_8,
+#SITE_PAGES .font_9,
+#SITE_PAGES li,
+#SITE_PAGES td,
+#SITE_PAGES th {
+  color: #2c2c2c;
+}
+
+/* Wix color class overrides — these use CSS vars we already overrode,
+   but add class-level override for belt-and-suspenders certainty        */
+.color_39 { color: rgb(var(--color_39)) !important; }
+.color_7  { color: rgb(var(--color_7))  !important; }
+.color_10 { color: rgb(var(--color_10)) !important; }
+
+/* Preserve any explicitly-colored spans (inline style="color:#xxx")
+   by NOT using !important on the broad rule above, only on class rules  */
+
+/* =======================================================================
+   6c. FORCE ALL INLINE WHITE/LIGHT TEXT TO DARK — ALL 20 PAGES
+   ======================================================================= */
+/* Override explicit inline white & light-gray colors that were set for
+   the original dark-background theme.  Using attribute selectors with
+   !important beats inline style specificity.
+   NOTE: brand accent colours (#8DC63F, #C7065C, #00AEEF, #FFD45A) are
+   NOT in this list so they are intentionally preserved.                  */
+
+/* ---- 6-char hex whites & near-whites -------------------------------- */
+#SITE_PAGES [style*="color:#ffffff"],
+#SITE_PAGES [style*="color: #ffffff"],
+#SITE_PAGES [style*="color:#FFFFFF"],
+#SITE_PAGES [style*="color: #FFFFFF"],
+#SITE_PAGES [style*="color:#f5f5f5"],
+#SITE_PAGES [style*="color:#F5F5F5"],
+#SITE_PAGES [style*="color:#eeeeee"],
+#SITE_PAGES [style*="color:#EEEEEE"],
+#SITE_PAGES [style*="color:#e0e0e0"],
+#SITE_PAGES [style*="color:#E0E0E0"],
+#SITE_PAGES [style*="color:#DBDBDB"],
+#SITE_PAGES [style*="color:#dbdbdb"],
+#SITE_PAGES [style*="color:#D5D5D5"],
+#SITE_PAGES [style*="color:#d5d5d5"],
+#SITE_PAGES [style*="color:#D0D0D0"],
+#SITE_PAGES [style*="color:#d0d0d0"],
+#SITE_PAGES [style*="color:#cccccc"],
+#SITE_PAGES [style*="color:#CCCCCC"],
+#SITE_PAGES [style*="color:#c7c7c7"],
+#SITE_PAGES [style*="color:#C7C7C7"],
+#SITE_PAGES [style*="color:#c0c0c0"],
+#SITE_PAGES [style*="color:#C0C0C0"],
+#SITE_PAGES [style*="color:#b8b8b8"],
+#SITE_PAGES [style*="color:#B8B8B8"],
+#SITE_PAGES [style*="color:#b0b0b0"],
+#SITE_PAGES [style*="color:#B0B0B0"],
+#SITE_PAGES [style*="color:#aaaaaa"],
+#SITE_PAGES [style*="color:#AAAAAA"],
+#SITE_PAGES [style*="color:#a0a0a0"],
+#SITE_PAGES [style*="color:#A0A0A0"],
+#SITE_PAGES [style*="color:#999999"],
+#SITE_PAGES [style*="color:#989898"],
+/* near-whites used in FAQ page headings */
+#SITE_PAGES [style*="color:#FFFFFE"],
+#SITE_PAGES [style*="color:#fffffe"],
+#SITE_PAGES [style*="color:#FFFFFD"],
+#SITE_PAGES [style*="color:#FFFFFC"] {
+  color: #2c2c2c !important;
+}
+
+/* ---- 3-char hex whites (must end with ; for safety) --------------- */
+#SITE_PAGES [style*="color:#fff;"],
+#SITE_PAGES [style*="color: #fff;"],
+#SITE_PAGES [style*="color:#eee;"],
+#SITE_PAGES [style*="color: #eee;"],
+#SITE_PAGES [style*="color:#ddd;"],
+#SITE_PAGES [style*="color: #ddd;"],
+#SITE_PAGES [style*="color:#ccc;"],
+#SITE_PAGES [style*="color: #ccc;"],
+#SITE_PAGES [style*="color:#bbb;"],
+#SITE_PAGES [style*="color: #bbb;"],
+#SITE_PAGES [style*="color:#aaa;"],
+#SITE_PAGES [style*="color: #aaa;"],
+#SITE_PAGES [style*="color:#999;"],
+#SITE_PAGES [style*="color: #999;"] {
+  color: #2c2c2c !important;
+}
+
+/* ---- Wix color classes that map to light colors on dark bg --------- */
+.color_11,
+.color_12,
+.color_13,
+.color_14,
+.color_15,
+.color_16,
+.color_17,
+.color_18,
+/* color_36 = rgb(255,255,255) white — used for all FAQ answer text */
+.color_36 {
+  color: #2c2c2c !important;
+}
+
+/* =======================================================================
+   6d. STOCKDESIGNS.HTML — REMOVE DARK SECTION BACKGROUND
+   ======================================================================= */
+/* The first section (comp-lgckkvek) has a dark green/black hexagonal
+   background image ("2022 Background Green Black2.png") rendered via
+   bgMedia.  Also hide the full-page decorative bg overlay image
+   (comp-ksozm47l, 980×1682 px, also dark).                              */
+#bgMedia_comp-lgckkvek wow-image,
+#bgMedia_comp-lgckkvek img {
+  display: none !important;
+}
+#comp-lgckkvek {
+  background-color: #ffffff !important;
+}
+#comp-ksozm47l {
+  display: none !important;
+}
+
+/* =======================================================================
+   7. SECTION BACKGROUNDS — INDUSTRIAL DEPTH
+   ======================================================================= */
+
+/* Classic sections – alternating dark layers */
+[class*="ClassicSection"],
+[class*="gOE_3z"],
+[class*="PFkO7r"],
+[class*="_9tvAi"] {
+  border-bottom: 1px solid var(--br-border) !important;
+}
+
+/* Wix strip containers */
+[class*="wixui-strip-columns-container"] {
+  border-bottom: 1px solid var(--br-border) !important;
+}
+
+/* Force dark bg on sections that had white overlay from Wix */
+[class*="comp-jqce"][class*="inlineContent"],
+[class*="comp-jqcf"][class*="inlineContent"],
+[class*="comp-m4k"][class*="inlineContent"] {
+  background-color: transparent !important;
+}
+
+/* =======================================================================
+   8. TYPOGRAPHY — BOLD INDUSTRIAL SYSTEM
+   ======================================================================= */
+
+/* H1 level — Display / Oswald Bold */
+.font_0,
+.font_0 span,
+h1.wixui-rich-text__text,
+.wixui-rich-text h1 {
+  font-family: 'Oswald', var(--br-font-heading) !important;
+  font-weight: 700 !important;
+  letter-spacing: 2px !important;
+  text-transform: uppercase !important;
+  line-height: 1.1 !important;
+}
+
+/* H2 level */
+.font_2,
+.font_2 span,
+h2.wixui-rich-text__text,
+.wixui-rich-text h2 {
+  font-family: 'Oswald', var(--br-font-heading) !important;
+  font-weight: 600 !important;
+  letter-spacing: 1.5px !important;
+  text-transform: uppercase !important;
+  line-height: 1.15 !important;
+}
+
+/* H3 level */
+.font_4,
+.font_4 span,
+h3.wixui-rich-text__text,
+.wixui-rich-text h3 {
+  font-family: 'Barlow Condensed', var(--br-font-body) !important;
+  font-weight: 700 !important;
+  letter-spacing: 1.2px !important;
+  text-transform: uppercase !important;
+}
+
+/* Body text */
+.font_5,
+.font_7,
+.font_8,
+.font_9,
+.font_5 span,
+.font_7 span,
+.font_8 span,
+.font_9 span,
+p.wixui-rich-text__text,
+.wixui-rich-text p {
+  font-family: var(--br-font-body) !important;
+  line-height: 1.7 !important;
+}
+
+/* =======================================================================
+   9. BUTTONS — BOLD INDUSTRIAL CTAs
+   ======================================================================= */
+[class*="StylableButton"] {
+  border-radius: 0 !important;
+  transition: all var(--br-transition) !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+[class*="StylableButton"]:hover {
+  filter: brightness(1.12) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: var(--br-shadow-green) !important;
+}
+
+[class*="StylableButton"] .StylableButton2545352419__label {
+  font-family: 'Oswald', var(--br-font-heading) !important;
+  font-weight: 700 !important;
+  letter-spacing: 3px !important;
+  text-transform: uppercase !important;
+  font-size: 15px !important;
+  line-height: 1 !important;
+}
+
+[class*="StylableButton"] .StylableButton2545352419__icon {
+  transition: transform var(--br-transition) !important;
+}
+
+[class*="StylableButton"]:hover .StylableButton2545352419__icon {
+  transform: translateX(3px) !important;
+}
+
+/* =======================================================================
+   9b. WIXUI-BUTTON — SOLID PINK OVERRIDE (belt-and-suspenders)
+   ======================================================================= */
+.wixui-button,
+a.wixui-button,
+.uDW_Qe.wixui-button,
+a.uDW_Qe.wixui-button,
+.PlZyDq.wixui-button,
+a.PlZyDq.wixui-button {
+  background-color: #C7065C !important;
+  border: none !important;
+  border-radius: 0 !important;
+  padding: 0 28px !important;
+  min-height: 44px !important;
+  transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.wixui-button:hover,
+a.wixui-button:hover,
+.uDW_Qe.wixui-button:hover,
+a.uDW_Qe.wixui-button:hover {
+  background-color: #9a0447 !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 20px rgba(199,6,92,0.35) !important;
+}
+
+.wixui-button__label,
+.l7_2fn.wixui-button__label,
+.wixui-button .wixui-button__label {
+  color: #ffffff !important;
+  font-family: 'Oswald', sans-serif !important;
+  font-weight: 700 !important;
+  font-size: 14px !important;
+  letter-spacing: 2.5px !important;
+  text-transform: uppercase !important;
+}
+
+/* =======================================================================
+   10. FOOTER — DARK INDUSTRIAL REDESIGN
+   ======================================================================= */
+#SITE_FOOTER_WRAPPER,
+#SITE_FOOTER {
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+  border-top: 3px solid var(--br-green) !important;
+  box-shadow: none !important;
+  position: relative !important;
+  z-index: 10 !important;
+}
+
+/* Kill fill layers in footer */
+#SITE_FOOTER [data-testid="fillLayers"],
+#SITE_FOOTER [class*="fillLayers"],
+#SITE_FOOTER > div:first-child:not([data-mesh-id]):not([id]) {
+  background-color: transparent !important;
+  background: transparent !important;
+  opacity: 0 !important;
+}
+
+/* Footer text elements */
+#SITE_FOOTER .wixui-rich-text__text,
+#SITE_FOOTER span,
+#SITE_FOOTER p,
+#SITE_FOOTER h1,
+#SITE_FOOTER h2,
+#SITE_FOOTER h3 {
+  color: var(--br-text-50) !important;
+}
+
+#SITE_FOOTER a,
+#SITE_FOOTER a .wixui-rich-text__text {
+  color: var(--br-text-80) !important;
+  text-decoration: none !important;
+  transition: color var(--br-transition) !important;
+}
+
+#SITE_FOOTER a:hover,
+#SITE_FOOTER a:hover .wixui-rich-text__text {
+  color: var(--br-green) !important;
+}
+
+/* Footer headings (business hours, address, contact) */
+#SITE_FOOTER .font_2 span,
+#SITE_FOOTER .font_0 span {
+  color: var(--br-text-100) !important;
+  font-family: 'Oswald', var(--br-font-heading) !important;
+  letter-spacing: 2px !important;
+  text-transform: uppercase !important;
+  font-weight: 700 !important;
+}
+
+/* =======================================================================
+   11. PINK ACCENT TEXT — SITE-WIDE
+   ======================================================================= */
+[style*="color:#8DC63F"],
+[style*="color: #8DC63F"],
+[style*="color:#8dc63f"],
+[style*="color: #8dc63f"],
+.color_22 {
+  color: var(--br-green) !important;
+}
+
+/* =======================================================================
+   12. IMAGE CONTAINERS — FRAMED INDUSTRIAL LOOK
+   ======================================================================= */
+.wixui-image:not(#comp-ky0cyl68),
+[class*="wixui-image"]:not(#comp-ky0cyl68):not(.comp-ky0cyl68) {
+  border: 1px solid var(--br-border-mid) !important;
+  transition: border-color var(--br-transition), box-shadow var(--br-transition) !important;
+  display: block !important;
+}
+
+.wixui-image:not(#comp-ky0cyl68):hover,
+[class*="wixui-image"]:not(#comp-ky0cyl68):not(.comp-ky0cyl68):hover {
+  border-color: var(--br-green) !important;
+  box-shadow: var(--br-shadow-green) !important;
+}
+
+/* =======================================================================
+   13. HORIZONTAL DIVIDERS
+   ======================================================================= */
+[class*="FiveGridLine"],
+[class*="wixui-line"],
+[class*="ushYlt"] {
+  border-color: var(--br-green-dark) !important;
+  opacity: 0.6 !important;
+}
+
+/* =======================================================================
+   14. LINK BAR (Social Icons)
+   ======================================================================= */
+[class*="wixui-link-bar"] a,
+[class*="wixui-link-bar"] svg {
+  filter: brightness(0) invert(0.6) !important;
+  transition: filter var(--br-transition) !important;
+}
+
+[class*="wixui-link-bar"] a:hover,
+[class*="wixui-link-bar"] a:hover svg {
+  filter: invert(55%) sepia(80%) saturate(500%) hue-rotate(55deg) brightness(1.1) !important;
+}
+
+/* =======================================================================
+   15. GALLERY — PRO GALLERY ADJUSTMENTS
+   ======================================================================= */
+[class*="ProGallery"],
+[class*="pro-gallery"] {
+  background: transparent !important;
+}
+
+[class*="gallery-item"],
+[class*="galleryItem"] {
+  border: 1px solid var(--br-border) !important;
+  transition: border-color var(--br-transition), transform 0.3s ease !important;
+}
+
+[class*="gallery-item"]:hover,
+[class*="galleryItem"]:hover {
+  border-color: var(--br-green) !important;
+  transform: scale(1.01) !important;
+  z-index: 1 !important;
+}
+
+/* =======================================================================
+   16. SCROLLBAR — INDUSTRIAL DARK
+   ======================================================================= */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f0f0f0;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--br-green-dark);
+  border-radius: 0;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--br-green);
+}
+
+/* =======================================================================
+   17. SKIP TO CONTENT BUTTON
+   ======================================================================= */
+[class*="SCROLL_TO_TOP"],
+[class*="skipToContent"] {
+  background: var(--br-green) !important;
+  color: var(--br-bg-00) !important;
+}
+
+/* =======================================================================
+   18. WORDING / CONTENT VISUAL TWEAKS
+   ======================================================================= */
+
+/* Italic em elements — keep italic styling without broad color override */
+em.wixui-rich-text__text {
+  font-style: italic !important;
+}
+
+/* Highlight info blocks */
+[style*="background-color:#8DC63F"],
+[style*="background-color: #8DC63F"],
+[style*="background:#8DC63F"],
+[style*="background-color:#C7065C"],
+[style*="background-color: #C7065C"] {
+  background-color: var(--br-green) !important;
+  color: var(--br-bg-00) !important;
+}
+
+/* Red accent sections */
+[style*="color:#BB2423"],
+[style*="color: #BB2423"] {
+  color: var(--br-red) !important;
+}
+
+/* color_36 = white on dark theme — force dark for white bg */
+.color_36,
+.color_36 span {
+  color: #2c2c2c !important;
+}
+
+/* color_39 = light gray on dark theme — force dark for white bg */
+.color_39,
+.color_39 span {
+  color: #2c2c2c !important;
+}
+
+/* BADA55 / lime green headings — override to brand pink */
+[style*="color:#BADA55"],
+[style*="color: #BADA55"] {
+  color: var(--br-green) !important;
+}
+
+/* Dark container sections that have black bg (#color_37) keep their text white */
+.UJQjeD .wixui-rich-text__text,
+.UJQjeD span,
+.UJQjeD p {
+  color: var(--br-text-100) !important;
+}
+
+/* Footer section text — keep readable */
+#comp-jqch33hw span,
+#comp-jqch4ut4 span,
+#comp-jqch6sfz span,
+#comp-jqch6sgd span,
+#comp-jqch7n9x span,
+#comp-jqch75fg span,
+#comp-jqch75fu span {
+  color: var(--br-text-80) !important;
+}
+
+/* Footer section headings */
+#comp-jqch33hw h1,
+#comp-jqch6sfz h1,
+#comp-jqch7n9x h1,
+#comp-jqch75fg h1,
+[id^="comp-jqch"] h1 span[style*="#8DC63F"],
+[id^="comp-jqch"] .color_22 {
+  color: var(--br-green) !important;
+}
+
+/* All footer links */
+#SITE_FOOTER a {
+  color: var(--br-green) !important;
+  transition: color var(--br-transition) !important;
+}
+#SITE_FOOTER a:hover {
+  color: var(--br-text-100) !important;
+}
+
+/* =======================================================================
+   19. FORMS & INPUTS (Order Page)
+   ======================================================================= */
+[class*="wixui-text-input"],
+[class*="wixui-textarea"],
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+textarea {
+  background-color: #ffffff !important;
+  border: 1px solid #cccccc !important;
+  border-radius: 0 !important;
+  color: #222222 !important;
+  font-family: var(--br-font-body) !important;
+  transition: border-color var(--br-transition) !important;
+}
+
+[class*="wixui-text-input"]:focus,
+[class*="wixui-textarea"]:focus,
+input:focus,
+textarea:focus {
+  border-color: var(--br-green) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 2px var(--br-green-glow) !important;
+}
+
+/* =======================================================================
+   20. RICH TEXT TABLES (Size Chart, Price List)
+   ======================================================================= */
+table {
+  border-collapse: collapse !important;
+  width: 100% !important;
+}
+
+th {
+  background-color: var(--br-green) !important;
+  color: #ffffff !important;
+  font-family: 'Oswald', var(--br-font-heading) !important;
+  font-weight: 700 !important;
+  letter-spacing: 1.5px !important;
+  text-transform: uppercase !important;
+  padding: 10px 14px !important;
+  border: 1px solid #cccccc !important;
+}
+
+td {
+  background-color: #ffffff !important;
+  color: #333333 !important;
+  font-family: var(--br-font-body) !important;
+  padding: 8px 14px !important;
+  border: 1px solid #dddddd !important;
+}
+
+tr:nth-child(even) td {
+  background-color: #f5f5f5 !important;
+}
+
+tr:hover td {
+  background-color: rgba(199,6,92,0.04) !important;
+  color: #111111 !important;
+}
+
+/* =======================================================================
+   21. ORDER / FAQ ACCORDIONS
+   ======================================================================= */
+[class*="wixui-accordion"],
+[class*="Accordion"],
+[class*="accordion"] {
+  border: 1px solid var(--br-border-mid) !important;
+  border-radius: 0 !important;
+}
+
+[class*="accordion-item"],
+[class*="AccordionItem"] {
+  border-bottom: 1px solid #dddddd !important;
+  background: #ffffff !important;
+}
+
+/* =======================================================================
+   22. COOKIE CONSENT BANNER (restyle)
+   ======================================================================= */
+.MNUFxS {
+  background-color: #ffffff !important;
+  color: #444444 !important;
+  border-top: 2px solid var(--br-green) !important;
+}
+
+.MNUFxS a {
+  color: var(--br-green) !important;
+}
+
+.Pg7AcP {
+  font-family: 'Oswald', sans-serif !important;
+  letter-spacing: 1.5px !important;
+  border-radius: 0 !important;
+}
+
+/* =======================================================================
+   23. WIXADS & MISC WRAPPERS
+   ======================================================================= */
+/* Hide Wix branding bar */
+#WIX_ADS {
+  display: none !important;
+}
+
+/* =======================================================================
+   24. SECTION-LEVEL ENHANCEMENTS
+   ======================================================================= */
+
+/* Classic Section containers - add subtle depth separators */
+.wixui-section,
+.CohWsy,
+[class*="wixui-column-strip"] {
+  border-bottom: 1px solid var(--br-border) !important;
+}
+
+/* Page wrapper */
+.PFkO7r {
+  background: transparent !important;
+}
+
+/* Strip column containers background */
+.if7Vw2 .LWbAav {
+  /* Keep section-specific backgrounds — don't override */
+}
+
+/* Inner section text containers on dark-bg sections */
+.wixui-rich-text {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+/* Highlighted/accent text wrappers */
+[class*="wixui-box"] {
+  border-radius: 0 !important;
+}
+
+/* Process steps (DESIGN / CHOOSE / ORDER / ENJOY on Home) */
+[id*="comp-jqce"] .font_2,
+[id*="comp-jqcf"] .font_2 {
+  font-family: 'Bebas Neue', 'Oswald', sans-serif !important;
+  font-size: clamp(2rem, 4vw, 3.5rem) !important;
+  letter-spacing: 4px !important;
+}
+
+/* Wix ProGallery - dark frame */
+[class*="gallery-item-container"],
+[class*="fullscreen-gallery"] {
+  background: transparent !important;
+}
+
+/* FAQ page accordion headers */
+[class*="wixui-accordion"] [class*="summary"],
+[class*="wixui-accordion"] button {
+  font-family: 'Oswald', var(--br-font-heading) !important;
+  font-weight: 600 !important;
+  letter-spacing: 1px !important;
+  color: #222222 !important;
+  background: #f5f5f5 !important;
+}
+
+/* =======================================================================
+   25. MOBILE RESPONSIVE ADJUSTMENTS
+   ======================================================================= */
+@media (max-width: 980px) {
+  img#img_comp-ky0cyl68,
+  #img_comp-ky0cyl68 {
+    width: 55px !important;
+    height: 55px !important;
+    max-width: 55px !important;
+    max-height: 55px !important;
+  }
+
+  #comp-ky0cyl68 {
+    width: 55px !important;
+    height: 55px !important;
+  }
+}
+
+@media (max-width: 600px) {
+  img#img_comp-ky0cyl68,
+  #img_comp-ky0cyl68 {
+    width: 45px !important;
+    height: 45px !important;
+    max-width: 45px !important;
+    max-height: 45px !important;
+  }
+
+  #comp-ky0cyl68 {
+    width: 45px !important;
+    height: 45px !important;
+  }
+}
+
+/* =======================================================================
+   26. TYPOGRAPHY ENHANCEMENT — BOLD INDUSTRIAL FINAL POLISH
+   ======================================================================= */
+
+/* Nav dropdown arrow — brand pink */
+#comp-jqcd41er ._pfxlW svg {
+  fill: var(--br-green) !important;
+}
+
+/* Section H2 titles at large size */
+[style*="font-size:70px"] .wixui-rich-text__text {
+  font-family: 'Bebas Neue', 'Oswald', sans-serif !important;
+  letter-spacing: 6px !important;
+  text-transform: uppercase !important;
+}
+
+/* Process step headings */
+[style*="font-size:50px"] .wixui-rich-text__text {
+  font-family: 'Bebas Neue', 'Oswald', sans-serif !important;
+  letter-spacing: 5px !important;
+}
+
+/* Product section headings */
+[style*="font-size:35px"] .wixui-rich-text__text {
+  font-family: 'Oswald', sans-serif !important;
+  letter-spacing: 3px !important;
+  font-weight: 700 !important;
+}
+
+/* =======================================================================
+   27. LINK STYLING — CONSISTENT BRAND COLOR
+   ======================================================================= */
+
+/* Phone/email links in header and footer */
+a[href^="tel:"],
+a[href^="mailto:"] {
+  color: var(--br-green) !important;
+  font-weight: 600 !important;
+  text-decoration: none !important;
+}
+
+/* =======================================================================
+   28. PRINT STYLES
+   ======================================================================= */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  #SITE_HEADER,
+  #SITE_FOOTER,
+  #comp-jqcd41er {
+    background: white !important;
+    border: none !important;
+  }
+}
+
+/* ███████████████████████████████████████████████████████████████████████
+   ██                                                                   ██
+   ██   PHASE 3 — ANIMATIONS, IMAGE BORDERS, MODERN DEPTH & POLISH     ██
+   ██   Version 3.0 | April 2026                                        ██
+   ██                                                                   ██
+   ███████████████████████████████████████████████████████████████████████ */
+
+/* =======================================================================
+   29. DESIGN TOKEN EXPANSION — ANIMATION & DEPTH SYSTEM
+   ======================================================================= */
+:root {
+  /* Animation timing */
+  --anim-fast:       0.18s;
+  --anim-mid:        0.35s;
+  --anim-slow:       0.6s;
+  --anim-ease:       cubic-bezier(0.22, 1, 0.36, 1);
+  --anim-bounce:     cubic-bezier(0.34, 1.56, 0.64, 1);
+  --anim-snap:       cubic-bezier(0.87, 0, 0.13, 1);
+
+  /* Image border system — subtle default, bold on hover */
+  --img-border-width:   1px;
+  --img-border-color:   rgba(199,6,92,0.15);
+  --img-border-hover:   rgba(199,6,92,0.70);
+  --img-border-active:  #C7065C;
+  --img-corner-accent:  8px;
+
+  /* Elevation shadows */
+  --elev-1:  0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.12);
+  --elev-2:  0 3px 14px rgba(0,0,0,0.10), 0 1px 4px rgba(0,0,0,0.08);
+  --elev-3:  0 8px 30px rgba(0,0,0,0.13), 0 2px 8px rgba(0,0,0,0.08);
+  --elev-4:  0 16px 50px rgba(0,0,0,0.16), 0 4px 14px rgba(0,0,0,0.10);
+  --elev-pink:  0 8px 32px rgba(199,6,92,0.22), 0 2px 8px rgba(199,6,92,0.14);
+  --elev-pink-lg: 0 16px 60px rgba(199,6,92,0.30), 0 4px 20px rgba(199,6,92,0.18);
+
+  /* Section accent gradients */
+  --grad-pink-light: linear-gradient(135deg, #fff0f6 0%, #ffffff 60%);
+  --grad-pink-bold:  linear-gradient(135deg, #C7065C 0%, #9a0447 100%);
+  --grad-dark:       linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  --grad-subtle:     linear-gradient(180deg, #f9f9f9 0%, #ffffff 100%);
+}
+
+/* =======================================================================
+   30. KEYFRAME ANIMATIONS
+   ======================================================================= */
+
+/* Fade up — general entrance */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Fade in — simple opacity */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Slide in from left */
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Slide in from right */
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Scale up entry */
+@keyframes scaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Pink pulse — CTA / highlight */
+@keyframes pinkPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(199,6,92,0.50); }
+  50%  { box-shadow: 0 0 0 12px rgba(199,6,92,0); }
+  100% { box-shadow: 0 0 0 0 rgba(199,6,92,0); }
+}
+
+/* Border sweep — image hover line wipe */
+@keyframes borderSweepH {
+  from { transform: scaleX(0); transform-origin: left; }
+  to   { transform: scaleX(1); transform-origin: left; }
+}
+
+/* Shimmer — loading / highlight effect */
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+/* Float — subtle levitation for cards */
+@keyframes float {
+  0%   { transform: translateY(0px); }
+  50%  { transform: translateY(-6px); }
+  100% { transform: translateY(0px); }
+}
+
+/* Underline grow */
+@keyframes underlineGrow {
+  from { width: 0; }
+  to   { width: 100%; }
+}
+
+/* spin (logo hover) */
+@keyframes spinIn {
+  from { transform: rotate(-8deg) scale(0.9); opacity: 0; }
+  to   { transform: rotate(0deg) scale(1);   opacity: 1; }
+}
+
+/* Glow pulse on border */
+@keyframes glowPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(199,6,92,0.45), var(--elev-2); }
+  50%  { box-shadow: 0 0 22px 4px rgba(199,6,92,0.18), var(--elev-3); }
+  100% { box-shadow: 0 0 0 0 rgba(199,6,92,0.45), var(--elev-2); }
+}
+
+/* Wipe in — horizontal */
+@keyframes wipeIn {
+  from { clip-path: inset(0 100% 0 0); }
+  to   { clip-path: inset(0 0% 0 0); }
+}
+
+/* Number count up visual */
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* =======================================================================
+   31. PAGE-LEVEL ENTRANCE ANIMATIONS
+   ======================================================================= */
+
+/* Hero / first visible section — fade up on load */
+#PAGES_CONTAINER > *:first-child,
+[id^="pageBackground_"] + * {
+  animation: fadeIn 0.7s var(--anim-ease) both;
+}
+
+/* Scoped staggered entrance — ONLY inside page content, not header/footer */
+#SITE_PAGES [data-mesh-id$="inlineContent"]:nth-child(1) { animation: fadeUp 0.5s 0.04s var(--anim-ease) both; }
+#SITE_PAGES [data-mesh-id$="inlineContent"]:nth-child(2) { animation: fadeUp 0.5s 0.10s var(--anim-ease) both; }
+#SITE_PAGES [data-mesh-id$="inlineContent"]:nth-child(3) { animation: fadeUp 0.5s 0.16s var(--anim-ease) both; }
+#SITE_PAGES [data-mesh-id$="inlineContent"]:nth-child(4) { animation: fadeUp 0.5s 0.22s var(--anim-ease) both; }
+#SITE_PAGES [data-mesh-id$="inlineContent"]:nth-child(n+5) { animation: fadeUp 0.5s 0.28s var(--anim-ease) both; }
+
+/* =======================================================================
+   32. HEADER ENTRANCE — SLIDES DOWN
+   ======================================================================= */
+#SITE_HEADER_WRAPPER {
+  animation: fadeIn 0.45s var(--anim-ease) both !important;
+}
+
+/* Top info bar rows */
+[data-mesh-id=SITE_HEADERinlineContent-gridContainer] > [id="comp-krdkqkw3"],
+[data-mesh-id=SITE_HEADERinlineContent-gridContainer] > interact-element > [id="comp-krdkqkw3"] {
+  animation: slideInLeft 0.5s 0.1s var(--anim-ease) both !important;
+}
+
+[data-mesh-id=SITE_HEADERinlineContent-gridContainer] > [id="comp-lh55zcgi"],
+[data-mesh-id=SITE_HEADERinlineContent-gridContainer] > interact-element > [id="comp-lh55zcgi"] {
+  animation: slideInRight 0.5s 0.1s var(--anim-ease) both !important;
+}
+
+/* Logo entrance */
+[data-mesh-id=SITE_HEADERinlineContent-gridContainer] > [id="comp-ky0cyl68"],
+[data-mesh-id=SITE_HEADERinlineContent-gridContainer] > interact-element > [id="comp-ky0cyl68"] {
+  animation: spinIn 0.6s 0.2s var(--anim-bounce) both !important;
+}
+
+/* Nav entrance — simple fade only, no translate that breaks dropdown positioning */
+[data-mesh-id=SITE_HEADERinlineContent-gridContainer] > [id="comp-jqcd41er"],
+[data-mesh-id=SITE_HEADERinlineContent-gridContainer] > interact-element > [id="comp-jqcd41er"] {
+  animation: fadeIn 0.4s 0.15s var(--anim-ease) both !important;
+}
+
+/* =======================================================================
+   33. LOGO — ANIMATED & POLISHED
+   ======================================================================= */
+#comp-ky0cyl68 a,
+#comp-ky0cyl68 > a {
+  display: block !important;
+  border-radius: 0 !important;
+  transition: transform var(--anim-mid) var(--anim-bounce) !important;
+}
+
+#comp-ky0cyl68 a:hover {
+  transform: scale(1.08) !important;
+}
+
+img#img_comp-ky0cyl68 {
+  transition: filter 0.3s ease, transform 0.3s var(--anim-bounce) !important;
+}
+
+img#img_comp-ky0cyl68:hover {
+  transform: scale(1.08) !important;
+  filter: drop-shadow(0 4px 16px rgba(199,6,92,0.40)) brightness(1.05) !important;
+}
+
+/* =======================================================================
+   34. NAVIGATION — REFINED ANIMATIONS & MICRO-INTERACTIONS
+   ======================================================================= */
+
+/* Animated underline on each nav item */
+/* NOTE: overflow must stay visible so dropdown <ul> is not clipped */
+#comp-jqcd41er,
+#comp-jqcd41er ul.y7qwii,
+#comp-jqcd41er li.Tg1gOB,
+#comp-jqcd41er li.Tg1gOB > a.UiHgGh {
+  overflow: visible !important;
+}
+
+#comp-jqcd41er li.Tg1gOB > a.UiHgGh {
+  position: relative !important;
+}
+
+#comp-jqcd41er li.Tg1gOB > a.UiHgGh::after {
+  content: '' !important;
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  width: 0 !important;
+  height: 2px !important;
+  background: #C7065C !important;
+  transition: width 0.25s var(--anim-snap) !important;
+}
+
+#comp-jqcd41er li.Tg1gOB > a.UiHgGh:hover::after,
+#comp-jqcd41er li.Tg1gOB.current > a.UiHgGh::after {
+  width: 100% !important;
+}
+
+/* Dropdown items — staggered slide in */
+#comp-jqcd41er li.Tg1gOB > ul {
+  transform-origin: top center !important;
+  transition: opacity 0.2s ease, transform 0.22s var(--anim-ease) !important;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.14), 0 2px 8px rgba(0,0,0,0.08) !important;
+}
+
+#comp-jqcd41er li.Tg1gOB > ul li {
+  border-bottom: 1px solid #f0f0f0 !important;
+}
+
+#comp-jqcd41er li.Tg1gOB > ul li:last-child {
+  border-bottom: none !important;
+}
+
+#comp-jqcd41er li.Tg1gOB > ul li a {
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+#comp-jqcd41er li.Tg1gOB > ul li a::before {
+  content: '' !important;
+  position: absolute !important;
+  inset: 0 !important;
+  background: rgba(199,6,92,0.06) !important;
+  transform: scaleX(0) !important;
+  transform-origin: left !important;
+  transition: transform 0.2s ease !important;
+}
+
+#comp-jqcd41er li.Tg1gOB > ul li a:hover::before {
+  transform: scaleX(1) !important;
+}
+
+/* =======================================================================
+   35. BOLD IMAGE BORDERS — ALL IMAGES SITE-WIDE
+   ======================================================================= */
+
+/* Core image wrapper border — subtle at rest, visible on hover */
+.wixui-image:not(#comp-ky0cyl68),
+[class*="wixui-image"]:not(#comp-ky0cyl68):not(.comp-ky0cyl68) {
+  border: var(--img-border-width) solid var(--img-border-color) !important;
+  box-shadow: none !important;
+  transition:
+    border-color 0.28s ease,
+    box-shadow 0.28s ease,
+    transform 0.28s var(--anim-ease)
+    !important;
+  overflow: hidden !important;
+  position: relative !important;
+}
+
+.wixui-image:not(#comp-ky0cyl68):hover,
+[class*="wixui-image"]:not(#comp-ky0cyl68):not(.comp-ky0cyl68):hover {
+  border-color: var(--img-border-hover) !important;
+  box-shadow: var(--elev-pink) !important;
+  transform: translateY(-3px) !important;
+  z-index: 2 !important;
+}
+
+/* Corner accent brackets on images — ::before top-left, ::after bottom-right */
+[class*="wixui-image"]:not(#comp-ky0cyl68):not(.comp-ky0cyl68) {
+  position: relative !important;
+}
+
+[class*="wixui-image"]:not(#comp-ky0cyl68)::before {
+  content: '' !important;
+  position: absolute !important;
+  top: -1px !important;
+  left: -1px !important;
+  width: 22px !important;
+  height: 22px !important;
+  border-top: 3px solid #C7065C !important;
+  border-left: 3px solid #C7065C !important;
+  z-index: 3 !important;
+  pointer-events: none !important;
+  opacity: 0 !important;
+  transition: opacity 0.22s ease !important;
+}
+
+[class*="wixui-image"]:not(#comp-ky0cyl68)::after {
+  content: '' !important;
+  position: absolute !important;
+  bottom: -1px !important;
+  right: -1px !important;
+  width: 22px !important;
+  height: 22px !important;
+  border-bottom: 3px solid #C7065C !important;
+  border-right: 3px solid #C7065C !important;
+  z-index: 3 !important;
+  pointer-events: none !important;
+  opacity: 0 !important;
+  transition: opacity 0.22s ease !important;
+}
+
+[class*="wixui-image"]:not(#comp-ky0cyl68):hover::before,
+[class*="wixui-image"]:not(#comp-ky0cyl68):hover::after {
+  opacity: 1 !important;
+}
+
+/* Gallery images */
+[class*="gallery-item"] img,
+[class*="galleryItem"] img,
+[class*="ProGallery"] img {
+  transition: transform 0.4s var(--anim-ease), filter 0.4s ease !important;
+}
+
+[class*="gallery-item"]:hover img,
+[class*="galleryItem"]:hover img {
+  transform: scale(1.05) !important;
+  filter: brightness(1.06) saturate(1.1) !important;
+}
+
+/* All img tags in content area — invisible border by default, pink on hover */
+#SITE_PAGES img:not([id*="ky0cyl68"]):not([class*="icon"]):not([class*="Icon"]) {
+  border: 1px solid transparent !important;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease !important;
+}
+
+#SITE_PAGES img:not([id*="ky0cyl68"]):not([class*="icon"]):not([class*="Icon"]):hover {
+  border-color: rgba(199,6,92,0.50) !important;
+  box-shadow: 0 4px 16px rgba(199,6,92,0.14) !important;
+}
+
+/* =======================================================================
+   36. BUTTON ANIMATION — LIFT & GLOW
+   ======================================================================= */
+
+/* StylableButton — enhanced */
+[class*="StylableButton"] {
+  position: relative !important;
+  overflow: hidden !important;
+  transition:
+    background-color 0.22s ease,
+    transform 0.22s var(--anim-bounce),
+    box-shadow 0.22s ease
+    !important;
+}
+
+/* Ripple shimmer overlay on hover */
+[class*="StylableButton"]::before {
+  content: '' !important;
+  position: absolute !important;
+  inset: 0 !important;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255,255,255,0.15) 50%,
+    transparent 100%
+  ) !important;
+  background-size: 200% 100% !important;
+  opacity: 0 !important;
+  transition: opacity 0.2s ease !important;
+  pointer-events: none !important;
+}
+
+[class*="StylableButton"]:hover::before {
+  opacity: 1 !important;
+  animation: shimmer 0.7s linear !important;
+}
+
+[class*="StylableButton"]:hover {
+  transform: translateY(-3px) !important;
+  box-shadow: var(--elev-pink) !important;
+}
+
+[class*="StylableButton"]:active {
+  transform: translateY(-1px) !important;
+  box-shadow: var(--elev-1) !important;
+}
+
+/* wixui-button enhanced */
+.wixui-button,
+a.wixui-button {
+  position: relative !important;
+  overflow: hidden !important;
+  transition:
+    background-color 0.22s ease,
+    transform 0.22s var(--anim-bounce),
+    box-shadow 0.22s ease
+    !important;
+}
+
+.wixui-button::before,
+a.wixui-button::before {
+  content: '' !important;
+  position: absolute !important;
+  inset: 0 !important;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255,255,255,0.18) 50%,
+    transparent 100%
+  ) !important;
+  background-size: 200% 100% !important;
+  opacity: 0 !important;
+  transition: opacity 0.2s ease !important;
+  pointer-events: none !important;
+  z-index: 1 !important;
+}
+
+.wixui-button:hover::before,
+a.wixui-button:hover::before {
+  opacity: 1 !important;
+  animation: shimmer 0.7s linear !important;
+}
+
+.wixui-button:hover,
+a.wixui-button:hover {
+  transform: translateY(-3px) !important;
+  box-shadow: var(--elev-pink) !important;
+}
+
+.wixui-button:active,
+a.wixui-button:active {
+  transform: translateY(-1px) !important;
+}
+
+/* Primary / hero CTA buttons — pulsing draw-attention effect */
+[id*="comp-jqciaoeu"],
+[id*="comp-jqciaslz"] {
+  animation: pinkPulse 2.8s 1.5s ease infinite !important;
+}
+
+/* =======================================================================
+   37. CARDS & PRODUCT TILES — HOVER LIFT WITH BORDER GLOW
+   ======================================================================= */
+
+/* Wix Box / container used as cards — no overflow:hidden (breaks content) */
+[class*="wixui-box"]:not(#SITE_HEADER):not(#SITE_FOOTER):not(#comp-jqcd41er) {
+  transition:
+    transform 0.28s var(--anim-ease),
+    box-shadow 0.28s ease
+    !important;
+}
+
+[class*="wixui-box"]:not(#SITE_HEADER):not(#SITE_FOOTER):not(#comp-jqcd41er):hover {
+  transform: translateY(-3px) !important;
+  box-shadow: var(--elev-2) !important;
+}
+
+/* Strip column items */
+[class*="wixui-column-strip__column"],
+[class*="StripColumnsContainer"] > * {
+  transition: background-color 0.3s ease !important;
+}
+
+/* Price list rows / product blocks */
+[id*="comp-jqce"],
+[id*="comp-jqcf"],
+[id*="comp-m4k"] {
+  transition:
+    transform 0.25s var(--anim-ease),
+    box-shadow 0.25s ease
+    !important;
+}
+
+[id*="comp-jqce"]:hover,
+[id*="comp-jqcf"]:hover,
+[id*="comp-m4k"]:hover {
+  transform: translateY(-2px) !important;
+}
+
+/* =======================================================================
+   38. SECTION HEADINGS — ANIMATED ACCENT LINES
+   ======================================================================= */
+
+/* H1 page titles */
+h1.wixui-rich-text__text,
+.wixui-rich-text h1 {
+  position: relative !important;
+}
+
+/* H2 section titles — scoped to main page content only to avoid random lines */
+#SITE_PAGES h2.wixui-rich-text__text,
+#SITE_PAGES .wixui-rich-text h2 {
+  position: relative !important;
+}
+
+/* =======================================================================
+   39. SECTION STRIP BACKGROUNDS — ALTERNATING SUBTLE BANDS
+   ======================================================================= */
+
+/* Section backgrounds — white base, no alternating tints (too aggressive) */
+.wixui-section,
+[class*="ClassicSection"] {
+  background-color: #ffffff !important;
+}
+
+/* =======================================================================
+   40. HERO SECTION — HOMEPAGE FEATURED PANELS
+   ======================================================================= */
+
+/* Feature image containers — bold framing */
+[id*="comp-m4k7zp59"],
+[id*="comp-jqcb"] {
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+/* Overlay shimmer on hero image containers */
+[id*="comp-m4k7zp59"]::after {
+  content: '' !important;
+  position: absolute !important;
+  inset: 0 !important;
+  background: linear-gradient(
+    to bottom,
+    transparent 55%,
+    rgba(199,6,92,0.08) 100%
+  ) !important;
+  pointer-events: none !important;
+  z-index: 1 !important;
+}
+
+/* =======================================================================
+   41. PRICE LIST PAGE — TABLE ENHANCEMENTS
+   ======================================================================= */
+
+/* Animated row highlight */
+tr {
+  transition: background-color 0.18s ease !important;
+}
+
+tr:hover td {
+  background-color: rgba(199,6,92,0.05) !important;
+  color: #111111 !important;
+}
+
+/* Table header row — pink with shine */
+th {
+  background: linear-gradient(135deg, #C7065C 0%, #9a0447 100%) !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+th::after {
+  content: '' !important;
+  position: absolute !important;
+  inset: 0 !important;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255,255,255,0.08) 50%,
+    transparent 100%
+  ) !important;
+  pointer-events: none !important;
+}
+
+/* Price cells emphasis */
+td:first-child {
+  font-weight: 600 !important;
+  letter-spacing: 0.5px !important;
+}
+
+/* =======================================================================
+   42. FAQ PAGE — ACCORDION ANIMATIONS
+   ======================================================================= */
+
+[class*="wixui-accordion"] [class*="header"],
+[class*="wixui-accordion"] summary,
+[class*="wixui-accordion"] [class*="title"] {
+  transition:
+    background-color 0.22s ease,
+    color 0.22s ease,
+    padding-left 0.22s ease
+    !important;
+  border-left: 3px solid transparent !important;
+  cursor: pointer !important;
+}
+
+[class*="wixui-accordion"] [class*="header"]:hover,
+[class*="wixui-accordion"] summary:hover {
+  background-color: rgba(199,6,92,0.05) !important;
+  color: #C7065C !important;
+  border-left-color: #C7065C !important;
+  padding-left: 20px !important;
+}
+
+[class*="wixui-accordion"] [class*="content"],
+[class*="wixui-accordion"] [class*="panel"] {
+  animation: fadeUp 0.3s var(--anim-ease) both;
+}
+
+/* =======================================================================
+   43. FORMS — ANIMATED FOCUS STATES
+   ======================================================================= */
+
+/* Input wrapper */
+[class*="wixui-text-input__wrapper"],
+[class*="wixui-textarea__wrapper"] {
+  transition: transform 0.18s ease !important;
+}
+
+[class*="wixui-text-input__wrapper"]:focus-within,
+[class*="wixui-textarea__wrapper"]:focus-within {
+  transform: translateY(-1px) !important;
+}
+
+/* Input border animation — bottom glow line */
+[class*="wixui-text-input"],
+[class*="wixui-textarea"],
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+textarea {
+  border-bottom: 2px solid #C7065C !important;
+  transition:
+    border-color 0.22s ease,
+    box-shadow 0.22s ease,
+    background-color 0.22s ease
+    !important;
+}
+
+[class*="wixui-text-input"]:focus,
+[class*="wixui-textarea"]:focus,
+input:focus,
+textarea:focus {
+  border-color: #C7065C !important;
+  box-shadow:
+    0 0 0 3px rgba(199,6,92,0.10),
+    0 3px 14px rgba(0,0,0,0.08)
+    !important;
+  background-color: #fff8fb !important;
+}
+
+/* Label text */
+[class*="wixui-text-input"] label,
+[class*="form-field"] label {
+  transition: color 0.18s ease !important;
+  font-weight: 600 !important;
+}
+
+[class*="wixui-text-input"]:focus-within label {
+  color: #C7065C !important;
+}
+
+/* =======================================================================
+   44. DIVIDER LINES — ANIMATED PULSE
+   ======================================================================= */
+
+[class*="FiveGridLine"],
+[class*="wixui-line"],
+[class*="ushYlt"] {
+  background: linear-gradient(90deg, transparent, #C7065C 30%, #C7065C 70%, transparent) !important;
+  height: 2px !important;
+  border: none !important;
+  opacity: 0.45 !important;
+  transition: opacity 0.3s ease !important;
+}
+
+[class*="FiveGridLine"]:hover,
+[class*="wixui-line"]:hover {
+  opacity: 0.9 !important;
+}
+
+/* =======================================================================
+   45. PAGE TRANSITIONS — SMOOTH CONTENT REVEAL
+   ======================================================================= */
+
+/* Inner page content containers */
+#SITE_PAGES > * {
+  animation: fadeUp 0.5s 0.05s var(--anim-ease) both;
+}
+
+/* Each major wix section */
+[class*="ClassicSection"],
+.wixui-section,
+[class*="gOE_3z"] {
+  transition: background-color 0.3s ease !important;
+}
+
+/* Content panels — scoped so nav/header grids don't flash on every page */
+#SITE_PAGES [data-mesh-id$="-gridContainer"] {
+  animation: fadeIn 0.4s var(--anim-ease) both;
+}
+
+/* =======================================================================
+   46. LINK HOVER ANIMATIONS — SITE-WIDE
+   ======================================================================= */
+
+/* Body text links */
+#SITE_PAGES a:not([class*="wixui-button"]):not(.UiHgGh):not([class*="StylableButton"]) {
+  position: relative !important;
+  text-decoration: none !important;
+  color: #C7065C !important;
+  transition: color 0.18s ease !important;
+}
+
+#SITE_PAGES a:not([class*="wixui-button"]):not(.UiHgGh):not([class*="StylableButton"])::after {
+  content: '' !important;
+  position: absolute !important;
+  bottom: -1px !important;
+  left: 0 !important;
+  width: 0 !important;
+  height: 1px !important;
+  background: currentColor !important;
+  transition: width 0.22s var(--anim-snap) !important;
+}
+
+#SITE_PAGES a:not([class*="wixui-button"]):not(.UiHgGh):not([class*="StylableButton"]):hover::after {
+  width: 100% !important;
+}
+
+/* =======================================================================
+   47. FOOTER — ANIMATED SOCIAL ICONS & LINKS
+   ======================================================================= */
+
+[class*="wixui-link-bar"] a {
+  transition:
+    transform 0.22s var(--anim-bounce),
+    filter 0.22s ease
+    !important;
+  display: inline-block !important;
+}
+
+[class*="wixui-link-bar"] a:hover {
+  transform: translateY(-3px) scale(1.12) !important;
+  filter: none !important;
+}
+
+[class*="wixui-link-bar"] svg {
+  transition: fill 0.22s ease !important;
+}
+
+[class*="wixui-link-bar"] a:hover svg {
+  fill: #C7065C !important;
+  filter: none !important;
+}
+
+/* =======================================================================
+   48. SCROLLBAR — BRAND PINK ANIMATED THUMB
+   ======================================================================= */
+
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f4f4f4;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #C7065C 0%, #9a0447 100%);
+  border-radius: 0;
+  transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #e00869 0%, #C7065C 100%);
+}
+
+/* =======================================================================
+   49. GALLERY PAGE — IMAGE GRID ANIMATIONS
+   ======================================================================= */
+
+[class*="ProGallery"],
+[class*="pro-gallery"] {
+  background: transparent !important;
+}
+
+/* Gallery items — staggered entrance */
+[class*="gallery-item"],
+[class*="galleryItem"] {
+  animation: scaleUp 0.4s var(--anim-ease) both !important;
+  border: var(--img-border-width) solid rgba(199,6,92,0.35) !important;
+  overflow: hidden !important;
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.25s var(--anim-ease)
+    !important;
+}
+
+[class*="gallery-item"]:nth-child(1),
+[class*="galleryItem"]:nth-child(1) { animation-delay: 0.05s !important; }
+[class*="gallery-item"]:nth-child(2),
+[class*="galleryItem"]:nth-child(2) { animation-delay: 0.10s !important; }
+[class*="gallery-item"]:nth-child(3),
+[class*="galleryItem"]:nth-child(3) { animation-delay: 0.15s !important; }
+[class*="gallery-item"]:nth-child(4),
+[class*="galleryItem"]:nth-child(4) { animation-delay: 0.20s !important; }
+[class*="gallery-item"]:nth-child(n+5),
+[class*="galleryItem"]:nth-child(n+5) { animation-delay: 0.25s !important; }
+
+[class*="gallery-item"]:hover,
+[class*="galleryItem"]:hover {
+  border-color: #C7065C !important;
+  box-shadow: var(--elev-pink) !important;
+  transform: scale(1.025) translateY(-2px) !important;
+  z-index: 3 !important;
+}
+
+/* Gallery overlay on hover */
+[class*="gallery-item-hover-layer"],
+[class*="galleryItemHover"] {
+  background: rgba(199,6,92,0.12) !important;
+  transition: background 0.25s ease !important;
+}
+
+/* =======================================================================
+   50. MOBILE MENU — ANIMATED OPEN/CLOSE
+   ======================================================================= */
+
+[class*="mobileMenuButton"],
+[class*="menuToggle"],
+[class*="hambMenu"] {
+  transition: transform 0.22s var(--anim-ease) !important;
+}
+
+[class*="mobileMenuButton"]:hover,
+[class*="menuToggle"]:hover {
+  transform: scale(1.1) !important;
+}
+
+/* =======================================================================
+   51. FOCUS ACCESSIBILITY — KEYBOARD NAVIGATION
+   ======================================================================= */
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid #C7065C !important;
+  outline-offset: 3px !important;
+  border-radius: 0 !important;
+}
+
+/* =======================================================================
+   52. RICH TEXT — PARAGRAPH ANIMATION
+   ======================================================================= */
+
+/* Text blocks inside sections */
+[class*="wixui-rich-text"] p,
+[class*="wixui-rich-text"] li,
+[class*="wixui-rich-text"] blockquote {
+  animation: fadeIn 0.5s var(--anim-ease) both;
+}
+
+/* Blockquotes */
+[class*="wixui-rich-text"] blockquote {
+  border-left: 4px solid #C7065C !important;
+  padding-left: 18px !important;
+  margin-left: 0 !important;
+  font-style: italic !important;
+  background: rgba(199,6,92,0.03) !important;
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
+}
+
+/* Lists */
+[class*="wixui-rich-text"] ul li::marker,
+[class*="wixui-rich-text"] ul li::before {
+  color: #C7065C !important;
+}
+
+[class*="wixui-rich-text"] li {
+  padding-left: 4px !important;
+  margin-bottom: 4px !important;
+}
+
+/* =======================================================================
+   53. SITE-WIDE PINK GLOW SELECTION
+   ======================================================================= */
+
+::selection {
+  background: rgba(199,6,92,0.20) !important;
+  color: #111111 !important;
+}
+
+::-moz-selection {
+  background: rgba(199,6,92,0.20) !important;
+  color: #111111 !important;
+}
+
+/* =======================================================================
+   54. PAGE TITLE HEADINGS — ENTRANCE ANIMATION
+   ======================================================================= */
+
+/* H1 — bold staggered wipe in */
+h1.wixui-rich-text__text {
+  animation: fadeUp 0.6s 0.1s var(--anim-ease) both !important;
+}
+
+h2.wixui-rich-text__text {
+  animation: fadeUp 0.55s 0.18s var(--anim-ease) both !important;
+}
+
+h3.wixui-rich-text__text {
+  animation: fadeUp 0.50s 0.24s var(--anim-ease) both !important;
+}
+
+/* =======================================================================
+   55. BADGE / CHIP ELEMENTS
+   ======================================================================= */
+
+/* Any small highlighted spans that look like badges */
+[style*="background-color:#C7065C"] span,
+[style*="background:#C7065C"] span {
+  animation: pinkPulse 3s ease infinite !important;
+  border-radius: 0 !important;
+  padding: 2px 8px !important;
+}
+
+/* =======================================================================
+   56. SIZE CHART PAGE — TABLE GRID ANIMATION
+   ======================================================================= */
+
+/* Animate table rows in */
+tr:nth-child(1)  { animation: fadeUp 0.35s 0.03s var(--anim-ease) both; }
+tr:nth-child(2)  { animation: fadeUp 0.35s 0.06s var(--anim-ease) both; }
+tr:nth-child(3)  { animation: fadeUp 0.35s 0.09s var(--anim-ease) both; }
+tr:nth-child(4)  { animation: fadeUp 0.35s 0.12s var(--anim-ease) both; }
+tr:nth-child(5)  { animation: fadeUp 0.35s 0.15s var(--anim-ease) both; }
+tr:nth-child(6)  { animation: fadeUp 0.35s 0.18s var(--anim-ease) both; }
+tr:nth-child(n+7){ animation: fadeUp 0.35s 0.22s var(--anim-ease) both; }
+
+/* =======================================================================
+   57. ORDER PAGE — FORM ENTRANCE ANIMATION
+   ======================================================================= */
+
+/* Each form field group animates in */
+[class*="wixui-text-input"],
+[class*="wixui-textarea"],
+[class*="wixui-dropdown"] {
+  animation: slideInLeft 0.4s var(--anim-ease) both !important;
+}
+
+[class*="wixui-text-input"]:nth-child(1)  { animation-delay: 0.05s !important; }
+[class*="wixui-text-input"]:nth-child(2)  { animation-delay: 0.10s !important; }
+[class*="wixui-text-input"]:nth-child(3)  { animation-delay: 0.15s !important; }
+[class*="wixui-text-input"]:nth-child(4)  { animation-delay: 0.20s !important; }
+[class*="wixui-text-input"]:nth-child(n+5){ animation-delay: 0.25s !important; }
+
+/* =======================================================================
+   58. BREADCRUMB / BACK LINKS
+   ======================================================================= */
+
+[class*="breadcrumb"] a,
+[class*="wixui-breadcrumbs"] a {
+  transition: color 0.18s ease, letter-spacing 0.18s ease !important;
+}
+
+[class*="breadcrumb"] a:hover,
+[class*="wixui-breadcrumbs"] a:hover {
+  color: #C7065C !important;
+  letter-spacing: 0.5px !important;
+}
+
+/* =======================================================================
+   59. HOVER TOOLTIP VISUAL AID
+   ======================================================================= */
+
+[title]:not([title=""]):hover {
+  cursor: pointer !important;
+}
+
+/* =======================================================================
+   60. BACK TO TOP BUTTON — ANIMATED
+   ======================================================================= */
+
+[class*="SCROLL_TO_TOP"],
+[id*="SCROLL_TO_TOP"],
+[aria-label*="top"],
+[aria-label*="scroll"] {
+  background: #C7065C !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: 0 4px 16px rgba(199,6,92,0.35) !important;
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s var(--anim-bounce),
+    box-shadow 0.2s ease
+    !important;
+}
+
+[class*="SCROLL_TO_TOP"]:hover,
+[id*="SCROLL_TO_TOP"]:hover {
+  background: #9a0447 !important;
+  transform: translateY(-4px) !important;
+  box-shadow: 0 8px 28px rgba(199,6,92,0.45) !important;
+}
+
+/* =======================================================================
+   61. CUSTOM LOGOS PAGE — LOGO CARD GRID
+   ======================================================================= */
+
+/* Logo showcase cards */
+[id*="comp-kl2"] {
+  transition:
+    transform 0.25s var(--anim-bounce),
+    box-shadow 0.25s ease
+    !important;
+  border: 2px solid rgba(199,6,92,0.20) !important;
+}
+
+[id*="comp-kl2"]:hover {
+  transform: translateY(-5px) scale(1.02) !important;
+  box-shadow: var(--elev-pink) !important;
+  border-color: #C7065C !important;
+}
+
+/* =======================================================================
+   62. HEADGEAR / BASICS / SUBLIMATION PAGES — PRODUCT IMAGE GRIDS
+   ======================================================================= */
+
+/* Product category thumbnails */
+[id*="comp-jqce"] .wixui-image,
+[id*="comp-jqcf"] .wixui-image,
+[id*="comp-m9b"] .wixui-image,
+[id*="comp-m4k"] .wixui-image {
+  border: var(--img-border-width) solid rgba(199,6,92,0.40) !important;
+  transition:
+    border-color 0.25s ease,
+    transform 0.28s var(--anim-bounce),
+    box-shadow 0.28s ease
+    !important;
+}
+
+[id*="comp-jqce"]:hover .wixui-image,
+[id*="comp-jqcf"]:hover .wixui-image,
+[id*="comp-m9b"]:hover .wixui-image,
+[id*="comp-m4k"]:hover .wixui-image {
+  border-color: #C7065C !important;
+  transform: scale(1.03) !important;
+  box-shadow: var(--elev-pink) !important;
+}
+
+/* =======================================================================
+   63. WRAP DESIGN PAGE — IMAGE OVERLAY
+   ======================================================================= */
+
+[id*="comp-kl2"][class*="wixui-image"] {
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+/* =======================================================================
+   64. PRICELIST PAGE — PRODUCT CATEGORY BLOCKS
+   ======================================================================= */
+
+/* Category heading blocks */
+[class*="wixui-rich-text"] h2:hover {
+  color: #C7065C !important;
+  transition: color 0.18s ease !important;
+  cursor: default !important;
+}
+
+/* =======================================================================
+   65. ABOUT PAGE — TEAM / INFO CARDS
+   ======================================================================= */
+
+/* About page content sections */
+[id*="comp-jqce"]:hover {
+  background: rgba(199,6,92,0.02) !important;
+}
+
+/* =======================================================================
+   66. GENERAL INTER-SECTION SEPARATOR LINES
+   ======================================================================= */
+
+/* Pink accent dots separator */
+[class*="wixui-section"] + [class*="wixui-section"],
+[class*="ClassicSection"] + [class*="ClassicSection"] {
+  border-top: 1px solid rgba(199,6,92,0.08) !important;
+}
+
+/* =======================================================================
+   67. RESPONSIVE ANIMATION ADJUSTMENTS — TABLET
+   ======================================================================= */
+
+@media (max-width: 980px) {
+  /* Reduce animation distance on smaller screens */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Keep images clean on touch */
+  .wixui-image:not(#comp-ky0cyl68):hover {
+    transform: none !important;
+  }
+
+  /* Reduce card lift */
+  [class*="wixui-box"]:not(#SITE_HEADER):not(#SITE_FOOTER):hover {
+    transform: none !important;
+  }
+
+  /* Simplify button hover on touch */
+  [class*="StylableButton"]:hover,
+  .wixui-button:hover {
+    transform: none !important;
+  }
+}
+
+/* =======================================================================
+   68. RESPONSIVE — MOBILE PHONE
+   ======================================================================= */
+
+@media (max-width: 600px) {
+  /* Disable heavy animations on mobile for performance */
+  [data-mesh-id$="inlineContent"] {
+    animation: none !important;
+  }
+
+  /* Minimal transitions */
+  .wixui-image:not(#comp-ky0cyl68) {
+    border-width: 2px !important;
+    transition: border-color 0.2s ease !important;
+  }
+
+  /* Keep buttons smooth */
+  [class*="StylableButton"],
+  .wixui-button {
+    transition: background-color 0.18s ease !important;
+  }
+
+  /* Disable float animation */
+  animation: none !important;
+}
+
+/* =======================================================================
+   69. PERFORMANCE — REDUCE MOTION ACCESSIBILITY
+   ======================================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* =======================================================================
+   70. FINAL PRINT OVERRIDE (PHASE 3)
+   ======================================================================= */
+
+@media print {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  [class*="wixui-image"] {
+    border: 1px solid #cccccc !important;
+    box-shadow: none !important;
+  }
+}
+
+/* =======================================================================
+   71. AUTH BAR — Login / Signup / Admin Top Bar
+   ======================================================================= */
+
+#br-auth-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 999999;
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+  border-bottom: 2px solid #C7065C;
+  padding: 0 24px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  font-family: 'Montserrat', 'Oswald', sans-serif;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+}
+
+.br-auth-bar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.br-auth-logo {
+  color: #C7065C !important;
+  font-family: 'Bebas Neue', 'Oswald', sans-serif;
+  font-size: 18px;
+  letter-spacing: 3px;
+  text-decoration: none !important;
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+.br-auth-logo:hover {
+  color: #e0076b !important;
+}
+
+.br-auth-links {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.br-auth-btn {
+  display: inline-block;
+  padding: 5px 16px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  text-decoration: none !important;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border: none;
+  font-family: 'Montserrat', sans-serif;
+  white-space: nowrap;
+  color: #ccc !important;
+  background: transparent;
+}
+
+.br-auth-btn:hover {
+  color: #fff !important;
+  background: rgba(199, 6, 92, 0.15);
+}
+
+.br-auth-signup {
+  color: #fff !important;
+  background: #C7065C !important;
+  border-radius: 4px;
+}
+
+.br-auth-signup:hover {
+  background: #e0076b !important;
+}
+
+.br-auth-admin {
+  color: #C7065C !important;
+  border: 1px solid #C7065C;
+  border-radius: 4px;
+}
+
+.br-auth-admin:hover {
+  background: #C7065C !important;
+  color: #fff !important;
+}
+
+.br-auth-logout {
+  color: #888 !important;
+  background: transparent;
+  font-size: 11px;
+}
+
+.br-auth-logout:hover {
+  color: #C7065C !important;
+}
+
+/* Push page content down to account for fixed auth bar */
+body {
+  padding-top: 38px !important;
+}
+
+/* Mobile auth bar */
+@media (max-width: 600px) {
+  #br-auth-bar {
+    height: 34px;
+    padding: 0 12px;
+  }
+
+  .br-auth-logo {
+    font-size: 14px;
+    letter-spacing: 2px;
+  }
+
+  .br-auth-btn {
+    padding: 4px 10px;
+    font-size: 10px;
+  }
+
+  body {
+    padding-top: 34px !important;
+  }
+}
+
+/* Auth bar greeting */
+.br-auth-greeting {
+  color: #aaa;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+/* =======================================================================
+   72. FEATURE IMAGE SLIDER — Auto-rotating Carousel
+   ======================================================================= */
+
+/* The whole strip section that holds the slider */
+#comp-lgckkvft {
+  overflow: hidden !important;
+  position: relative !important;
+}
+
+/* Container: the section holding the 3 feature images */
+[data-mesh-id="comp-lgckkvftinlineContent-gridContainer"] {
+  position: relative !important;
+  overflow: hidden !important;
+  min-height: 400px !important;
+}
+
+/* Make the parent inline-content clip properly */
+#comp-lgckkvft [data-mesh-id="comp-lgckkvftinlineContent"] {
+  min-height: 400px !important;
+  overflow: hidden !important;
+  position: relative !important;
+}
+
+/* Stack all 3 feature images in same position — contained inside parent */
+#comp-m4k7zp59,
+#comp-m4k7zp5d,
+#comp-m4k7zp5h {
+  position: absolute !important;
+  top: 20px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  margin: 0 !important;
+  width: 305px !important;
+  height: 331px !important;
+  opacity: 0;
+  transition: opacity 0.8s ease-in-out;
+  z-index: 1;
+  pointer-events: none;
+}
+
+#comp-m4k7zp59.br-slide-active,
+#comp-m4k7zp5d.br-slide-active,
+#comp-m4k7zp5h.br-slide-active {
+  opacity: 1 !important;
+  z-index: 2;
+  pointer-events: auto;
+}
+
+#comp-m4k7zp59 img,
+#comp-m4k7zp5d img,
+#comp-m4k7zp5h img {
+  width: 305px !important;
+  height: 331px !important;
+  object-fit: cover !important;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+}
+
+/* Slider controls container — inside the section */
+.br-slider-controls {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Navigation dots */
+.br-slider-dots {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.br-slider-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ccc;
+  border: 2px solid #ddd;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 0;
+}
+
+.br-slider-dot.active {
+  background: #C7065C;
+  border-color: #C7065C;
+  transform: scale(1.2);
+}
+
+.br-slider-dot:hover {
+  background: #C7065C;
+  border-color: #C7065C;
+}
+
+/* Prev / Next arrows */
+.br-slider-arrow {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.9);
+  border: 1px solid #ddd;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: #333;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  padding: 0;
+  line-height: 1;
+}
+
+.br-slider-arrow:hover {
+  background: #C7065C;
+  color: #fff;
+  border-color: #C7065C;
+}
+
+/* Mobile slider */
+@media (max-width: 768px) {
+  #comp-m4k7zp59,
+  #comp-m4k7zp5d,
+  #comp-m4k7zp5h {
+    width: 260px !important;
+    height: 282px !important;
+  }
+
+  #comp-m4k7zp59 img,
+  #comp-m4k7zp5d img,
+  #comp-m4k7zp5h img {
+    width: 260px !important;
+    height: 282px !important;
+  }
+
+  [data-mesh-id="comp-lgckkvftinlineContent-gridContainer"],
+  #comp-lgckkvft [data-mesh-id="comp-lgckkvftinlineContent"] {
+    min-height: 340px !important;
+  }
+
+  .br-slider-arrow {
+    width: 30px;
+    height: 30px;
+    font-size: 14px;
+  }
+}
