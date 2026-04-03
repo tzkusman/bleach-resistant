@@ -120,7 +120,7 @@ bleach-resistant/
 
 ## Key Features
 
-- **Feature Image Slider** — Auto-rotating carousel on homepage with prev/next arrows, dots, touch/swipe support
+- **Feature Image Slider** — Auto-rotating carousel on homepage with prev/next arrows, dots, touch/swipe support, opacity fade transitions (v5 — minimal overrides preserving Wix grid)
 - **CSS Hover Dropdowns** — PRODUCTS and SERVICES menus work without JavaScript
 - **Admin Dashboard** — Full CMS with orders, contacts, visual page editor, media library, settings, analytics
 - **Supabase Integration** — Real-time data for orders, contacts, page content overrides, site settings
@@ -195,6 +195,21 @@ vercel --prod
 | Text       | `rgb(141,198,63)` (green)    |
 | Hover      | `rgb(160,160,159)` (gray)    |
 | Background | `rgb(36,35,35)` / `#fff`     |
+
+---
+
+## Changelog
+
+| Commit    | Description |
+| --------- | ----------- |
+| `54240fe` | Slider v5 — minimal CSS approach, keeps Wix grid intact, only overrides image left/opacity |
+| `8541b59` | Slider v4 — eliminated gap with padding-top approach |
+| `3b2768c` | Fixed UTF-8 mojibake encoding in all 10 admin & auth pages |
+| `255c34b` | Slider v3 CSS fix, added README, updated .gitignore |
+| `d8adfc9` | Replaced old FinPrint favicon with new BR branded favicon.svg |
+| `cba4b0d` | Rebuilt page editor — fixed blank preview, added element scanner |
+| `881c336` | Slider v2, admin upgrade — navigation/settings/analytics pages |
+| `adcf356` | Initial production release — 20 pages, admin panel, Supabase CMS, SEO |
 
 ---
 
