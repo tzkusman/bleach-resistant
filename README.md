@@ -78,7 +78,7 @@ bleach-resistant/
     content-loader.js         # Mobile scaling, hamburger nav, Supabase content overrides
 
   Database
-    supabase-setup.sql        # SQL schema for all tables
+    supabase-setup.sql        # Full DB setup: tables, RLS policies, grants, storage buckets
     SUPABASE_GUIDE.md         # Supabase setup documentation
 
   Deployment
@@ -256,6 +256,9 @@ These are cosmetic console errors from the Wix runtime bundle  they do not affec
 
 | Commit    | Date          | Description |
 | --------- | ------------- | ----------- |
+| `77d24b6` | 2026-04-04    | Fix: remove `.select()` after insert so anon role can submit orders (RLS 401 fix) |
+| `06017f6` | 2026-04-04    | Rebuild order page: comprehensive inquiry form + admin panel upgrade |
+| `fb2aa87` | 2026-04-04    | Update README: comprehensive guide + April 4 2026 changes |
 | `e03c612` | 2026-04-04    | Fix encoding: replace garbled triple-encoded em dashes with `&#x2014;` in all 20 pages; remove U+009D control chars |
 | `68ad9b5` | 2026-04-04    | Fix: remove dead `blob:` scripts from all pages, fix z-index conflicts, correct scale height, improve vercel.json security+cache headers |
 | `b6a209e` | 2026-04-04    | Mobile fix: DOCTYPE all pages, JS viewport scaling, hamburger nav Phase 4 CSS rewrite |
@@ -302,7 +305,37 @@ The fixed auth bar (which shows login/logout) sat at `z-index: 999999`. The hamb
 - ` 1024px`  stacked layout, smaller sidebar
 - ` 768px`  horizontal scrollable nav strip instead of sidebar
 - ` 480px`  compact table cells, full-width forms
+### 7. Order Page — Complete Rebuild
+The old `order.html` (Wix-exported static page) was fully replaced with a custom-built inquiry and order form.
 
+**Form structure (4 steps):**
+- **Step 1 — Service Type:** Dropdown with 15 services across 4 categories (Apparel & Printing, Design Services, Vehicle & Signage, Other). Dynamic sub-fields appear per service selection:
+  - Apparel → item type, quantity, size checkboxes (XS–3XL + Youth), colour tag picker (13 colours)
+  - Head Gear → cap style, quantity
+  - Design/Logo → deliverable type, file format preference
+  - Vehicle Wrap → wrap type, vehicle make/model
+  - International → destination country, quantity
+- **Step 2 — Contact Info:** First/last name, email, phone, company/team/school, city. Auto-filled when user is signed in.
+- **Step 3 — Order Details:** Deadline date picker, urgency quick-pick (Flexible / 2–3 Weeks / 1 Week / Rush ⚡), budget range dropdown, design notes textarea, artwork file upload (drag & drop, 20 MB max, all art formats), how did you hear about us.
+- **Submit:** Inserts to Supabase `orders` table → success screen with random reference number (e.g. `REF: BR-A3F7K2`)
+
+**Auth:** Completely optional — guests submit freely, logged-in users get name/email pre-filled and `user_id` linked to the row.
+
+**Admin panel (`admin-orders.html`) upgrades:**
+- Table columns expanded: Service (badge), Item, Qty, Deadline/Urgency, Budget, Company
+- View modal shows all fields in grouped sections: Contact / Order Details / Notes + attachment download link
+- CSV export now includes 19 columns
+- Search also matches company name and service type
+
+### 8. Supabase SQL Queries Run (April 4, 2026)
+All SQL executed in the Supabase SQL Editor (now saved in `supabase-setup.sql`):
+
+1. `ALTER TABLE orders ADD COLUMN IF NOT EXISTS ...` — added 16 new columns to the orders table
+2. `INSERT INTO storage.buckets ...` — created `order-attachments` bucket
+3. RLS policies — `DROP POLICY` + `CREATE POLICY` for orders (public INSERT, admin SELECT/UPDATE/DELETE)
+4. Storage policies — anyone can upload/view `order-attachments`, admin manages `media`
+5. `GRANT INSERT ON TABLE orders TO anon` + sequences grant — fixed 401 error for guest submissions
+6. `ALTER TABLE orders ALTER COLUMN quantity TYPE TEXT` — fixed 400 error (quantity stored as range string e.g. `"6-10"`, not integer)
 ---
 
 ## License
