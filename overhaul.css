@@ -2628,3 +2628,542 @@ body {
     padding: 6px 12px;
   }
 }
+
+/* ███████████████████████████████████████████████████████████████████████
+   ██                                                                   ██
+   ██   PHASE 4 — COMPREHENSIVE MOBILE RESPONSIVENESS                  ██
+   ██   All 20 public pages — no functionality broken                  ██
+   ██   Version 4.0 | April 2026                                       ██
+   ██                                                                   ██
+   ███████████████████████████████████████████████████████████████████████ */
+
+/* =======================================================================
+   73. BASE — PREVENT HORIZONTAL OVERFLOW EVERYWHERE
+   ======================================================================= */
+
+html,
+body {
+  overflow-x: hidden !important;
+  max-width: 100% !important;
+}
+
+/* Site root containers — must be fluid */
+#SITE_CONTAINER,
+#masterPage,
+#SITE_STRUCTURE {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+}
+
+/* Header / footer / pages — fluid */
+#SITE_HEADER_WRAPPER,
+#SITE_HEADER,
+#PAGES_CONTAINER,
+#SITE_PAGES,
+#SITE_FOOTER_WRAPPER,
+#SITE_FOOTER {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  overflow-x: hidden !important;
+}
+
+/* All Wix section containers — fluid */
+.wixui-section,
+[class*="ClassicSection"],
+[class*="gOE_3z"],
+[class*="PFkO7r"],
+[class*="wixui-column-strip"],
+[class*="StripColumnsContainer"],
+[class*="wixui-strip-columns-container"] {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  overflow-x: hidden !important;
+}
+
+/* All [id^="comp-"] containers — remove forced min-widths */
+[id^="comp-"] {
+  max-width: 100% !important;
+}
+
+/* =======================================================================
+   74. TABLET BREAKPOINT (≤ 980px)
+   ======================================================================= */
+
+@media (max-width: 980px) {
+
+  /* ---- Remove all Wix-imposed min-width constraints ---- */
+  [id^="comp-"],
+  [data-mesh-id],
+  [class*="ClassicSection"],
+  .wixui-section {
+    min-width: 0 !important;
+  }
+
+  /* ---- Fix negative calc() left margins ----
+     Wix uses: margin-left: calc((100% - 980px) * 0.5)
+     On viewports < 980px this goes NEGATIVE and pushes content off-screen.
+     max(0px, ...) clamps to 0 so content stays on-screen.        ---- */
+  [data-mesh-id$="-gridContainer"] > [id],
+  [data-mesh-id$="-gridContainer"] > interact-element > [id] {
+    margin-left: max(0px, calc((100% - 980px) * 0.5)) !important;
+  }
+
+  /* ---- All images fluid ---- */
+  img:not([id*="ky0cyl68"]) {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  /* ---- Navigation: horizontal scrollable on tablets ---- */
+  #comp-jqcd41er,
+  wix-dropdown-menu,
+  [id*="comp-jqcd41er"] {
+    overflow-x: auto !important;
+    overflow-y: visible !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+  }
+  #comp-jqcd41er::-webkit-scrollbar,
+  wix-dropdown-menu::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  /* ---- Tables need horizontal scroll ---- */
+  .wixui-table-widget,
+  [class*="wixui-table"],
+  table {
+    overflow-x: auto !important;
+    display: block !important;
+  }
+}
+
+/* =======================================================================
+   75. MOBILE BREAKPOINT (≤ 768px) — Deep Layout Overrides
+   ======================================================================= */
+
+@media (max-width: 768px) {
+
+  /* ---- Activate body padding for auth bar ---- */
+  body {
+    padding-top: 0 !important;
+  }
+
+  /* ---- Site header — compact & sticky ---- */
+  #SITE_HEADER_WRAPPER {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 9000 !important;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.12) !important;
+  }
+
+  /* ---- Constrain header internals ---- */
+  [data-mesh-id="SITE_HEADERinlineContent"],
+  [data-mesh-id="SITE_HEADERinlineContent-gridContainer"] {
+    overflow: visible !important;
+    padding-bottom: 0 !important;
+  }
+
+  /* ---- Logo: scale down on smaller screens ---- */
+  img#img_comp-ky0cyl68,
+  #img_comp-ky0cyl68 {
+    width: 44px !important;
+    height: 44px !important;
+    max-width: 44px !important;
+    max-height: 44px !important;
+  }
+  #comp-ky0cyl68 {
+    width: 44px !important;
+    height: 44px !important;
+  }
+
+  /* ---- Navigation — horizontal scrollable strip ---- */
+  #comp-jqcd41er,
+  wix-dropdown-menu {
+    overflow-x: auto !important;
+    overflow-y: visible !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+    display: block !important;
+  }
+
+  /* Nav list — flex row, wrappable */
+  #comp-jqcd41er ul.y7qwii,
+  #comp-jqcd41er > ul {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    gap: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    list-style: none !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+    width: max-content !important;
+  }
+
+  /* Nav items */
+  #comp-jqcd41er li.Tg1gOB {
+    flex-shrink: 0 !important;
+    display: block !important;
+  }
+
+  /* Nav links */
+  #comp-jqcd41er li.Tg1gOB > a.UiHgGh {
+    padding: 10px 14px !important;
+    font-size: 11px !important;
+    letter-spacing: 1px !important;
+    white-space: nowrap !important;
+    display: block !important;
+  }
+
+  /* Hide dropdowns on mobile (no hover on touch) */
+  #comp-jqcd41er li.Tg1gOB > ul {
+    display: none !important;
+    position: absolute !important;
+    z-index: 10000 !important;
+    min-width: 180px !important;
+  }
+
+  /* Show dropdown on focus-within (touch-accessible) */
+  #comp-jqcd41er li.Tg1gOB:focus-within > ul,
+  #comp-jqcd41er li.Tg1gOB:hover > ul {
+    display: block !important;
+  }
+
+  /* ---- Sections: force full width ---- */
+  .wixui-section,
+  [class*="ClassicSection"],
+  [class*="gOE_3z"],
+  [id^="comp-"][class*="Section"] {
+    width: 100% !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    overflow-x: hidden !important;
+  }
+
+  /* ---- Grid containers: prevent x-overflow ---- */
+  [data-mesh-id$="-gridContainer"] {
+    overflow-x: hidden !important;
+    min-width: 0 !important;
+  }
+
+  /* ---- Fix Wix absolute element overflow ---- */
+  /* Elements absolutely positioned too far right get clipped cleanly */
+  [data-mesh-id$="-gridContainer"] > [id],
+  [data-mesh-id$="-gridContainer"] > interact-element > [id] {
+    max-width: 100% !important;
+  }
+
+  /* ---- Wix images fluid ---- */
+  wix-image img,
+  [class*="wixui-image"] img,
+  [class*="image-container"] img {
+    max-width: 100% !important;
+    width: 100% !important;
+    height: auto !important;
+    object-fit: cover !important;
+  }
+
+  wix-image,
+  [class*="wixui-image"]:not(#comp-ky0cyl68) {
+    max-width: 100% !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  /* ---- Wix text containers fluid ---- */
+  [class*="wixui-rich-text"],
+  [class*="wixui-text"] {
+    max-width: 100% !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+  }
+
+  /* ---- Font size scaling for mobile ---- */
+  [style*="font-size:70px"] .wixui-rich-text__text,
+  [style*="font-size: 70px"] .wixui-rich-text__text {
+    font-size: 36px !important;
+  }
+  [style*="font-size:50px"] .wixui-rich-text__text,
+  [style*="font-size: 50px"] .wixui-rich-text__text {
+    font-size: 28px !important;
+  }
+  [style*="font-size:40px"] .wixui-rich-text__text,
+  [style*="font-size: 40px"] .wixui-rich-text__text {
+    font-size: 24px !important;
+  }
+  [style*="font-size:35px"] .wixui-rich-text__text,
+  [style*="font-size: 35px"] .wixui-rich-text__text {
+    font-size: 22px !important;
+  }
+  [style*="font-size:30px"] .wixui-rich-text__text,
+  [style*="font-size: 30px"] .wixui-rich-text__text {
+    font-size: 20px !important;
+  }
+
+  /* ---- Wix buttons fluid on mobile ---- */
+  [class*="StylableButton"],
+  .wixui-button {
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+
+  /* ---- Tables — horizontal scroll wrappers ---- */
+  table {
+    display: block !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    max-width: 100% !important;
+    white-space: nowrap !important;
+  }
+  th, td {
+    white-space: normal !important;
+    min-width: 80px !important;
+  }
+
+  /* ---- Footer compact on mobile ---- */
+  #SITE_FOOTER_WRAPPER {
+    overflow-x: hidden !important;
+  }
+
+  /* ---- Order form: already custom HTML, just improve ---- */
+  #br-order-form-wrapper {
+    margin: 20px 12px !important;
+    padding: 24px 16px !important;
+  }
+
+  #br-order-form div[style*="grid-template-columns:1fr 1fr"] {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+
+  /* ---- Slider mobile ---- */
+  #comp-m4k7zp59,
+  #comp-m4k7zp5d,
+  #comp-m4k7zp5h {
+    width: 280px !important;
+    height: 280px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+  }
+
+  .br-slider-controls {
+    bottom: 12px !important;
+    padding: 6px 12px !important;
+    gap: 10px !important;
+  }
+
+  .br-slider-arrow {
+    width: 26px !important;
+    height: 26px !important;
+    font-size: 11px !important;
+  }
+
+  .br-slider-dot {
+    width: 8px !important;
+    height: 8px !important;
+  }
+
+  /* ---- Auth bar on mobile ---- */
+  #br-auth-bar {
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+  }
+
+  .br-auth-logo {
+    font-size: 13px !important;
+  }
+
+  .br-auth-btn {
+    font-size: 10px !important;
+    padding: 4px 8px !important;
+  }
+}
+
+/* =======================================================================
+   76. SMALL MOBILE BREAKPOINT (≤ 480px)
+   ======================================================================= */
+
+@media (max-width: 480px) {
+
+  /* ---- Header: even more compact ---- */
+  img#img_comp-ky0cyl68,
+  #img_comp-ky0cyl68 {
+    width: 36px !important;
+    height: 36px !important;
+    max-width: 36px !important;
+    max-height: 36px !important;
+  }
+  #comp-ky0cyl68 {
+    width: 36px !important;
+    height: 36px !important;
+  }
+
+  /* ---- Body text smaller ---- */
+  [class*="wixui-rich-text"] p,
+  [class*="wixui-rich-text"] li,
+  [class*="font_5"],
+  [class*="font_7"],
+  [class*="font_8"] {
+    font-size: 14px !important;
+    line-height: 1.65 !important;
+  }
+
+  /* ---- Reduce large font sizes more aggressively ---- */
+  [style*="font-size:70px"] .wixui-rich-text__text,
+  [style*="font-size: 70px"] .wixui-rich-text__text {
+    font-size: 28px !important;
+    letter-spacing: 2px !important;
+  }
+  [style*="font-size:50px"] .wixui-rich-text__text,
+  [style*="font-size: 50px"] .wixui-rich-text__text {
+    font-size: 22px !important;
+  }
+  [style*="font-size:40px"] .wixui-rich-text__text,
+  [style*="font-size: 40px"] .wixui-rich-text__text {
+    font-size: 18px !important;
+  }
+  [style*="font-size:35px"] .wixui-rich-text__text,
+  [style*="font-size: 35px"] .wixui-rich-text__text {
+    font-size: 16px !important;
+  }
+
+  /* Nav links smaller */
+  #comp-jqcd41er li.Tg1gOB > a.UiHgGh {
+    padding: 8px 10px !important;
+    font-size: 10px !important;
+    letter-spacing: 0.8px !important;
+  }
+
+  /* ---- Order form tighten ---- */
+  #br-order-form-wrapper {
+    margin: 12px 8px !important;
+    padding: 18px 12px !important;
+  }
+
+  /* ---- Slider even smaller ---- */
+  #comp-m4k7zp59,
+  #comp-m4k7zp5d,
+  #comp-m4k7zp5h {
+    width: 240px !important;
+    height: 240px !important;
+  }
+}
+
+/* =======================================================================
+   77. PRO GALLERY — MOBILE GRID FIX
+   ======================================================================= */
+
+@media (max-width: 768px) {
+  /* Pro gallery: single column or 2-col */
+  [class*="ProGallery"],
+  [class*="pro-gallery"] {
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+  }
+
+  [class*="gallery-item"],
+  [class*="galleryItem"] {
+    max-width: 100% !important;
+  }
+}
+
+/* =======================================================================
+   78. REPEATER COMPONENTS (testimonials, products) — MOBILE STACK
+   ======================================================================= */
+
+@media (max-width: 768px) {
+  /* Wix Repeater: stack items vertically */
+  [class*="repeater"],
+  [class*="Repeater"],
+  [id$="_r_"] {
+    display: block !important;
+  }
+
+  /* Repeater items: full width */
+  [id*="_r_comp-"] {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+/* =======================================================================
+   79. STICKY HEADER HELPER — Prevents content jumping under sticky header
+   ======================================================================= */
+
+@media (max-width: 768px) {
+  /* Ensure scroll-mt works for anchor links */
+  [id]:target {
+    scroll-margin-top: 80px;
+  }
+
+  /* Nudge page container if header is sticky */
+  #PAGES_CONTAINER {
+    scroll-margin-top: 80px;
+  }
+}
+
+/* =======================================================================
+   80. WIXUI ACCORDION (FAQ) — MOBILE USABILITY
+   ======================================================================= */
+
+@media (max-width: 768px) {
+  [class*="wixui-accordion"] {
+    max-width: 100% !important;
+  }
+
+  [class*="wixui-accordion"] [class*="header"],
+  [class*="wixui-accordion"] summary {
+    padding: 14px 16px !important;
+    font-size: 13px !important;
+  }
+
+  [class*="wixui-accordion"] [class*="content"],
+  [class*="wixui-accordion"] [class*="panel"] {
+    padding: 12px 16px !important;
+    font-size: 13px !important;
+  }
+}
+
+/* =======================================================================
+   81. COOKIE BANNER & MISC — MOBILE FIX
+   ======================================================================= */
+
+@media (max-width: 768px) {
+  /* Cookie banner */
+  .MNUFxS {
+    flex-wrap: wrap !important;
+    padding: 12px 16px !important;
+    gap: 8px !important;
+  }
+
+  /* Scroll-to-top button: keep visible, reposition */
+  [class*="SCROLL_TO_TOP"],
+  [id*="SCROLL_TO_TOP"] {
+    bottom: 16px !important;
+    right: 16px !important;
+    width: 40px !important;
+    height: 40px !important;
+    font-size: 16px !important;
+  }
+
+  /* Link bars (social): center and wrap */
+  [class*="wixui-link-bar"] {
+    justify-content: center !important;
+    flex-wrap: wrap !important;
+  }
+
+  /* Wix divider lines */
+  [class*="FiveGridLine"],
+  [class*="wixui-line"] {
+    max-width: 100% !important;
+    margin: 0 !important;
+  }
+}

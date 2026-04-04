@@ -7,6 +7,61 @@
  *  them to the DOM — images, text, HTML, backgrounds, styles.
  *  ============================================================ */
 
+/* ============================================================
+ *  MOBILE OPTIMISATION — Activate Wix device-mobile-optimized
+ *  ============================================================
+ *  Wix Thunderbolt pages ship with built-in mobile CSS under
+ *  the class "device-mobile-optimized".  Wix JS normally adds
+ *  this class at runtime; on static deployments we do it here.
+ *  ============================================================ */
+(function () {
+  'use strict';
+
+  var MOBILE_BREAKPOINT = 768;
+
+  var mobileTargets = ['html', 'body', 'SITE_CONTAINER', 'masterPage'];
+
+  function getTargets() {
+    var els = [document.documentElement, document.body];
+    mobileTargets.slice(2).forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) els.push(el);
+    });
+    return els;
+  }
+
+  function applyMobileClass(isMobile) {
+    getTargets().forEach(function (el) {
+      if (!el) return;
+      if (isMobile) {
+        el.classList.add('device-mobile-optimized');
+      } else {
+        el.classList.remove('device-mobile-optimized');
+      }
+    });
+  }
+
+  var mq = window.matchMedia('(max-width: ' + MOBILE_BREAKPOINT + 'px)');
+
+  // Apply immediately (before DOMContentLoaded for fastest activation)
+  applyMobileClass(mq.matches);
+
+  // Re-apply once DOM is ready (catches late-added elements)
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function () {
+      applyMobileClass(mq.matches);
+    });
+  }
+
+  // Watch for viewport resize (e.g. orientation change, DevTools)
+  try {
+    mq.addEventListener('change', function (e) { applyMobileClass(e.matches); });
+  } catch (e) {
+    // Fallback for older Safari
+    mq.addListener(function (e) { applyMobileClass(e.matches); });
+  }
+})();
+
 (function() {
   'use strict';
 
