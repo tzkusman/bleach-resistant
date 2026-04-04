@@ -2661,9 +2661,9 @@ body {
 #br-mnav {
   display: none;   /* JS shows it when scale < 1 */
   position: fixed;
-  top: 12px;
+  top: 44px;        /* below the 38px auth bar + 6px gap */
   right: 14px;
-  z-index: 99999;
+  z-index: 1000002; /* above auth bar (999999) and overlay (1000001) */
   pointer-events: none; /* children handle clicks */
 }
 
@@ -2711,7 +2711,7 @@ body {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  z-index: 100000;
+  z-index: 1000001; /* above auth bar (999999) */
   pointer-events: auto;
   display: flex;
   flex-direction: column;

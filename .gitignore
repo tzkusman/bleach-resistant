@@ -19,3 +19,4 @@ desktop.ini
 # Supabase SQL (already executed)
 supabase-setup.sql
 .vercel
+.env*.local

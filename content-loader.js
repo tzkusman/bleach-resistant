@@ -39,22 +39,31 @@
 
     var scale = getScale();
     if (scale < 1) {
+      // Reset transform to measure true height
+      sc.style.transform    = '';
+      sc.style.marginBottom = '';
+      var originH = sc.offsetHeight || sc.scrollHeight;
+
       sc.style.transformOrigin = 'top left';
       sc.style.transform       = 'scale(' + scale + ')';
       sc.style.width           = DESIGN_WIDTH + 'px';
       sc.style.minWidth        = DESIGN_WIDTH + 'px';
-      // Fix body height so page scrolls correctly after scale
-      requestAnimationFrame(function () {
-        var h = sc.getBoundingClientRect().bottom * (1 / scale);
-        document.body.style.minHeight = Math.ceil(h * scale) + 'px';
-        document.body.style.overflowX = 'hidden';
-      });
+
+      // Collapse the extra space below the scaled element so the page
+      // doesn't scroll past the visual content.
+      // Without this, a 3000px tall container scaled to 0.4 still
+      // occupies 3000px in the document flow instead of 1200px.
+      var visualH = Math.ceil(originH * scale);
+      sc.style.marginBottom = '-' + Math.ceil(originH - visualH) + 'px';
+
+      document.body.style.overflowX = 'hidden';
     } else {
-      sc.style.transform     = '';
+      sc.style.transform       = '';
       sc.style.transformOrigin = '';
-      sc.style.width         = '';
-      sc.style.minWidth      = '';
-      document.body.style.minHeight = '';
+      sc.style.width           = '';
+      sc.style.minWidth        = '';
+      sc.style.marginBottom    = '';
+      document.body.style.overflowX = '';
     }
   }
 
@@ -168,6 +177,9 @@
   function init() {
     applyScale();
     buildHamburgerNav();
+    // Re-apply after Wix JS has had time to paint additional content
+    setTimeout(function () { applyScale(); updateNavVisibility(); }, 600);
+    setTimeout(function () { applyScale(); }, 1500);
   }
 
   if (document.readyState === 'loading') {
@@ -175,6 +187,12 @@
   } else {
     init();
   }
+
+  // Re-apply on window load (all images/fonts loaded — final heights)
+  window.addEventListener('load', function () {
+    applyScale();
+    updateNavVisibility();
+  });
 
   window.addEventListener('resize', function () {
     applyScale();
