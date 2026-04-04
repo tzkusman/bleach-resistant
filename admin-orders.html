@@ -79,17 +79,18 @@
               <tr>
                 <th>Date</th>
                 <th>Name</th>
-                <th>Email</th>
-                <th>Phone</th>
+                <th>Email / Phone</th>
+                <th>Service</th>
                 <th>Item</th>
                 <th>Qty</th>
                 <th>Deadline</th>
+                <th>Budget</th>
                 <th>Status</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody id="orders-body">
-              <tr><td colspan="9" class="loading-overlay"><span class="spinner"></span> Loading orders&#x2026;</td></tr>
+              <tr><td colspan="10" class="loading-overlay"><span class="spinner"></span> Loading orders&#x2026;</td></tr>
             </tbody>
           </table>
         </div>
@@ -126,6 +127,39 @@
       setTimeout(() => t.classList.remove('show'), 3000);
     }
 
+    function serviceLabel(s) {
+      const map = {
+        'custom-sublimation': 'Sublimation',
+        'basic-poly': 'Basic Poly',
+        'head-gear': 'Head Gear',
+        'stock-designs': 'Stock Designs',
+        'school-uniform': 'School Uniform',
+        'corporate-uniform': 'Corporate',
+        'sportswear': 'Sportswear',
+        'graphic-design': 'Graphic Design',
+        'logo-design': 'Logo Design',
+        'brand-package': 'Brand Package',
+        'vehicle-wrap': 'Vehicle Wrap',
+        'decals-signage': 'Decals / Signage',
+        'international': 'International',
+        'washing-samples': 'Washing Samples',
+        'general-inquiry': 'General Inquiry'
+      };
+      return map[s] || (s || 'Unknown');
+    }
+
+    function budgetLabel(b) {
+      const map = {
+        'under-250': 'Under $250',
+        '250-500': '$250–$500',
+        '500-1000': '$500–$1k',
+        '1000-2500': '$1k–$2.5k',
+        '2500-5000': '$2.5k–$5k',
+        '5000+': '$5k+'
+      };
+      return map[b] || (b || '—');
+    }
+
     function statusBadge(s) {
       const map = { new: 'badge-new', 'in-progress': 'badge-progress', complete: 'badge-complete', closed: 'badge-closed' };
       return '<span class="badge ' + (map[s] || 'badge-new') + '">' + brEscapeHtml(s || 'new') + '</span>';
@@ -146,7 +180,7 @@
       } catch (err) {
         console.error(err);
         document.getElementById('orders-body').innerHTML =
-          '<tr><td colspan="9" class="empty-state"><p>Error loading orders</p></td></tr>';
+          '<tr><td colspan="10" class="empty-state"><p>Error loading orders</p></td></tr>';
       }
     }
 
@@ -155,7 +189,7 @@
       const status = document.getElementById('filter-status').value;
       return allOrders.filter(o => {
         if (status && o.status !== status) return false;
-        if (search && !o.name?.toLowerCase().includes(search) && !o.email?.toLowerCase().includes(search)) return false;
+        if (search && !o.name?.toLowerCase().includes(search) && !o.email?.toLowerCase().includes(search) && !o.company?.toLowerCase().includes(search) && !serviceLabel(o.service_type).toLowerCase().includes(search)) return false;
         return true;
       });
     }
@@ -172,17 +206,18 @@
 
       const tbody = document.getElementById('orders-body');
       if (pageData.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="9" class="empty-state"><p>No orders found</p></td></tr>';
+        tbody.innerHTML = '<tr><td colspan="10" class="empty-state"><p>No orders found</p></td></tr>';
       } else {
         tbody.innerHTML = pageData.map(o => `
           <tr>
             <td style="white-space:nowrap;">${brFormatDate(o.created_at)}</td>
-            <td><strong>${brEscapeHtml(o.name)}</strong></td>
-            <td>${brEscapeHtml(o.email)}</td>
-            <td>${brEscapeHtml(o.phone || '&#x2014;')}</td>
-            <td>${brEscapeHtml(o.item_type || '&#x2014;')}</td>
-            <td>${o.quantity || '&#x2014;'}</td>
-            <td>${o.deadline || '&#x2014;'}</td>
+            <td><strong>${brEscapeHtml(o.name)}</strong>${o.company ? '<br><small style="color:#aaa">'+brEscapeHtml(o.company)+'</small>' : ''}</td>
+            <td>${brEscapeHtml(o.email)}<br><small style="color:#aaa">${brEscapeHtml(o.phone || '')}</small></td>
+            <td><span style="font-size:11px;font-weight:600;background:#f4f4f6;padding:2px 7px;border-radius:10px;white-space:nowrap;">${brEscapeHtml(serviceLabel(o.service_type))}</span></td>
+            <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${brEscapeHtml(o.item_type || '')}">${brEscapeHtml(o.item_type || '&#x2014;')}</td>
+            <td>${brEscapeHtml(o.quantity || '&#x2014;')}</td>
+            <td style="white-space:nowrap;">${o.deadline ? o.deadline : (o.urgency ? '<span style="font-size:11px;color:#C7065C">'+brEscapeHtml(o.urgency)+'</span>' : '&#x2014;')}</td>
+            <td style="font-size:11px">${brEscapeHtml(budgetLabel(o.budget_range))}</td>
             <td>${statusBadge(o.status)}</td>
             <td style="white-space:nowrap;">
               <button class="btn btn-sm btn-secondary" onclick="viewOrder('${o.id}')">View</button>
@@ -211,38 +246,43 @@
 
       document.getElementById('modal-title').textContent = 'Order from ' + o.name;
       document.getElementById('modal-body').innerHTML = `
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-          <div class="form-group">
-            <label>Name</label>
-            <input type="text" value="${brEscapeHtml(o.name)}" readonly style="background:#f9f9f9;">
-          </div>
-          <div class="form-group">
-            <label>Email</label>
-            <input type="text" value="${brEscapeHtml(o.email)}" readonly style="background:#f9f9f9;">
-          </div>
-          <div class="form-group">
-            <label>Phone</label>
-            <input type="text" value="${brEscapeHtml(o.phone || '')}" readonly style="background:#f9f9f9;">
-          </div>
-          <div class="form-group">
-            <label>Item Type</label>
-            <input type="text" value="${brEscapeHtml(o.item_type || '')}" readonly style="background:#f9f9f9;">
-          </div>
-          <div class="form-group">
-            <label>Quantity</label>
-            <input type="text" value="${o.quantity || ''}" readonly style="background:#f9f9f9;">
-          </div>
-          <div class="form-group">
-            <label>Deadline</label>
-            <input type="text" value="${o.deadline || ''}" readonly style="background:#f9f9f9;">
+        <!-- Contact info -->
+        <div style="margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid #f0f0f0;">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#aaa;margin-bottom:8px;">Contact</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="form-group"><label>Full Name</label><input type="text" value="${brEscapeHtml(o.name)}" readonly style="background:#f9f9f9;"></div>
+            <div class="form-group"><label>Email</label><input type="text" value="${brEscapeHtml(o.email)}" readonly style="background:#f9f9f9;"></div>
+            <div class="form-group"><label>Phone</label><input type="text" value="${brEscapeHtml(o.phone || '—')}" readonly style="background:#f9f9f9;"></div>
+            <div class="form-group"><label>Company / Team</label><input type="text" value="${brEscapeHtml(o.company || '—')}" readonly style="background:#f9f9f9;"></div>
+            <div class="form-group"><label>City</label><input type="text" value="${brEscapeHtml(o.city || '—')}" readonly style="background:#f9f9f9;"></div>
+            <div class="form-group"><label>Country</label><input type="text" value="${brEscapeHtml(o.country || '—')}" readonly style="background:#f9f9f9;"></div>
           </div>
         </div>
-        <div class="form-group">
-          <label>Design Notes</label>
-          <textarea readonly style="background:#f9f9f9;min-height:80px;">${brEscapeHtml(o.design_notes || '')}</textarea>
+        <!-- Service / Order info -->
+        <div style="margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid #f0f0f0;">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#aaa;margin-bottom:8px;">Order Details</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="form-group"><label>Service Type</label><input type="text" value="${brEscapeHtml(serviceLabel(o.service_type))}" readonly style="background:#f9f9f9;"></div>
+            <div class="form-group"><label>Item Type</label><input type="text" value="${brEscapeHtml(o.item_type || '—')}" readonly style="background:#f9f9f9;"></div>
+            <div class="form-group"><label>Quantity</label><input type="text" value="${brEscapeHtml(o.quantity || '—')}" readonly style="background:#f9f9f9;"></div>
+            <div class="form-group"><label>Sizes</label><input type="text" value="${brEscapeHtml(o.sizes || '—')}" readonly style="background:#f9f9f9;"></div>
+            <div class="form-group"><label>Colours</label><input type="text" value="${brEscapeHtml(o.colors || '—')}" readonly style="background:#f9f9f9;"></div>
+            <div class="form-group"><label>Budget Range</label><input type="text" value="${brEscapeHtml(budgetLabel(o.budget_range))}" readonly style="background:#f9f9f9;"></div>
+            <div class="form-group"><label>Deadline</label><input type="text" value="${brEscapeHtml(o.deadline || '—')}" readonly style="background:#f9f9f9;"></div>
+            <div class="form-group"><label>Urgency</label><input type="text" value="${brEscapeHtml(o.urgency || '—')}" readonly style="background:#f9f9f9;"></div>
+            ${o.vehicle_model ? '<div class="form-group"><label>Vehicle Model</label><input type="text" value="'+brEscapeHtml(o.vehicle_model)+'" readonly style="background:#f9f9f9;"></div>' : ''}
+            ${o.design_format ? '<div class="form-group"><label>Design Format</label><input type="text" value="'+brEscapeHtml(o.design_format)+'" readonly style="background:#f9f9f9;"></div>' : ''}
+          </div>
         </div>
+        <!-- Notes -->
+        <div style="margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid #f0f0f0;">
+          <div class="form-group"><label>Design Notes / Special Requests</label><textarea readonly style="background:#f9f9f9;min-height:90px;">${brEscapeHtml(o.design_notes || '')}</textarea></div>
+          ${o.attachment_url ? '<div class="form-group"><label>Attachment</label><a href="'+brEscapeHtml(o.attachment_url)+'" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:#f4f4f6;border-radius:6px;font-size:12px;font-weight:600;color:#C7065C;text-decoration:none;">&#x1F4CE; View / Download Attachment</a></div>' : ''}
+          <div class="form-group" style="margin-top:8px;"><label>Source / How they heard</label><input type="text" value="${brEscapeHtml(o.source || '—')}" readonly style="background:#f9f9f9;"></div>
+        </div>
+        <!-- Status -->
         <div class="form-group">
-          <label>Status</label>
+          <label>Update Status</label>
           <select id="edit-status" style="padding:10px 14px;border:1px solid #ddd;border-radius:6px;width:100%;">
             <option value="new" ${o.status==='new'?'selected':''}>New</option>
             <option value="in-progress" ${o.status==='in-progress'?'selected':''}>In Progress</option>
@@ -252,6 +292,7 @@
         </div>
         <div style="font-size:11px;color:#aaa;margin-top:8px;">
           Submitted: ${brFormatDate(o.created_at)} &nbsp;|&nbsp; ID: ${o.id}
+          ${o.user_id ? ' &nbsp;|&nbsp; Registered User' : ' &nbsp;|&nbsp; Guest'}
         </div>
       `;
       document.getElementById('modal-footer').innerHTML = `
@@ -289,12 +330,15 @@
     function exportCSV() {
       const rows = getFiltered();
       if (rows.length === 0) { showToast('No data to export', 'info'); return; }
-      const headers = ['Date','Name','Email','Phone','Item Type','Quantity','Deadline','Status','Notes'];
+      const headers = ['Date','Name','Email','Phone','Company','City','Country','Service','Item Type','Quantity','Sizes','Colours','Deadline','Urgency','Budget','Status','Attachment','Source','Notes'];
       const csv = [headers.join(',')];
       rows.forEach(o => {
         csv.push([
-          o.created_at, o.name, o.email, o.phone||'', o.item_type||'',
-          o.quantity||'', o.deadline||'', o.status, (o.design_notes||'').replace(/,/g, ';').replace(/\n/g, ' ')
+          o.created_at, o.name, o.email, o.phone||'', o.company||'', o.city||'', o.country||'',
+          serviceLabel(o.service_type), o.item_type||'', o.quantity||'', o.sizes||'', o.colors||'',
+          o.deadline||'', o.urgency||'', budgetLabel(o.budget_range), o.status,
+          o.attachment_url||'', o.source||'',
+          (o.design_notes||'').replace(/,/g, ';').replace(/\n/g, ' ')
         ].map(v => '"' + String(v).replace(/"/g, '""') + '"').join(','));
       });
       const blob = new Blob([csv.join('\n')], { type: 'text/csv' });

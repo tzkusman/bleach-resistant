@@ -8,6 +8,32 @@
  *  2) Replace the two values below with your real credentials
  *  3) Run supabase-setup.sql in the SQL Editor first
  *
+ *  ORDERS TABLE — run this migration in Supabase SQL Editor if
+ *  you haven't already (adds columns for the new order form):
+ *
+ *  ALTER TABLE orders
+ *    ADD COLUMN IF NOT EXISTS first_name   TEXT,
+ *    ADD COLUMN IF NOT EXISTS last_name    TEXT,
+ *    ADD COLUMN IF NOT EXISTS company      TEXT,
+ *    ADD COLUMN IF NOT EXISTS city         TEXT,
+ *    ADD COLUMN IF NOT EXISTS country      TEXT,
+ *    ADD COLUMN IF NOT EXISTS service_type TEXT,
+ *    ADD COLUMN IF NOT EXISTS sizes        TEXT,
+ *    ADD COLUMN IF NOT EXISTS colors       TEXT,
+ *    ADD COLUMN IF NOT EXISTS urgency      TEXT,
+ *    ADD COLUMN IF NOT EXISTS budget_range TEXT,
+ *    ADD COLUMN IF NOT EXISTS attachment_url TEXT,
+ *    ADD COLUMN IF NOT EXISTS vehicle_model TEXT,
+ *    ADD COLUMN IF NOT EXISTS design_format TEXT,
+ *    ADD COLUMN IF NOT EXISTS source       TEXT,
+ *    ADD COLUMN IF NOT EXISTS source_page  TEXT,
+ *    ADD COLUMN IF NOT EXISTS user_id      UUID REFERENCES auth.users(id) ON DELETE SET NULL;
+ *
+ *  Also create the storage bucket for attachments:
+ *  INSERT INTO storage.buckets (id, name, public)
+ *    VALUES ('order-attachments', 'order-attachments', true)
+ *    ON CONFLICT DO NOTHING;
+ *
  *  This file is loaded by ALL pages (public + admin).
  *  The anon key is safe in HTML because RLS restricts it.
  *  ============================================================ */
