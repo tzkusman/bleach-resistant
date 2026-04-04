@@ -1265,7 +1265,7 @@
           source_page:    window.location.href
         };
 
-        var result = await db.from('orders').insert([orderData]).select().single();
+        var result = await db.from('orders').insert([orderData]);
 
         if (result.error) throw result.error;
 
@@ -1274,7 +1274,7 @@
         document.getElementById('auth-nudge').style.display = 'none';
         var ss = document.getElementById('success-screen');
         ss.classList.add('show');
-        var refId = result.data && result.data.id ? result.data.id.toString().slice(-6).toUpperCase() : Math.random().toString(36).slice(2, 8).toUpperCase();
+        var refId = Math.random().toString(36).slice(2, 8).toUpperCase();
         document.getElementById('ref-num').textContent = 'REF: BR-' + refId;
         window.scrollTo({ top: 0, behavior: 'smooth' });
 
