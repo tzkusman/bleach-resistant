@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hero Slider &#x2014; Bleach Resistant Admin</title>
+  <link rel="icon" href="favicon.svg" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+</head>
+<body>
+
+  <!-- ===== SIDEBAR ===== -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <h2>Bleach Resistant</h2>
+      <small>Admin Panel</small>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-section">Main</div>
+      <a href="admin.html"><span class="icon">&#x1F4CA;</span> Dashboard</a>
+      <a href="admin-orders.html"><span class="icon">&#x1F4E6;</span> Orders</a>
+      <a href="admin-contacts.html"><span class="icon">&#x1F4AC;</span> Contacts</a>
+      <div class="nav-section">Content</div>
+      <a href="admin-products.html"><span class="icon">&#x1F6CD;&#xFE0F;</span> Products</a>
+      <a href="admin-slider.html" class="active"><span class="icon">&#x1F3A0;</span> Hero Slider</a>
+      <a href="admin-pages.html"><span class="icon">&#x1F4C4;</span> Pages</a>
+      <a href="admin-media.html"><span class="icon">&#x1F5BC;&#xFE0F;</span> Media Library</a>
+      <a href="admin-navigation.html"><span class="icon">&#x1F517;</span> Navigation</a>
+      <div class="nav-section">Settings</div>
+      <a href="admin-settings.html"><span class="icon">&#x2699;&#xFE0F;</span> Site Settings</a>
+      <a href="admin-analytics.html"><span class="icon">&#x1F4C8;</span> Analytics</a>
+      <div class="nav-section">Website</div>
+      <a href="home.html" target="_blank"><span class="icon">&#x1F310;</span> View Site</a>
+      <a href="order.html" target="_blank"><span class="icon">&#x1F6D2;</span> Order Page</a>
+    </div>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" id="user-avatar">A</div>
+        <div>
+          <div style="font-size:12px;font-weight:600;" id="user-name">Admin</div>
+          <div class="user-email" id="user-email">loading&#x2026;</div>
+        </div>
+      </div>
+      <button class="btn btn-secondary btn-sm btn-block" onclick="brSignOut()">Sign Out</button>
+    </div>
+  </nav>
+
+  <!-- ===== MAIN ===== -->
+  <div class="main-content">
+    <div class="topbar">
+      <div>
+        <h1>Hero Slider</h1>
+        <div class="breadcrumb">Manage homepage hero slides &#x2014; visitors see these on the landing page</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn btn-sm btn-primary" onclick="openEditor()">&#x2795; Add Slide</button>
+      </div>
+    </div>
+
+    <div class="content-area">
+      <!-- Slides List -->
+      <div class="table-card">
+        <div class="table-header">
+          <h3>All Slides <span id="slide-count" style="color:#aaa;font-weight:400;"></span></h3>
+        </div>
+        <div id="slides-list" style="padding:16px;">
+          <div class="loading-overlay"><span class="spinner"></span> Loading slides&#x2026;</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SLIDE EDITOR MODAL ===== -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal" style="max-width:700px;">
+      <div class="modal-header">
+        <h3 id="modal-title">Add Slide</h3>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="slide-id">
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          <div class="form-group">
+            <label>Title (main text)</label>
+            <input type="text" id="slide-title" placeholder="e.g. Custom Sublimation">
+          </div>
+          <div class="form-group">
+            <label>Highlight (colored text)</label>
+            <input type="text" id="slide-highlight" placeholder="e.g. The Way You'd Love">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Subtitle</label>
+          <textarea id="slide-subtitle" rows="2" placeholder="Short description below the heading..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Badges (one per line)</label>
+          <textarea id="slide-badges" rows="3" placeholder="&#x26A1; 24h Response&#x0A;&#x1F4CD; Guelph, Ontario&#x0A;&#x1F30E; Canada &amp; International"></textarea>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 2fr;gap:16px;">
+          <div class="form-group">
+            <label>Background Type</label>
+            <select id="slide-bg-type">
+              <option value="gradient">Gradient</option>
+              <option value="image">Image URL</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Background Value</label>
+            <input type="text" id="slide-bg-value" placeholder="linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%)">
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          <div class="form-group">
+            <label>Button 1 Text</label>
+            <input type="text" id="slide-btn1-text" placeholder="e.g. Order Today">
+          </div>
+          <div class="form-group">
+            <label>Button 1 Link</label>
+            <input type="text" id="slide-btn1-link" placeholder="e.g. order.html">
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          <div class="form-group">
+            <label>Button 2 Text</label>
+            <input type="text" id="slide-btn2-text" placeholder="e.g. View Products">
+          </div>
+          <div class="form-group">
+            <label>Button 2 Link</label>
+            <input type="text" id="slide-btn2-link" placeholder="e.g. product.html">
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">
+          <div class="form-group">
+            <label>Button 1 Style</label>
+            <select id="slide-btn1-style">
+              <option value="primary">Primary (Pink)</option>
+              <option value="white">White</option>
+              <option value="outline">Outline</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Button 2 Style</label>
+            <select id="slide-btn2-style">
+              <option value="white">White</option>
+              <option value="primary">Primary (Pink)</option>
+              <option value="outline">Outline</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Sort Order</label>
+            <input type="number" id="slide-sort" value="0" min="0">
+          </div>
+        </div>
+
+        <div class="form-group" style="display:flex;align-items:center;gap:10px;">
+          <input type="checkbox" id="slide-active" checked style="width:auto;">
+          <label for="slide-active" style="margin:0;cursor:pointer;">Active (visible on site)</label>
+        </div>
+
+        <!-- Live Preview -->
+        <div style="margin-top:16px;">
+          <label style="display:block;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#888;margin-bottom:8px;">Preview</label>
+          <div id="slide-preview" style="position:relative;border-radius:10px;overflow:hidden;min-height:200px;display:flex;align-items:center;padding:32px;color:#fff;"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-primary" id="save-slide-btn" onclick="saveSlide()">Save Slide</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast"></div>
+
+  <script>
+    let allSlides = [];
+
+    function showToast(msg, type) {
+      const t = document.getElementById('toast');
+      t.className = 'toast toast-' + (type || 'info');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    function closeModal() {
+      document.getElementById('modal-overlay').classList.remove('active');
+    }
+
+    async function loadSlides() {
+      try {
+        const { data, error } = await db.from('hero_slides')
+          .select('*')
+          .order('sort_order', { ascending: true });
+        if (error) throw error;
+        allSlides = data || [];
+        renderSlides();
+      } catch (err) {
+        console.error(err);
+        document.getElementById('slides-list').innerHTML =
+          '<div class="empty-state"><p>Error loading slides: ' + err.message + '</p></div>';
+      }
+    }
+
+    function renderSlides() {
+      const container = document.getElementById('slides-list');
+      document.getElementById('slide-count').textContent = '(' + allSlides.length + ')';
+
+      if (allSlides.length === 0) {
+        container.innerHTML = '<div class="empty-state" style="padding:40px;text-align:center;">' +
+          '<p style="font-size:16px;margin-bottom:8px;">No slides yet</p>' +
+          '<p style="color:#aaa;margin-bottom:16px;">Add your first hero slide to get started.</p>' +
+          '<button class="btn btn-primary btn-sm" onclick="openEditor()">&#x2795; Add Slide</button></div>';
+        return;
+      }
+
+      container.innerHTML = allSlides.map((s, i) => {
+        const badges = parseBadges(s.badges);
+        const bgPreview = s.bg_type === 'image' && s.bg_value
+          ? 'background-image:url(' + s.bg_value + ');background-size:cover;'
+          : 'background:' + (s.bg_value || 'linear-gradient(135deg,#1a1a2e,#0f3460)') + ';';
+
+        return `
+          <div style="display:flex;gap:16px;align-items:center;padding:16px;background:#fff;border:1px solid #eee;border-radius:10px;margin-bottom:12px;${!s.active ? 'opacity:0.5;' : ''}">
+            <div style="width:180px;min-height:100px;border-radius:8px;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;padding:12px;${bgPreview}">
+              <div>
+                <div style="font-weight:700;font-size:14px;">${brEscapeHtml(s.title || '')}${s.highlight ? ' <span style="color:#e8337d;">' + brEscapeHtml(s.highlight) + '</span>' : ''}</div>
+                ${s.subtitle ? '<div style="font-size:11px;opacity:0.7;margin-top:4px;">' + brEscapeHtml(s.subtitle).substring(0, 60) + '</div>' : ''}
+              </div>
+            </div>
+            <div style="flex:1;">
+              <div style="font-weight:700;font-size:15px;margin-bottom:4px;">
+                ${brEscapeHtml(s.title || 'Untitled')}${s.highlight ? ' <span style="color:#C7065C;">' + brEscapeHtml(s.highlight) + '</span>' : ''}
+                ${!s.active ? '<span class="badge badge-closed" style="margin-left:8px;">Inactive</span>' : '<span class="badge badge-new" style="margin-left:8px;">Active</span>'}
+              </div>
+              <div style="font-size:12px;color:#888;">${brEscapeHtml(s.subtitle || '').substring(0, 80)}${(s.subtitle||'').length > 80 ? '...' : ''}</div>
+              ${badges.length ? '<div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:4px;">' + badges.map(b => '<span style="font-size:10px;background:#f0f0f0;padding:2px 8px;border-radius:10px;">' + brEscapeHtml(b) + '</span>').join('') + '</div>' : ''}
+              <div style="font-size:11px;color:#bbb;margin-top:6px;">Order: ${s.sort_order} &middot; ${s.btn1_text ? 'Btn1: ' + brEscapeHtml(s.btn1_text) : 'No buttons'}</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
+              <button class="btn btn-sm btn-secondary" onclick="editSlide('${s.id}')">Edit</button>
+              <button class="btn btn-sm btn-${s.active ? 'secondary' : 'success'}" onclick="toggleSlide('${s.id}', ${!s.active})">${s.active ? 'Hide' : 'Show'}</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteSlide('${s.id}')">Delete</button>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    function parseBadges(val) {
+      try {
+        if (typeof val === 'string') return JSON.parse(val);
+        return val || [];
+      } catch(e) { return []; }
+    }
+
+    function openEditor(slide) {
+      document.getElementById('modal-title').textContent = slide ? 'Edit Slide' : 'Add Slide';
+      document.getElementById('slide-id').value = slide ? slide.id : '';
+      document.getElementById('slide-title').value = slide ? slide.title || '' : '';
+      document.getElementById('slide-highlight').value = slide ? slide.highlight || '' : '';
+      document.getElementById('slide-subtitle').value = slide ? slide.subtitle || '' : '';
+      document.getElementById('slide-badges').value = slide ? parseBadges(slide.badges).join('\n') : '';
+      document.getElementById('slide-bg-type').value = slide ? slide.bg_type || 'gradient' : 'gradient';
+      document.getElementById('slide-bg-value').value = slide ? slide.bg_value || '' : 'linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%)';
+      document.getElementById('slide-btn1-text').value = slide ? slide.btn1_text || '' : 'Order Today';
+      document.getElementById('slide-btn1-link').value = slide ? slide.btn1_link || '' : 'order.html';
+      document.getElementById('slide-btn1-style').value = slide ? slide.btn1_style || 'primary' : 'primary';
+      document.getElementById('slide-btn2-text').value = slide ? slide.btn2_text || '' : 'View Products';
+      document.getElementById('slide-btn2-link').value = slide ? slide.btn2_link || '' : 'product.html';
+      document.getElementById('slide-btn2-style').value = slide ? slide.btn2_style || 'white' : 'white';
+      document.getElementById('slide-sort').value = slide ? slide.sort_order || 0 : allSlides.length;
+      document.getElementById('slide-active').checked = slide ? slide.active !== false : true;
+      updatePreview();
+      document.getElementById('modal-overlay').classList.add('active');
+    }
+
+    function editSlide(id) {
+      const s = allSlides.find(x => x.id === id);
+      if (s) openEditor(s);
+    }
+
+    function updatePreview() {
+      const bgType = document.getElementById('slide-bg-type').value;
+      const bgValue = document.getElementById('slide-bg-value').value;
+      const title = document.getElementById('slide-title').value;
+      const highlight = document.getElementById('slide-highlight').value;
+      const subtitle = document.getElementById('slide-subtitle').value;
+      const badges = document.getElementById('slide-badges').value.split('\n').filter(b => b.trim());
+
+      const preview = document.getElementById('slide-preview');
+      if (bgType === 'image' && bgValue) {
+        preview.style.cssText = 'position:relative;border-radius:10px;overflow:hidden;min-height:200px;display:flex;align-items:center;padding:32px;color:#fff;background-image:url(' + bgValue + ');background-size:cover;background-position:center;';
+      } else {
+        preview.style.cssText = 'position:relative;border-radius:10px;overflow:hidden;min-height:200px;display:flex;align-items:center;padding:32px;color:#fff;' + (bgValue ? 'background:' + bgValue + ';' : 'background:linear-gradient(135deg,#1a1a2e,#0f3460);');
+      }
+
+      let html = '<div style="position:relative;z-index:1;">';
+      if (badges.length) {
+        html += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;">';
+        badges.forEach(b => { html += '<span style="font-size:11px;background:rgba(255,255,255,0.15);padding:4px 10px;border-radius:20px;">' + b + '</span>'; });
+        html += '</div>';
+      }
+      html += '<div style="font-size:24px;font-weight:800;line-height:1.1;">' + (title || 'Slide Title');
+      if (highlight) html += ' <span style="color:#e8337d;">' + highlight + '</span>';
+      html += '</div>';
+      if (subtitle) html += '<p style="font-size:13px;opacity:0.8;margin-top:8px;">' + subtitle + '</p>';
+      html += '</div>';
+
+      // Overlay for image backgrounds
+      if (bgType === 'image') {
+        html = '<div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(26,26,46,0.85),rgba(26,26,46,0.5));"></div>' + html;
+      }
+
+      preview.innerHTML = html;
+    }
+
+    // Live preview updates
+    ['slide-title','slide-highlight','slide-subtitle','slide-badges','slide-bg-type','slide-bg-value'].forEach(id => {
+      document.getElementById(id).addEventListener('input', updatePreview);
+    });
+    document.getElementById('slide-bg-type').addEventListener('change', updatePreview);
+
+    async function saveSlide() {
+      const id = document.getElementById('slide-id').value;
+      const badges = document.getElementById('slide-badges').value.split('\n').map(b => b.trim()).filter(Boolean);
+
+      const data = {
+        title: document.getElementById('slide-title').value.trim(),
+        highlight: document.getElementById('slide-highlight').value.trim() || null,
+        subtitle: document.getElementById('slide-subtitle').value.trim() || null,
+        badges: badges,
+        bg_type: document.getElementById('slide-bg-type').value,
+        bg_value: document.getElementById('slide-bg-value').value.trim() || null,
+        btn1_text: document.getElementById('slide-btn1-text').value.trim() || null,
+        btn1_link: document.getElementById('slide-btn1-link').value.trim() || null,
+        btn1_style: document.getElementById('slide-btn1-style').value,
+        btn2_text: document.getElementById('slide-btn2-text').value.trim() || null,
+        btn2_link: document.getElementById('slide-btn2-link').value.trim() || null,
+        btn2_style: document.getElementById('slide-btn2-style').value,
+        sort_order: parseInt(document.getElementById('slide-sort').value) || 0,
+        active: document.getElementById('slide-active').checked
+      };
+
+      if (!data.title) { showToast('Title is required', 'error'); return; }
+
+      const btn = document.getElementById('save-slide-btn');
+      btn.disabled = true;
+      btn.textContent = 'Saving...';
+
+      try {
+        let result;
+        if (id) {
+          result = await db.from('hero_slides').update(data).eq('id', id);
+        } else {
+          result = await db.from('hero_slides').insert(data);
+        }
+        if (result.error) throw result.error;
+        showToast(id ? 'Slide updated!' : 'Slide created!', 'success');
+        closeModal();
+        loadSlides();
+      } catch (err) {
+        showToast('Error: ' + err.message, 'error');
+      }
+      btn.disabled = false;
+      btn.textContent = 'Save Slide';
+    }
+
+    async function toggleSlide(id, active) {
+      try {
+        const { error } = await db.from('hero_slides').update({ active }).eq('id', id);
+        if (error) throw error;
+        showToast(active ? 'Slide activated' : 'Slide hidden', 'success');
+        loadSlides();
+      } catch (err) {
+        showToast('Error: ' + err.message, 'error');
+      }
+    }
+
+    async function deleteSlide(id) {
+      if (!confirm('Delete this slide permanently?')) return;
+      try {
+        const { error } = await db.from('hero_slides').delete().eq('id', id);
+        if (error) throw error;
+        showToast('Slide deleted', 'success');
+        loadSlides();
+      } catch (err) {
+        showToast('Error: ' + err.message, 'error');
+      }
+    }
+
+    // Init
+    (async () => {
+      try {
+        const user = await brRequireAdmin();
+        const name = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Admin';
+        document.getElementById('user-name').textContent = name;
+        document.getElementById('user-email').textContent = user.email;
+        document.getElementById('user-avatar').textContent = name.charAt(0).toUpperCase();
+        await loadSlides();
+      } catch (err) {
+        if (err.message !== 'Not authenticated') console.error(err);
+      }
+    })();
+  </script>
+</body>
+</html>

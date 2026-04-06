@@ -25,6 +25,7 @@
       <a href="admin-contacts.html" class="active"><span class="icon">&#x1F4AC;</span> Contacts</a>
       <div class="nav-section">Content</div>
       <a href="admin-products.html"><span class="icon">&#x1F6CD;&#xFE0F;</span> Products</a>
+      <a href="admin-slider.html"><span class="icon">&#x1F3A0;</span> Hero Slider</a>
       <a href="admin-pages.html"><span class="icon">&#x1F4C4;</span> Pages</a>
       <a href="admin-media.html"><span class="icon">&#x1F5BC;&#xFE0F;</span> Media Library</a>
       <a href="admin-navigation.html"><span class="icon">&#x1F517;</span> Navigation</a>
@@ -76,11 +77,12 @@
                 <th>Email</th>
                 <th>Message</th>
                 <th>From Page</th>
+                <th>Status</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody id="contacts-body">
-              <tr><td colspan="6" class="loading-overlay"><span class="spinner"></span> Loading messages&#x2026;</td></tr>
+              <tr><td colspan="7" class="loading-overlay"><span class="spinner"></span> Loading messages&#x2026;</td></tr>
             </tbody>
           </table>
         </div>
@@ -134,7 +136,7 @@
       } catch (err) {
         console.error(err);
         document.getElementById('contacts-body').innerHTML =
-          '<tr><td colspan="6" class="empty-state"><p>Error loading messages</p></td></tr>';
+          '<tr><td colspan="7" class="empty-state"><p>Error loading messages</p></td></tr>';
       }
     }
 
@@ -160,21 +162,28 @@
 
       const tbody = document.getElementById('contacts-body');
       if (pageData.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><p>No messages found</p></td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><p>No messages found</p></td></tr>';
       } else {
-        tbody.innerHTML = pageData.map(c => `
+        tbody.innerHTML = pageData.map(c => {
+          const replied = !!c.admin_reply;
+          const statusBadge = replied
+            ? '<span class="badge badge-complete">Replied</span>'
+            : '<span class="badge badge-new">New</span>';
+          return `
           <tr>
             <td style="white-space:nowrap;">${brFormatDate(c.created_at)}</td>
             <td><strong>${brEscapeHtml(c.name)}</strong></td>
             <td><a href="mailto:${brEscapeHtml(c.email)}">${brEscapeHtml(c.email)}</a></td>
             <td style="max-width:250px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${brEscapeHtml(c.message)}</td>
-            <td>${brEscapeHtml(c.page_source || '&#x2014;')}</td>
+            <td>${brEscapeHtml(c.page_source || '\u2014')}</td>
+            <td>${statusBadge}</td>
             <td style="white-space:nowrap;">
               <button class="btn btn-sm btn-secondary" onclick="viewMsg('${c.id}')">View</button>
+              <button class="btn btn-sm btn-primary" onclick="replyMsg('${c.id}')">Reply</button>
               <button class="btn btn-sm btn-danger" onclick="deleteMsg('${c.id}')">&#x2715;</button>
             </td>
           </tr>
-        `).join('');
+        `}).join('');
       }
 
       // Pagination
@@ -219,13 +228,70 @@
             <input type="text" value="${brFormatDate(c.created_at)}" readonly style="background:#f9f9f9;">
           </div>
         </div>
-        <div style="margin-top:12px;">
-          <a href="mailto:${brEscapeHtml(c.email)}?subject=Re: Your Message to Bleach Resistant" class="btn btn-primary btn-sm">
-            &#x1F4E7; Reply via Email
+        ${c.admin_reply ? `
+          <div style="margin-top:16px;padding:16px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;">
+            <label style="display:block;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#16a34a;margin-bottom:6px;">
+              Your Reply (${brFormatDate(c.replied_at)})
+            </label>
+            <p style="font-size:13px;color:#333;margin:0;white-space:pre-wrap;">${brEscapeHtml(c.admin_reply)}</p>
+          </div>
+        ` : ''}
+        <div style="margin-top:16px;display:flex;gap:8px;">
+          <button class="btn btn-primary btn-sm" onclick="closeModal();replyMsg('${c.id}')">
+            &#x1F4AC; Reply
+          </button>
+          <a href="mailto:${brEscapeHtml(c.email)}?subject=Re: Your Message to Bleach Resistant" class="btn btn-secondary btn-sm">
+            &#x1F4E7; Email
           </a>
         </div>
       `;
       document.getElementById('modal-overlay').classList.add('active');
+    }
+
+    function replyMsg(id) {
+      const c = allContacts.find(x => x.id === id);
+      if (!c) return;
+      document.getElementById('modal-title').textContent = 'Reply to ' + c.name;
+      document.getElementById('modal-body').innerHTML = `
+        <div style="background:#f8f9fa;border-radius:8px;padding:16px;margin-bottom:16px;">
+          <div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#888;margin-bottom:6px;">Original Message</div>
+          <p style="font-size:13px;color:#555;margin:0 0 8px 0;">${brEscapeHtml(c.message)}</p>
+          <div style="font-size:11px;color:#aaa;">From: ${brEscapeHtml(c.name)} &lt;${brEscapeHtml(c.email)}&gt; &middot; ${brFormatDate(c.created_at)}${c.page_source ? ' &middot; Page: ' + brEscapeHtml(c.page_source) : ''}</div>
+        </div>
+        <div class="form-group">
+          <label>Your Reply</label>
+          <textarea id="reply-text" style="min-height:120px;" placeholder="Type your reply...">${c.admin_reply ? brEscapeHtml(c.admin_reply) : ''}</textarea>
+        </div>
+        <div style="display:flex;gap:8px;justify-content:flex-end;">
+          <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+          <button class="btn btn-primary" id="send-reply-btn" onclick="sendReply('${c.id}')">&#x1F4AC; Send Reply</button>
+        </div>
+      `;
+      document.getElementById('modal-overlay').classList.add('active');
+      setTimeout(() => document.getElementById('reply-text')?.focus(), 100);
+    }
+
+    async function sendReply(id) {
+      const text = document.getElementById('reply-text')?.value?.trim();
+      if (!text) { showToast('Please type a reply', 'error'); return; }
+      const btn = document.getElementById('send-reply-btn');
+      btn.disabled = true;
+      btn.textContent = 'Sending...';
+      try {
+        const { error } = await db.from('contacts').update({
+          admin_reply: text,
+          replied_at: new Date().toISOString(),
+          status: 'replied'
+        }).eq('id', id);
+        if (error) throw error;
+        showToast('Reply saved successfully!', 'success');
+        closeModal();
+        loadContacts();
+      } catch (err) {
+        showToast('Error: ' + err.message, 'error');
+        btn.disabled = false;
+        btn.textContent = '💬 Send Reply';
+      }
     }
 
     async function deleteMsg(id) {
@@ -243,13 +309,16 @@
     function exportCSV() {
       const rows = getFiltered();
       if (rows.length === 0) { showToast('No data to export', 'info'); return; }
-      const headers = ['Date','Name','Email','Message','From Page'];
+      const headers = ['Date','Name','Email','Message','From Page','Status','Reply','Replied At'];
       const csv = [headers.join(',')];
       rows.forEach(c => {
         csv.push([
           c.created_at, c.name, c.email,
           (c.message||'').replace(/,/g,';').replace(/\n/g,' '),
-          c.page_source||''
+          c.page_source||'',
+          c.admin_reply ? 'replied' : 'new',
+          (c.admin_reply||'').replace(/,/g,';').replace(/\n/g,' '),
+          c.replied_at||''
         ].map(v => '"' + String(v).replace(/"/g, '""') + '"').join(','));
       });
       const blob = new Blob([csv.join('\n')], { type: 'text/csv' });

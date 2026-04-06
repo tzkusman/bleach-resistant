@@ -338,3 +338,163 @@ GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE products      TO authenticated;
 
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO authenticated;
+
+
+-- ============================================================
+-- SECTION 7: HERO SLIDES TABLE  (dynamic homepage slider)
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS hero_slides (
+  id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  created_at   TIMESTAMPTZ DEFAULT NOW(),
+  updated_at   TIMESTAMPTZ DEFAULT NOW(),
+  title        TEXT NOT NULL,          -- main heading text
+  highlight    TEXT,                   -- highlighted <span> part of the title
+  subtitle     TEXT,                   -- paragraph below heading
+  badges       JSONB DEFAULT '[]',    -- array of badge strings e.g. ["⚡ 24h Response","📍 Guelph"]
+  bg_type      TEXT DEFAULT 'gradient',-- 'gradient' or 'image'
+  bg_value     TEXT,                   -- CSS gradient string or image URL
+  btn1_text    TEXT,
+  btn1_link    TEXT,
+  btn1_style   TEXT DEFAULT 'primary', -- 'primary' or 'white'
+  btn2_text    TEXT,
+  btn2_link    TEXT,
+  btn2_style   TEXT DEFAULT 'white',
+  sort_order   INTEGER DEFAULT 0,
+  active       BOOLEAN DEFAULT true
+);
+
+-- Auto-update updated_at
+CREATE OR REPLACE FUNCTION update_hero_slides_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN NEW.updated_at = NOW(); RETURN NEW; END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_hero_slides_updated ON hero_slides;
+CREATE TRIGGER trg_hero_slides_updated
+  BEFORE UPDATE ON hero_slides
+  FOR EACH ROW EXECUTE FUNCTION update_hero_slides_updated_at();
+
+-- RLS for hero_slides
+ALTER TABLE hero_slides ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "hero_slides_public_read" ON hero_slides
+  FOR SELECT TO anon
+  USING (active = true);
+
+CREATE POLICY "hero_slides_auth_read" ON hero_slides
+  FOR SELECT TO authenticated
+  USING (true);
+
+CREATE POLICY "hero_slides_admin_insert" ON hero_slides
+  FOR INSERT TO authenticated
+  WITH CHECK (auth.email() = 'usman@gmail.com');
+
+CREATE POLICY "hero_slides_admin_update" ON hero_slides
+  FOR UPDATE TO authenticated
+  USING (auth.email() = 'usman@gmail.com')
+  WITH CHECK (auth.email() = 'usman@gmail.com');
+
+CREATE POLICY "hero_slides_admin_delete" ON hero_slides
+  FOR DELETE TO authenticated
+  USING (auth.email() = 'usman@gmail.com');
+
+GRANT SELECT ON TABLE hero_slides TO anon;
+GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE hero_slides TO authenticated;
+
+
+-- ============================================================
+-- SECTION 8: CONTACTS TABLE MIGRATION  (chat widget + admin reply)
+-- ============================================================
+
+ALTER TABLE contacts
+  ADD COLUMN IF NOT EXISTS page_source  TEXT,
+  ADD COLUMN IF NOT EXISTS admin_reply  TEXT,
+  ADD COLUMN IF NOT EXISTS replied_at   TIMESTAMPTZ;
+
+
+-- ============================================================
+-- SECTION 9: FIX RLS POLICIES  (use auth.email() everywhere)
+-- The old policies used auth.jwt() ->> 'email' which can break.
+-- This drops ALL old policies and recreates with auth.email().
+-- ============================================================
+
+-- ---- ORDERS ----
+DO $$ DECLARE pol RECORD; BEGIN
+  FOR pol IN SELECT policyname FROM pg_policies WHERE tablename='orders' AND schemaname='public'
+  LOOP EXECUTE 'DROP POLICY IF EXISTS "' || pol.policyname || '" ON orders'; END LOOP;
+END $$;
+
+CREATE POLICY "orders_public_insert"  ON orders FOR INSERT TO anon, authenticated WITH CHECK (true);
+CREATE POLICY "orders_admin_select"   ON orders FOR SELECT TO authenticated USING (auth.email() = 'usman@gmail.com');
+CREATE POLICY "orders_admin_update"   ON orders FOR UPDATE TO authenticated USING (auth.email() = 'usman@gmail.com');
+CREATE POLICY "orders_admin_delete"   ON orders FOR DELETE TO authenticated USING (auth.email() = 'usman@gmail.com');
+
+-- ---- CONTACTS ----
+DO $$ DECLARE pol RECORD; BEGIN
+  FOR pol IN SELECT policyname FROM pg_policies WHERE tablename='contacts' AND schemaname='public'
+  LOOP EXECUTE 'DROP POLICY IF EXISTS "' || pol.policyname || '" ON contacts'; END LOOP;
+END $$;
+
+CREATE POLICY "contacts_public_insert" ON contacts FOR INSERT TO anon, authenticated WITH CHECK (true);
+CREATE POLICY "contacts_admin_select"  ON contacts FOR SELECT TO authenticated USING (auth.email() = 'usman@gmail.com');
+CREATE POLICY "contacts_admin_update"  ON contacts FOR UPDATE TO authenticated USING (auth.email() = 'usman@gmail.com');
+CREATE POLICY "contacts_admin_delete"  ON contacts FOR DELETE TO authenticated USING (auth.email() = 'usman@gmail.com');
+
+-- ---- PAGE CONTENT ----
+DO $$ DECLARE pol RECORD; BEGIN
+  FOR pol IN SELECT policyname FROM pg_policies WHERE tablename='page_content' AND schemaname='public'
+  LOOP EXECUTE 'DROP POLICY IF EXISTS "' || pol.policyname || '" ON page_content'; END LOOP;
+END $$;
+
+CREATE POLICY "page_content_public_read" ON page_content FOR SELECT TO anon, authenticated USING (true);
+CREATE POLICY "page_content_admin_all"   ON page_content FOR ALL TO authenticated
+  USING (auth.email() = 'usman@gmail.com') WITH CHECK (auth.email() = 'usman@gmail.com');
+
+-- ---- MEDIA ----
+DO $$ DECLARE pol RECORD; BEGIN
+  FOR pol IN SELECT policyname FROM pg_policies WHERE tablename='media' AND schemaname='public'
+  LOOP EXECUTE 'DROP POLICY IF EXISTS "' || pol.policyname || '" ON media'; END LOOP;
+END $$;
+
+CREATE POLICY "media_admin_all" ON media FOR ALL TO authenticated
+  USING (auth.email() = 'usman@gmail.com') WITH CHECK (auth.email() = 'usman@gmail.com');
+
+-- ---- SITE SETTINGS ----
+DO $$ DECLARE pol RECORD; BEGIN
+  FOR pol IN SELECT policyname FROM pg_policies WHERE tablename='site_settings' AND schemaname='public'
+  LOOP EXECUTE 'DROP POLICY IF EXISTS "' || pol.policyname || '" ON site_settings'; END LOOP;
+END $$;
+
+CREATE POLICY "settings_public_read" ON site_settings FOR SELECT TO anon, authenticated USING (true);
+CREATE POLICY "settings_admin_all"   ON site_settings FOR ALL TO authenticated
+  USING (auth.email() = 'usman@gmail.com') WITH CHECK (auth.email() = 'usman@gmail.com');
+
+-- ---- PRODUCTS (re-create if needed — safe due to IF NOT EXISTS semantics) ----
+DO $$ DECLARE pol RECORD; BEGIN
+  FOR pol IN SELECT policyname FROM pg_policies WHERE tablename='products' AND schemaname='public'
+  LOOP EXECUTE 'DROP POLICY IF EXISTS "' || pol.policyname || '" ON products'; END LOOP;
+END $$;
+
+CREATE POLICY "products_public_read"  ON products FOR SELECT TO anon USING (active = true);
+CREATE POLICY "products_auth_read"    ON products FOR SELECT TO authenticated USING (true);
+CREATE POLICY "products_admin_insert" ON products FOR INSERT TO authenticated WITH CHECK (auth.email() = 'usman@gmail.com');
+CREATE POLICY "products_admin_update" ON products FOR UPDATE TO authenticated
+  USING (auth.email() = 'usman@gmail.com') WITH CHECK (auth.email() = 'usman@gmail.com');
+CREATE POLICY "products_admin_delete" ON products FOR DELETE TO authenticated USING (auth.email() = 'usman@gmail.com');
+
+-- ---- STORAGE POLICIES ----
+DO $$ DECLARE pol RECORD; BEGIN
+  FOR pol IN SELECT policyname FROM pg_policies WHERE tablename='objects' AND schemaname='storage'
+  LOOP EXECUTE 'DROP POLICY IF EXISTS "' || pol.policyname || '" ON storage.objects'; END LOOP;
+END $$;
+
+CREATE POLICY "storage_order_upload" ON storage.objects FOR INSERT TO anon, authenticated
+  WITH CHECK (bucket_id = 'order-attachments');
+CREATE POLICY "storage_order_read" ON storage.objects FOR SELECT TO anon, authenticated
+  USING (bucket_id = 'order-attachments');
+CREATE POLICY "storage_media_admin" ON storage.objects FOR ALL TO authenticated
+  USING (bucket_id = 'media' AND auth.email() = 'usman@gmail.com')
+  WITH CHECK (bucket_id = 'media' AND auth.email() = 'usman@gmail.com');
+CREATE POLICY "storage_media_public_read" ON storage.objects FOR SELECT TO anon
+  USING (bucket_id = 'media');
