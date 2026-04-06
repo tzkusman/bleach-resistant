@@ -28,15 +28,7 @@
   <section class="br-section">
     <div class="br-container">
       <div class="br-text-center">
-        <div class="br-tabs" data-target="allProducts">
-          <button class="br-tab active" data-filter="all">All</button>
-          <button class="br-tab" data-filter="apparel">Apparel</button>
-          <button class="br-tab" data-filter="headgear">Head Gear</button>
-          <button class="br-tab" data-filter="basicpoly">Basic Poly</button>
-          <button class="br-tab" data-filter="stockdesigns">Stock Designs</button>
-          <button class="br-tab" data-filter="wraps">Vehicle Wraps</button>
-          <button class="br-tab" data-filter="design">Design</button>
-        </div>
+        <div class="br-tabs" id="productTabs" data-target="allProducts"></div>
       </div>
       <div id="allProducts" class="br-products-grid"></div>
     </div>
@@ -58,7 +50,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js?v=7"></script>
-  <script src="content-loader.js?v=6"></script>
+  <script src="content-loader.js?v=7"></script>
   <script>brLoadProducts('allProducts', {});</script>
 </body>
 </html>

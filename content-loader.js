@@ -271,6 +271,39 @@
 
       // Re-observe for animations
       container.querySelectorAll('[data-animate]').forEach(function(el) { animObserver.observe(el); });
+
+      // Build dynamic category tabs from actual product data
+      var tabContainer = document.getElementById('productTabs');
+      if (tabContainer && !tabContainer.hasChildNodes()) {
+        var cats = [];
+        data.forEach(function(p) {
+          if (p.category && cats.indexOf(p.category) === -1) cats.push(p.category);
+        });
+        var allBtn = document.createElement('button');
+        allBtn.className = 'br-tab active';
+        allBtn.setAttribute('data-filter', 'all');
+        allBtn.textContent = 'All';
+        tabContainer.appendChild(allBtn);
+        cats.forEach(function(cat) {
+          var btn = document.createElement('button');
+          btn.className = 'br-tab';
+          btn.setAttribute('data-filter', cat);
+          btn.textContent = cat.replace(/[-_]/g, ' ').replace(/\b\w/g, function(c) { return c.toUpperCase(); });
+          tabContainer.appendChild(btn);
+        });
+        // Attach filter listeners
+        tabContainer.querySelectorAll('.br-tab').forEach(function(tab) {
+          tab.addEventListener('click', function() {
+            tabContainer.querySelectorAll('.br-tab').forEach(function(t) { t.classList.remove('active'); });
+            tab.classList.add('active');
+            var filter = tab.getAttribute('data-filter');
+            container.querySelectorAll('.br-product-card').forEach(function(card) {
+              card.style.display = (!filter || filter === 'all') ? '' : (card.getAttribute('data-category') === filter ? '' : 'none');
+            });
+          });
+        });
+      }
+
       return data;
     } catch (err) {
       console.warn('[products]', err.message);
