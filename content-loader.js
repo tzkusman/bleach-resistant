@@ -467,12 +467,9 @@
 
       try {
         if (typeof db === 'undefined') throw new Error('Not connected');
-        var contactData = { name: name, email: email, message: msg, status: 'new' };
-        // Try with page_source; fall back without it if column doesn't exist yet
-        var result = await db.from('contacts').insert(Object.assign({ page_source: currentPage }, contactData));
-        if (result.error) {
-          result = await db.from('contacts').insert(contactData);
-        }
+        // Insert just the core fields
+        var result = await db.from('contacts').insert({ name: name, email: email, message: msg });
+        console.log('[chat] insert result:', result);
         if (result.error) throw result.error;
 
         // Save info
@@ -483,13 +480,14 @@
         // Show confirmation
         var confirm = document.createElement('div');
         confirm.className = 'br-chat-message br-chat-msg-them';
-        confirm.innerHTML = '<p>Thanks ' + name.replace(/</g, '&lt;') + '! &#9989; Your message has been sent. We\'ll get back to you at <strong>' + email.replace(/</g, '&lt;') + '</strong> soon.</p>';
+        confirm.innerHTML = '<p>Thanks ' + name.replace(/</g, '&lt;') + '! &#9989; Message sent! We\'ll reply to <strong>' + email.replace(/</g, '&lt;') + '</strong> soon.</p>';
         body.appendChild(confirm);
         body.scrollTop = body.scrollHeight;
       } catch (err) {
+        console.error('[chat] error:', err);
         var errMsg = document.createElement('div');
         errMsg.className = 'br-chat-message br-chat-msg-them br-chat-msg-error';
-        errMsg.innerHTML = '<p>Sorry, there was an error sending your message. Please try again or email us directly.</p>';
+        errMsg.innerHTML = '<p>Could not send. Please email us at <a href="mailto:bleachresistant@gmail.com" style="color:var(--br-primary);text-decoration:underline;">bleachresistant@gmail.com</a></p>';
         body.appendChild(errMsg);
         body.scrollTop = body.scrollHeight;
       }
