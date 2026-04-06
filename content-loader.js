@@ -365,7 +365,10 @@
           var cls = sibling.className || '';
           // Stop before CTA banner, footer, or script
           if (cls.indexOf('br-cta-banner') >= 0 || tag === 'footer' || tag === 'script') break;
-          sibling.style.display = 'none';
+          // Don't hide sections that contain products grids
+          if (!sibling.querySelector('.br-products-grid')) {
+            sibling.style.display = 'none';
+          }
           sibling = sibling.nextElementSibling;
         }
       }
