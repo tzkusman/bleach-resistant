@@ -350,80 +350,80 @@
       var sections = result.data || [];
       if (sections.length === 0) return; // keep static content as fallback
 
-      // Sort by sort_order if available, else by updated_at
+      // Sort by sort_order if available
       sections.sort(function(a, b) { return (a.sort_order || 0) - (b.sort_order || 0); });
 
       var esc = function(str) { var d = document.createElement('div'); d.textContent = str || ''; return d.innerHTML; };
 
-      // Process each section from DB
-      sections.forEach(function(s, idx) {
-        var hero = idx === 0 ? document.querySelector('.br-category-hero') : null;
-
-        // If no .br-category-hero exists OR this is an extra section, create one
-        if (!hero) {
-          var wrapper = document.createElement('section');
-          wrapper.className = idx % 2 === 0 ? 'br-section' : 'br-section-alt';
-          wrapper.innerHTML = '<div class="br-container"><div class="br-category-hero" data-animate="fade-up">' +
-            '<div><span class="br-section-label"></span><h2></h2><p></p><ul class="br-checklist"></ul>' +
-            '<div class="br-btn-group" style="margin-top:24px"></div></div>' +
-            '<div class="br-category-image" style="background:linear-gradient(135deg,#1a1a2e,#0f3460);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.3);font-size:1.2rem"></div>' +
-            '</div></div>';
-          // Insert before the first .br-section-alt or .br-cta-banner after the page header
-          var pageHeader = document.querySelector('.br-page-header');
-          var insertTarget = pageHeader ? pageHeader.nextElementSibling : document.querySelector('.br-section, .br-section-alt');
-          if (insertTarget) {
-            insertTarget.parentNode.insertBefore(wrapper, insertTarget);
-          } else {
-            document.querySelector('.br-container')?.parentNode?.appendChild(wrapper);
-          }
-          hero = wrapper.querySelector('.br-category-hero');
+      // Hide ALL existing static sections between .br-page-header and .br-cta-banner / footer
+      // because we're replacing them with DB-driven content
+      var pageHeader = document.querySelector('.br-page-header');
+      if (pageHeader) {
+        var sibling = pageHeader.nextElementSibling;
+        while (sibling) {
+          var tag = sibling.tagName.toLowerCase();
+          var cls = sibling.className || '';
+          // Stop before CTA banner, footer, or script
+          if (cls.indexOf('br-cta-banner') >= 0 || tag === 'footer' || tag === 'script') break;
+          sibling.style.display = 'none';
+          sibling = sibling.nextElementSibling;
         }
+      }
 
-        // Update section label
-        var labelEl = hero.querySelector('.br-section-label');
-        if (labelEl && s.section_label) labelEl.textContent = s.section_label;
+      // Build and insert each DB section
+      var insertBefore = pageHeader ? pageHeader.nextElementSibling : null;
+      // Find the first still-visible element after hidden ones (the CTA or footer)
+      while (insertBefore && insertBefore.style.display === 'none') {
+        insertBefore = insertBefore.nextElementSibling;
+      }
 
-        // Update heading
-        var h2 = hero.querySelector('h2');
-        if (h2 && s.heading) h2.textContent = s.heading;
-
-        // Update description
-        var desc = hero.querySelector('h2 ~ p');
-        if (desc && s.description) desc.textContent = s.description;
-
-        // Update checklist
+      sections.forEach(function(s, idx) {
         var items = [];
         try { items = typeof s.checklist === 'string' ? JSON.parse(s.checklist) : (s.checklist || []); } catch(e) {}
-        var ul = hero.querySelector('.br-checklist');
-        if (ul) {
-          if (items.length) {
-            ul.innerHTML = items.map(function(item) { return '<li>' + esc(item) + '</li>'; }).join('');
-          } else {
-            ul.style.display = 'none';
-          }
+
+        var checklistHtml = '';
+        if (items.length) {
+          checklistHtml = '<ul class="br-checklist">' + items.map(function(item) { return '<li>' + esc(item) + '</li>'; }).join('') + '</ul>';
         }
 
-        // Update image
-        var imgDiv = hero.querySelector('.br-category-image');
-        if (imgDiv && s.image_url) {
-          imgDiv.style.cssText = '';
-          imgDiv.innerHTML = '<img src="' + esc(s.image_url) + '" alt="' + esc(s.section_label || '') + '" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">';
-        } else if (imgDiv && !s.image_url) {
-          imgDiv.style.display = 'none';
+        var btnHtml = '';
+        if (s.btn1_text || s.btn2_text) {
+          btnHtml = '<div class="br-btn-group" style="margin-top:24px">';
+          if (s.btn1_text) btnHtml += '<a href="' + esc(s.btn1_link || '#') + '" class="br-btn br-btn-primary">' + esc(s.btn1_text) + '</a>';
+          if (s.btn2_text) btnHtml += '<a href="' + esc(s.btn2_link || '#') + '" class="br-btn br-btn-outline br-btn-sm">' + esc(s.btn2_text) + '</a>';
+          btnHtml += '</div>';
         }
 
-        // Update buttons
-        var btnGroup = hero.querySelector('.br-btn-group');
-        if (btnGroup) {
-          var html = '';
-          if (s.btn1_text) html += '<a href="' + esc(s.btn1_link || '#') + '" class="br-btn br-btn-primary">' + esc(s.btn1_text) + '</a>';
-          if (s.btn2_text) html += '<a href="' + esc(s.btn2_link || '#') + '" class="br-btn br-btn-outline br-btn-sm">' + esc(s.btn2_text) + '</a>';
-          if (html) btnGroup.innerHTML = html;
-          else btnGroup.style.display = 'none';
+        var imageHtml = '';
+        if (s.image_url) {
+          imageHtml = '<div class="br-category-image"><img src="' + esc(s.image_url) + '" alt="' + esc(s.section_label || s.heading || '') + '"></div>';
         }
 
-        // Animate
-        hero.querySelectorAll('[data-animate]').forEach(function(el) { if (typeof animObserver !== 'undefined') animObserver.observe(el); });
+        var descHtml = s.description ? '<p>' + esc(s.description) + '</p>' : '';
+        var labelHtml = s.section_label ? '<span class="br-section-label">' + esc(s.section_label) + '</span>' : '';
+        var headingHtml = s.heading ? '<h2>' + esc(s.heading) + '</h2>' : '';
+
+        var wrapper = document.createElement('section');
+        wrapper.className = idx % 2 === 0 ? 'br-section' : 'br-section-alt';
+        wrapper.innerHTML =
+          '<div class="br-container">' +
+            '<div class="br-category-hero">' +
+              '<div>' + labelHtml + headingHtml + descHtml + checklistHtml + btnHtml + '</div>' +
+              imageHtml +
+            '</div>' +
+          '</div>';
+
+        // Insert before the CTA banner / footer
+        if (insertBefore && insertBefore.parentNode) {
+          insertBefore.parentNode.insertBefore(wrapper, insertBefore);
+        } else if (pageHeader && pageHeader.parentNode) {
+          pageHeader.parentNode.appendChild(wrapper);
+        }
+
+        // Animate children that have data-animate (none by default, so section is immediately visible)
+        wrapper.querySelectorAll('[data-animate]').forEach(function(el) {
+          if (typeof animObserver !== 'undefined') animObserver.observe(el);
+        });
       });
     } catch (err) {
       console.warn('[category-section]', err.message);
