@@ -35,33 +35,39 @@ Default admin email: `usman@gmail.com`
 bleach-resistant/
 
   Public Pages (20 HTML files)
-    home.html                 # Homepage with feature image slider
-    finprint.html             # Alternate homepage
+    home.html                 # Homepage with dynamic hero slider
+    finprint.html             # Alternate homepage / showcase
     About.html                # About Us
     services.html             # Services overview
-    product.html              # Product landing
+    product.html              # Product catalog (dynamic tabs from DB)
     Pricelist.html            # Price list / products index
-    headgear.html             # Headgear products
-    basicpoly.html            # Basic poly products
-    stockdesigns.html         # Stock design catalog
-    fabricdescriptions.html   # Fabric info
+    headgear.html             # Headgear products (dynamic category section)
+    basicpoly.html            # Basic poly products (dynamic category section)
+    stockdesigns.html         # Stock design catalog (dynamic category section)
+    fabricdescriptions.html   # Fabric info (dynamic category section)
     sublimationprinting.html  # Sublimation printing info
     grapicdesign.html         # Logos & graphic design
     customlogos.html          # Logo showcase
     wrapdesign.html           # Vehicle wrap design
     copyofwashingsamples.html # Washing samples / showcase
     sizechart.html            # Size chart reference
-    order.html                # Order form
+    order.html                # Order form (multi-step wizard)
     FAQs.html                 # Frequently asked questions
     privacypolicy.html        # Privacy policy
     termsconditions.html      # Terms & conditions
 
-  Admin Panel (10 HTML files)
-    login.html                # Admin login page
-    signup.html               # Admin signup page
-    admin.html                # Dashboard  orders, contacts overview
+  Client Pages
+    account.html              # Client dashboard (orders, profile, password)
+    login.html                # Sign in page
+    signup.html               # Sign up page
+
+  Admin Panel (11 HTML files)
+    admin.html                # Dashboard — orders, contacts overview
     admin-orders.html         # Manage orders
     admin-contacts.html       # Manage contact submissions
+    admin-products.html       # Manage products (CRUD, image upload)
+    admin-slider.html         # Hero slider management (CRUD)
+    admin-sections.html       # Category hero sections (CRUD per page)
     admin-pages.html          # Visual page editor (click-to-edit)
     admin-media.html          # Media library
     admin-navigation.html     # Navigation & page management
@@ -69,16 +75,16 @@ bleach-resistant/
     admin-analytics.html      # Analytics dashboard
 
   Styles & Assets
-    overhaul.css              # Master stylesheet (~2870 lines, 4 phases)
+    overhaul.css              # Master stylesheet (~1500+ lines)
     admin.css                 # Admin panel styles (3-breakpoint responsive)
     favicon.svg               # BR branded favicon
 
   JavaScript
-    supabase-config.js        # Supabase client + auth helpers
-    content-loader.js         # Mobile scaling, hamburger nav, Supabase content overrides
+    supabase-config.js        # Supabase client + auth helpers + admin reveal logic
+    content-loader.js         # Nav, products, hero slider, category sections, chat, auth-aware UI
 
   Database
-    supabase-setup.sql        # Full DB setup: tables, RLS policies, grants, storage buckets
+    supabase-setup.sql        # Full DB setup: 8 tables, RLS policies, grants, storage buckets
     SUPABASE_GUIDE.md         # Supabase setup documentation
 
   Deployment
@@ -109,15 +115,20 @@ bleach-resistant/
 
 ## Key Features
 
-- **Feature Image Slider**  Auto-rotating carousel on homepage with prev/next arrows, dots, touch/swipe support, opacity fade transitions
-- **CSS Hover Dropdowns**  PRODUCTS and SERVICES nav menus work without JS
-- **Mobile-Responsive**  JS viewport scaling (`transform: scale`) keeps Wix absolute layouts intact on all screen sizes; hamburger nav overlay with accordion sub-menus for screens  980 px
-- **Admin Dashboard**  Full CMS: orders, contacts, visual page editor, media library, settings, analytics
-- **Supabase Content Overrides**  `content-loader.js` pulls `page_content` rows from Supabase and patches live DOM on every public page
-- **SEO Optimized**  Meta tags, Open Graph, structured data, sitemap, robots.txt
-- **Security Headers**  X-Frame-Options, COOP/COEP headers, admin pages `noindex`, `no-store` cache
-- **Static Cache Control**  CSS/JS/images cached for 1 year immutable; HTML served `no-cache`
-- **Fully Self-Contained**  All navigation uses local `.html` files; no external Wix CDN required
+- **Dynamic Product Catalog** — Products loaded from Supabase with auto-generated category filter tabs
+- **Hero Slider** — Admin-managed rotating carousel on homepage (CRUD via admin-slider.html)
+- **Category Hero Sections** — Per-page hero content managed from admin (headgear, basicpoly, stockdesigns, fabricdescriptions)
+- **Client Account Page** — Order tracking, profile editing, password change for logged-in users
+- **Auth-Aware Navbar** — Dynamically shows "My Account" for logged-in users, "Order Now" for guests
+- **Chat Widget** — Floating chat on all public pages, messages saved to contacts table
+- **Admin Dashboard** — Full CMS: orders, contacts, products, hero slider, page sections, visual page editor, media library, site settings, analytics
+- **Admin Products CRUD** — Add/edit/delete products with image upload, categories, featured flag, sort order
+- **Supabase Content Overrides** — `content-loader.js` pulls `page_content` rows and patches live DOM
+- **CSS Hover Dropdowns** — PRODUCTS and SERVICES nav menus work without JS
+- **Mobile-Responsive** — JS viewport scaling for Wix absolute layouts; hamburger nav overlay with accordion sub-menus
+- **SEO Optimized** — Meta tags, Open Graph, structured data, sitemap, robots.txt
+- **Security Headers** — X-Frame-Options, COOP/COEP headers, admin pages `noindex`, `no-store` cache
+- **Admin Flash Prevention** — Admin pages hidden until auth verified (`body.admin-hidden` + explicit `display:flex` reveal)
 
 ---
 
@@ -146,15 +157,18 @@ bleach-resistant/
 
 ## Supabase Database Tables
 
-| Table           | Purpose                                                          |
-| --------------- | ---------------------------------------------------------------- |
-| `orders`        | Customer orders submitted via order.html                         |
-| `contacts`      | Contact form submissions                                         |
-| `page_content`  | Visual editor overrides (keyed by page + CSS selector)           |
-| `media`         | Uploaded media files metadata                                    |
-| `site_settings` | Site configuration (branding, SEO, social links, etc.)           |
+| Table               | Purpose                                                          |
+| ------------------- | ---------------------------------------------------------------- |
+| `orders`            | Customer orders submitted via order.html                         |
+| `contacts`          | Contact form + chat widget submissions                           |
+| `page_content`      | Visual editor overrides (keyed by page + CSS selector)           |
+| `media`             | Uploaded media files metadata                                    |
+| `site_settings`     | Site configuration (branding, SEO, social links, etc.)           |
+| `products`          | Product catalog (name, category, images, pricing, featured)      |
+| `hero_slides`       | Homepage hero slider slides (managed from admin)                 |
+| `category_sections` | Per-page category hero content (managed from admin)              |
 
-Run `supabase-setup.sql` in your Supabase SQL Editor to create all tables with RLS policies.  
+Run `supabase-setup.sql` in your Supabase SQL Editor to create all 8 tables with RLS policies.  
 Supabase URL: `https://dbppxzkkgdtnmikkviyt.supabase.co`
 
 ---
@@ -256,6 +270,10 @@ These are cosmetic console errors from the Wix runtime bundle  they do not affec
 
 | Commit    | Date          | Description |
 | --------- | ------------- | ----------- |
+| `7b6ca47` | 2026-04-06    | Dynamic product category tabs from DB instead of hardcoded |
+| `56829ad` | 2026-04-06    | Fix admin blank page: explicit display:flex on reveal + cache bust v7 |
+| `c8c3b59` | 2026-04-06    | Client account page: order tracking, profile, password change |
+| `2dd7c90` | 2026-04-06    | Chat widget, hero slider, admin sections, admin products, flash fix |
 | `77d24b6` | 2026-04-04    | Fix: remove `.select()` after insert so anon role can submit orders (RLS 401 fix) |
 | `06017f6` | 2026-04-04    | Rebuild order page: comprehensive inquiry form + admin panel upgrade |
 | `fb2aa87` | 2026-04-04    | Update README: comprehensive guide + April 4 2026 changes |
@@ -274,7 +292,73 @@ These are cosmetic console errors from the Wix runtime bundle  they do not affec
 
 ---
 
-## What Was Fixed (April 4, 2026)
+## What Was Done (April 6, 2026)
+
+### 1. Chat Widget (All Public Pages)
+A floating chat bubble appears on every public page (bottom-right corner). Users can type a message with their name/email and it inserts directly into the `contacts` table with `page_source` tracking. The widget is hidden on admin, login, and signup pages.
+
+### 2. Admin Products CRUD (`admin-products.html`)
+Full product management panel:
+- Add/edit/delete products with image upload to Supabase storage
+- Fields: name, slug, category, short description, full description, price_from, featured flag, active toggle, sort_order
+- Image preview in the editor modal
+- Products are loaded on `product.html` and `home.html` (featured) via `brLoadProducts()`
+
+### 3. Dynamic Hero Slider (`admin-slider.html`)
+Admin-managed homepage hero slider:
+- CRUD for slides: heading, subheading, CTA button text/link, background image upload
+- Sort order and active toggle
+- Loaded dynamically on `home.html` via `brLoadHeroSlider()` in content-loader.js
+
+### 4. Category Hero Sections (`admin-sections.html`)
+Per-page hero content managed from admin:
+- Each category page (headgear, basicpoly, stockdesigns, fabricdescriptions) has a dynamic hero section
+- Editable: section label, heading, description, checklist items (JSON), image, two CTA buttons
+- Loaded via `brLoadCategorySection()` — falls back to static HTML if no DB entry exists
+
+### 5. Admin Flash Prevention Fix
+Admin pages were briefly flashing content before auth check completed. Fixed with:
+- All 11 admin `<body>` tags: `class="admin-hidden" style="display:none"`
+- CSS: `body.admin-hidden { display: none !important; }`
+- On auth success: `classList.remove('admin-hidden')` + `document.body.style.display = 'flex'`
+- Non-admin users are redirected without ever seeing admin content
+
+### 6. Client Account Page (`account.html`)
+Full client dashboard with 3 tabs:
+- **My Orders** — Shows all orders by matching `user_id` OR `email`, with status badges and expandable details
+- **Profile** — Edit full name, phone, company (saved to Supabase `user_metadata`)
+- **Change Password** — Password update with confirmation field
+- Sign Out button
+- Admin users see an "Admin Panel" shortcut link
+
+### 7. Auth-Aware Navbar (All Public Pages)
+The navbar dynamically adapts based on login state:
+- **Guest:** Shows "Order Now" button
+- **Logged-in user:** Shows "My Account" button → links to `account.html`
+- **Admin user:** "My Account" → links to `admin.html`
+- Applied automatically by content-loader.js on all public pages
+
+### 8. Dynamic Product Category Tabs
+The product page (`product.html`) no longer uses hardcoded category filter tabs. Instead:
+- Tabs are generated dynamically from the actual product categories in the database
+- "All" tab always appears first
+- Only categories that have active products appear as tabs
+- Category names are auto-formatted for display (e.g., `stockdesigns` → `Stockdesigns`)
+
+### 9. Database Schema (8 Tables)
+`supabase-setup.sql` now covers all 8 tables with full RLS policies:
+- `orders` — with 16 extra columns for the multi-step order form + `user_id` for account linking
+- `contacts` — with `page_source`, `admin_reply`, `admin_reply_at` columns
+- `page_content`, `media`, `site_settings` — existing tables
+- `products` — product catalog with category, featured, image, pricing
+- `hero_slides` — homepage slider slides
+- `category_sections` — per-page category hero content
+
+**⚠️ IMPORTANT:** You must run `supabase-setup.sql` in the Supabase SQL Editor for all features to work. Without it, products, slider, category sections, and chat will silently fail.
+
+---
+
+## What Was Done (April 4, 2026)
 
 ### 1. Quirks Mode (18 pages missing `DOCTYPE`)
 All 20 Wix HTML pages were missing `<!DOCTYPE html>`, causing browsers to render in Quirks Mode (broken box model, incorrect font sizes, mispositioned elements).  
