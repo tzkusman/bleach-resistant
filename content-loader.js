@@ -345,10 +345,13 @@
     try {
       var page = window.location.pathname.split('/').pop() || '';
       var result = await db.from('category_sections').select('*')
-        .eq('page_name', page).eq('active', true).order('sort_order', { ascending: true });
+        .eq('page_name', page).eq('active', true);
       if (result.error) throw result.error;
       var sections = result.data || [];
       if (sections.length === 0) return; // keep static content as fallback
+
+      // Sort by sort_order if available, else by updated_at
+      sections.sort(function(a, b) { return (a.sort_order || 0) - (b.sort_order || 0); });
 
       var esc = function(str) { var d = document.createElement('div'); d.textContent = str || ''; return d.innerHTML; };
 

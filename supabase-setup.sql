@@ -512,7 +512,8 @@ CREATE POLICY "storage_media_public_read" ON storage.objects FOR SELECT TO anon
 
 CREATE TABLE IF NOT EXISTS category_sections (
   id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  page_name    TEXT NOT NULL UNIQUE,
+  created_at   TIMESTAMPTZ DEFAULT NOW(),
+  page_name    TEXT NOT NULL,
   section_label TEXT,
   heading      TEXT,
   description  TEXT,
@@ -523,8 +524,16 @@ CREATE TABLE IF NOT EXISTS category_sections (
   btn2_text    TEXT,
   btn2_link    TEXT,
   active       BOOLEAN DEFAULT true,
+  sort_order   INTEGER DEFAULT 0,
   updated_at   TIMESTAMPTZ DEFAULT now()
 );
+
+-- Migration: add missing columns if table already exists
+ALTER TABLE category_sections ADD COLUMN IF NOT EXISTS sort_order INTEGER DEFAULT 0;
+ALTER TABLE category_sections ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT NOW();
+
+-- Remove old UNIQUE constraint on page_name (allows multiple sections per page)
+ALTER TABLE category_sections DROP CONSTRAINT IF EXISTS category_sections_page_name_key;
 
 ALTER TABLE category_sections ENABLE ROW LEVEL SECURITY;
 
@@ -537,3 +546,18 @@ CREATE POLICY "cat_sections_admin_all" ON category_sections
   FOR ALL TO authenticated
   USING (auth.email() = 'usman@gmail.com')
   WITH CHECK (auth.email() = 'usman@gmail.com');
+
+GRANT SELECT ON TABLE category_sections TO anon;
+GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE category_sections TO authenticated;
+
+
+-- ============================================================
+-- SECTION 11: QUICK-FIX MIGRATION (April 6, 2026)
+-- Run ONLY this section if you already ran Sections 1-10 before.
+-- Safe to run multiple times.
+-- ============================================================
+
+-- Add sort_order + created_at to category_sections
+ALTER TABLE category_sections ADD COLUMN IF NOT EXISTS sort_order INTEGER DEFAULT 0;
+ALTER TABLE category_sections ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT NOW();
+ALTER TABLE category_sections DROP CONSTRAINT IF EXISTS category_sections_page_name_key;

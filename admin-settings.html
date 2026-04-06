@@ -497,10 +497,11 @@ function showPanel(name, el) {
 
 async function loadSettings() {
   try {
-    const { data } = await db.from('site_settings').select('*');
+    const { data, error } = await db.from('site_settings').select('*');
+    if (error) { console.warn('Failed to load settings:', error.message); return; }
     if (!data) return;
     const settings = {};
-    data.forEach(row => { settings[row.setting_key] = row.setting_value; });
+    data.forEach(row => { settings[row.key] = row.value; });
 
     // Apply to fields
     if (settings.biz_name) document.getElementById('s-biz-name').value = settings.biz_name;
@@ -539,25 +540,33 @@ async function saveSettings() {
   };
 
   const rows = [];
-  for (const [key, elId] of Object.entries(fields)) {
+  for (const [k, elId] of Object.entries(fields)) {
     const el = document.getElementById(elId);
-    if (el) rows.push({ setting_key: key, setting_value: el.value });
+    if (el) rows.push({ key: k, value: el.value });
   }
 
   // Checkboxes
   ['s-maintenance','s-notify-new-order','s-notify-status','s-notify-contact'].forEach(id => {
     const el = document.getElementById(id);
-    if (el) rows.push({ setting_key: id.replace('s-','').replace(/-/g,'_'), setting_value: el.checked ? 'true' : 'false' });
+    if (el) rows.push({ key: id.replace('s-','').replace(/-/g,'_'), value: el.checked ? 'true' : 'false' });
   });
 
+  const btn = document.querySelector('.save-bar .btn-primary');
+  if (btn) { btn.disabled = true; btn.textContent = 'Saving...'; }
+
   try {
+    let failed = 0;
     for (const row of rows) {
-      await db.from('site_settings').upsert(row, { onConflict: 'setting_key' });
+      const { error } = await db.from('site_settings').upsert(row, { onConflict: 'key' });
+      if (error) { console.warn('Failed to save', row.key, error.message); failed++; }
     }
-    showToast('Settings saved!', 'success');
+    if (failed > 0) showToast(failed + ' settings failed to save — check console', 'error');
+    else showToast('Settings saved!', 'success');
   } catch(e) {
     showToast('Error saving: ' + e.message, 'error');
   }
+
+  if (btn) { btn.disabled = false; btn.textContent = 'Save Settings'; }
 }
 
 async function exportData(table) {
