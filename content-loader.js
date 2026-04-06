@@ -416,7 +416,17 @@
         .eq('active', true).order('sort_order', { ascending: true });
       if (result.error) throw result.error;
       var slides = result.data || [];
-      if (slides.length === 0) return; // keep static slides as fallback
+      if (slides.length === 0) {
+        slides = [{
+          title: 'Custom Sublimation', highlight: "The Way You'd Love",
+          subtitle: 'Premium dye sublimation printing for teams, businesses, and individuals. 100% polyester, chemical-resistant fabric with vibrant, lasting prints.',
+          badges: ['⚡ 24h Response', '📍 Guelph, Ontario', '🌎 Canada & International'],
+          bg_type: 'gradient', bg_value: 'linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%)',
+          btn1_text: 'Order Today', btn1_link: 'order.html', btn1_style: 'primary',
+          btn2_text: 'View Products', btn2_link: 'product.html', btn2_style: 'white',
+          image_url: null
+        }];
+      }
 
       var esc = function(s) { var d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; };
 
