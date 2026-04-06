@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Page Sections &#x2014; Bleach Resistant Admin</title>
+  <link rel="icon" href="favicon.svg" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+</head>
+<body class="admin-hidden" style="display:none">
+
+  <!-- ===== SIDEBAR ===== -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <h2>Bleach Resistant</h2>
+      <small>Admin Panel</small>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-section">Main</div>
+      <a href="admin.html"><span class="icon">&#x1F4CA;</span> Dashboard</a>
+      <a href="admin-orders.html"><span class="icon">&#x1F4E6;</span> Orders</a>
+      <a href="admin-contacts.html"><span class="icon">&#x1F4AC;</span> Contacts</a>
+      <div class="nav-section">Content</div>
+      <a href="admin-products.html"><span class="icon">&#x1F6CD;&#xFE0F;</span> Products</a>
+      <a href="admin-slider.html"><span class="icon">&#x1F3A0;</span> Hero Slider</a>
+      <a href="admin-sections.html" class="active"><span class="icon">&#x1F4D0;</span> Page Sections</a>
+      <a href="admin-pages.html"><span class="icon">&#x1F4C4;</span> Pages</a>
+      <a href="admin-media.html"><span class="icon">&#x1F5BC;&#xFE0F;</span> Media Library</a>
+      <a href="admin-navigation.html"><span class="icon">&#x1F517;</span> Navigation</a>
+      <div class="nav-section">Settings</div>
+      <a href="admin-settings.html"><span class="icon">&#x2699;&#xFE0F;</span> Site Settings</a>
+      <a href="admin-analytics.html"><span class="icon">&#x1F4C8;</span> Analytics</a>
+      <div class="nav-section">Website</div>
+      <a href="home.html" target="_blank"><span class="icon">&#x1F310;</span> View Site</a>
+      <a href="order.html" target="_blank"><span class="icon">&#x1F6D2;</span> Order Page</a>
+    </div>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" id="user-avatar">A</div>
+        <div>
+          <div style="font-size:12px;font-weight:600;" id="user-name">Admin</div>
+          <div class="user-email" id="user-email">loading&#x2026;</div>
+        </div>
+      </div>
+      <button class="btn btn-secondary btn-sm btn-block" onclick="brSignOut()">Sign Out</button>
+    </div>
+  </nav>
+
+  <!-- ===== MAIN ===== -->
+  <div class="main-content">
+    <div class="topbar">
+      <div>
+        <h1>Page Sections</h1>
+        <div class="breadcrumb">Manage category hero sections &#x2014; images, text, checklists, and buttons shown on product &amp; service pages</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn btn-sm btn-primary" onclick="openEditor()">&#x2795; Add Section</button>
+      </div>
+    </div>
+
+    <div class="content-area">
+      <div class="table-card">
+        <div class="table-header">
+          <h3>All Sections <span id="section-count" style="color:#aaa;font-weight:400;"></span></h3>
+        </div>
+        <div id="sections-list" style="padding:16px;">
+          <div class="loading-overlay"><span class="spinner"></span> Loading sections&#x2026;</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SECTION EDITOR MODAL ===== -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal" style="max-width:720px;">
+      <div class="modal-header">
+        <h3 id="modal-title">Add Section</h3>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="sec-id">
+
+        <div class="form-group">
+          <label>Page</label>
+          <select id="sec-page">
+            <option value="">-- Select a page --</option>
+            <option value="headgear.html">Head Gear</option>
+            <option value="basicpoly.html">Basic Poly</option>
+            <option value="stockdesigns.html">Stock Designs</option>
+            <option value="fabricdescriptions.html">Fabric Guide</option>
+            <option value="sublimationprinting.html">Sublimation Printing</option>
+            <option value="grapicdesign.html">Graphic Design</option>
+            <option value="customlogos.html">Custom Logos</option>
+            <option value="wrapdesign.html">Vehicle Wraps</option>
+            <option value="home.html">Home Page</option>
+          </select>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          <div class="form-group">
+            <label>Section Label</label>
+            <input type="text" id="sec-label" placeholder="e.g. Head Gear Collection">
+          </div>
+          <div class="form-group">
+            <label>Heading</label>
+            <input type="text" id="sec-heading" placeholder="e.g. Full Custom Sublimation Headwear">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="sec-description" rows="3" placeholder="Paragraph text describing this category..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Checklist Items (one per line)</label>
+          <textarea id="sec-checklist" rows="5" placeholder="Full-panel dye sublimation printing&#x0A;Multiple styles: snapback, fitted, trucker&#x0A;100% polyester, chemical-resistant fabric"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Category Image</label>
+          <div style="display:flex;gap:12px;align-items:flex-start;">
+            <div style="flex:1;">
+              <input type="text" id="sec-image-url" placeholder="Image URL or upload below">
+              <input type="file" id="sec-image-file" accept="image/*" style="margin-top:8px;font-size:12px;">
+              <div id="sec-upload-status" style="font-size:11px;color:#888;margin-top:4px;"></div>
+            </div>
+            <div id="sec-image-preview" style="width:120px;height:90px;border-radius:8px;overflow:hidden;border:1px solid #eee;display:flex;align-items:center;justify-content:center;background:#f4f5f7;flex-shrink:0;">
+              <span style="font-size:11px;color:#bbb;">No image</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          <div class="form-group">
+            <label>Button 1 Text</label>
+            <input type="text" id="sec-btn1-text" placeholder="e.g. Order Head Gear">
+          </div>
+          <div class="form-group">
+            <label>Button 1 Link</label>
+            <input type="text" id="sec-btn1-link" placeholder="e.g. order.html?service=headgear">
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          <div class="form-group">
+            <label>Button 2 Text</label>
+            <input type="text" id="sec-btn2-text" placeholder="e.g. Size Chart">
+          </div>
+          <div class="form-group">
+            <label>Button 2 Link</label>
+            <input type="text" id="sec-btn2-link" placeholder="e.g. sizechart.html">
+          </div>
+        </div>
+
+        <div class="form-group" style="display:flex;align-items:center;gap:10px;">
+          <input type="checkbox" id="sec-active" checked style="width:auto;">
+          <label for="sec-active" style="margin:0;cursor:pointer;">Active (visible on site)</label>
+        </div>
+
+        <!-- Live Preview -->
+        <div style="margin-top:16px;">
+          <label style="display:block;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#888;margin-bottom:8px;">Preview</label>
+          <div id="sec-preview" style="display:grid;grid-template-columns:1fr 1fr;gap:24px;border:1px solid #eee;border-radius:10px;padding:24px;background:#fff;min-height:200px;"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-primary" id="save-section-btn" onclick="saveSection()">Save Section</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast"></div>
+
+  <script>
+    let allSections = [];
+
+    function showToast(msg, type) {
+      const t = document.getElementById('toast');
+      t.className = 'toast toast-' + (type || 'info');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    function closeModal() {
+      document.getElementById('modal-overlay').classList.remove('active');
+    }
+
+    function brEscapeHtml(s) {
+      const d = document.createElement('div');
+      d.textContent = s || '';
+      return d.innerHTML;
+    }
+
+    async function loadSections() {
+      try {
+        const { data, error } = await db.from('category_sections')
+          .select('*')
+          .order('page_name', { ascending: true });
+        if (error) throw error;
+        allSections = data || [];
+        renderSections();
+      } catch (err) {
+        console.error(err);
+        document.getElementById('sections-list').innerHTML =
+          '<div class="empty-state" style="padding:40px;text-align:center;">' +
+          '<p style="font-size:16px;margin-bottom:8px;">Error loading sections</p>' +
+          '<p style="color:#aaa;margin-bottom:16px;">' + brEscapeHtml(err.message) + '</p>' +
+          '<p style="color:#aaa;font-size:12px;">Make sure you\'ve run the SQL migration (Section 10 in supabase-setup.sql).</p></div>';
+      }
+    }
+
+    const PAGE_LABELS = {
+      'headgear.html': 'Head Gear',
+      'basicpoly.html': 'Basic Poly',
+      'stockdesigns.html': 'Stock Designs',
+      'fabricdescriptions.html': 'Fabric Guide',
+      'sublimationprinting.html': 'Sublimation Printing',
+      'grapicdesign.html': 'Graphic Design',
+      'customlogos.html': 'Custom Logos',
+      'wrapdesign.html': 'Vehicle Wraps',
+      'home.html': 'Home Page'
+    };
+
+    function renderSections() {
+      const container = document.getElementById('sections-list');
+      document.getElementById('section-count').textContent = '(' + allSections.length + ')';
+
+      if (allSections.length === 0) {
+        container.innerHTML = '<div class="empty-state" style="padding:40px;text-align:center;">' +
+          '<p style="font-size:16px;margin-bottom:8px;">No page sections yet</p>' +
+          '<p style="color:#aaa;margin-bottom:16px;">Add category hero sections for your product and service pages.</p>' +
+          '<button class="btn btn-primary btn-sm" onclick="openEditor()">&#x2795; Add Section</button></div>';
+        return;
+      }
+
+      container.innerHTML = allSections.map(s => {
+        const checklist = parseChecklist(s.checklist);
+        const pageName = PAGE_LABELS[s.page_name] || s.page_name;
+
+        return `
+          <div style="display:flex;gap:16px;align-items:center;padding:16px;background:#fff;border:1px solid #eee;border-radius:10px;margin-bottom:12px;${!s.active ? 'opacity:0.5;' : ''}">
+            <div style="width:140px;height:100px;border-radius:8px;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:#f0f0f0;">
+              ${s.image_url
+                ? '<img src="' + brEscapeHtml(s.image_url) + '" style="width:100%;height:100%;object-fit:cover;" alt="">'
+                : '<span style="font-size:11px;color:#bbb;">No image</span>'}
+            </div>
+            <div style="flex:1;">
+              <div style="font-weight:700;font-size:15px;margin-bottom:4px;">
+                ${brEscapeHtml(pageName)}
+                ${!s.active ? '<span class="badge badge-closed" style="margin-left:8px;">Inactive</span>' : '<span class="badge badge-new" style="margin-left:8px;">Active</span>'}
+              </div>
+              <div style="font-size:12px;color:#C7065C;margin-bottom:4px;">${brEscapeHtml(s.section_label || '')}</div>
+              <div style="font-size:13px;font-weight:600;margin-bottom:4px;">${brEscapeHtml(s.heading || '')}</div>
+              <div style="font-size:12px;color:#888;">${brEscapeHtml((s.description || '').substring(0, 100))}${(s.description||'').length > 100 ? '...' : ''}</div>
+              ${checklist.length ? '<div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:4px;">' + checklist.slice(0, 3).map(c => '<span style="font-size:10px;background:#f0f0f0;padding:2px 8px;border-radius:10px;">&#x2713; ' + brEscapeHtml(c) + '</span>').join('') + (checklist.length > 3 ? '<span style="font-size:10px;color:#bbb;">+' + (checklist.length - 3) + ' more</span>' : '') + '</div>' : ''}
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
+              <button class="btn btn-sm btn-secondary" onclick="editSection('${s.id}')">Edit</button>
+              <button class="btn btn-sm btn-${s.active ? 'secondary' : 'success'}" onclick="toggleSection('${s.id}', ${!s.active})">${s.active ? 'Hide' : 'Show'}</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteSection('${s.id}')">Delete</button>
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    function parseChecklist(val) {
+      try {
+        if (typeof val === 'string') return JSON.parse(val);
+        return val || [];
+      } catch(e) { return []; }
+    }
+
+    function openEditor(section) {
+      document.getElementById('modal-title').textContent = section ? 'Edit Section' : 'Add Section';
+      document.getElementById('sec-id').value = section ? section.id : '';
+      document.getElementById('sec-page').value = section ? section.page_name || '' : '';
+      document.getElementById('sec-label').value = section ? section.section_label || '' : '';
+      document.getElementById('sec-heading').value = section ? section.heading || '' : '';
+      document.getElementById('sec-description').value = section ? section.description || '' : '';
+      document.getElementById('sec-checklist').value = section ? parseChecklist(section.checklist).join('\n') : '';
+      document.getElementById('sec-image-url').value = section ? section.image_url || '' : '';
+      document.getElementById('sec-btn1-text').value = section ? section.btn1_text || '' : '';
+      document.getElementById('sec-btn1-link').value = section ? section.btn1_link || '' : '';
+      document.getElementById('sec-btn2-text').value = section ? section.btn2_text || '' : '';
+      document.getElementById('sec-btn2-link').value = section ? section.btn2_link || '' : '';
+      document.getElementById('sec-active').checked = section ? section.active !== false : true;
+      document.getElementById('sec-image-file').value = '';
+      document.getElementById('sec-upload-status').textContent = '';
+
+      // Disable page select when editing
+      document.getElementById('sec-page').disabled = !!section;
+
+      updatePreview();
+      updateImagePreview();
+      document.getElementById('modal-overlay').classList.add('active');
+    }
+
+    function editSection(id) {
+      const s = allSections.find(x => x.id === id);
+      if (s) openEditor(s);
+    }
+
+    function updateImagePreview() {
+      const url = document.getElementById('sec-image-url').value.trim();
+      const preview = document.getElementById('sec-image-preview');
+      if (url) {
+        preview.innerHTML = '<img src="' + brEscapeHtml(url) + '" style="width:100%;height:100%;object-fit:cover;" alt="">';
+      } else {
+        preview.innerHTML = '<span style="font-size:11px;color:#bbb;">No image</span>';
+      }
+    }
+
+    function updatePreview() {
+      const label = document.getElementById('sec-label').value;
+      const heading = document.getElementById('sec-heading').value;
+      const desc = document.getElementById('sec-description').value;
+      const checklist = document.getElementById('sec-checklist').value.split('\n').filter(x => x.trim());
+      const imgUrl = document.getElementById('sec-image-url').value.trim();
+      const btn1 = document.getElementById('sec-btn1-text').value;
+      const btn2 = document.getElementById('sec-btn2-text').value;
+
+      const preview = document.getElementById('sec-preview');
+      let left = '<div>';
+      if (label) left += '<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#C7065C;margin-bottom:8px;">' + brEscapeHtml(label) + '</div>';
+      left += '<div style="font-size:18px;font-weight:800;margin-bottom:8px;">' + brEscapeHtml(heading || 'Section Heading') + '</div>';
+      if (desc) left += '<p style="font-size:12px;color:#666;margin-bottom:10px;">' + brEscapeHtml(desc).substring(0, 120) + '</p>';
+      if (checklist.length) {
+        left += '<ul style="list-style:none;padding:0;margin:0;">';
+        checklist.forEach(c => { left += '<li style="font-size:11px;color:#444;padding:2px 0;">&#x2713; ' + brEscapeHtml(c) + '</li>'; });
+        left += '</ul>';
+      }
+      if (btn1 || btn2) {
+        left += '<div style="margin-top:12px;display:flex;gap:8px;">';
+        if (btn1) left += '<span style="background:#C7065C;color:#fff;padding:6px 14px;border-radius:6px;font-size:11px;font-weight:600;">' + brEscapeHtml(btn1) + '</span>';
+        if (btn2) left += '<span style="border:1px solid #C7065C;color:#C7065C;padding:6px 14px;border-radius:6px;font-size:11px;font-weight:600;">' + brEscapeHtml(btn2) + '</span>';
+        left += '</div>';
+      }
+      left += '</div>';
+
+      let right = '<div style="display:flex;align-items:center;justify-content:center;background:#f0f0f0;border-radius:8px;min-height:160px;overflow:hidden;">';
+      if (imgUrl) {
+        right += '<img src="' + brEscapeHtml(imgUrl) + '" style="width:100%;height:100%;object-fit:cover;" alt="">';
+      } else {
+        right += '<span style="font-size:12px;color:#bbb;">Category Image</span>';
+      }
+      right += '</div>';
+
+      preview.innerHTML = left + right;
+    }
+
+    // Live preview updates
+    ['sec-label','sec-heading','sec-description','sec-checklist','sec-image-url','sec-btn1-text','sec-btn2-text'].forEach(id => {
+      document.getElementById(id).addEventListener('input', () => { updatePreview(); if (id === 'sec-image-url') updateImagePreview(); });
+    });
+
+    // File upload
+    document.getElementById('sec-image-file').addEventListener('change', async function() {
+      const file = this.files[0];
+      if (!file) return;
+      const status = document.getElementById('sec-upload-status');
+      status.textContent = 'Uploading...';
+      status.style.color = '#888';
+      try {
+        const result = await brUploadFile('media', file, 'sections');
+        document.getElementById('sec-image-url').value = result.url;
+        updatePreview();
+        updateImagePreview();
+        status.textContent = 'Uploaded!';
+        status.style.color = '#22c55e';
+      } catch (err) {
+        status.textContent = 'Upload failed: ' + err.message;
+        status.style.color = '#e74c3c';
+      }
+    });
+
+    async function saveSection() {
+      const id = document.getElementById('sec-id').value;
+      const pageName = document.getElementById('sec-page').value;
+      if (!pageName) { showToast('Please select a page', 'error'); return; }
+
+      const checklist = document.getElementById('sec-checklist').value.split('\n').map(c => c.trim()).filter(Boolean);
+
+      const data = {
+        page_name: pageName,
+        section_label: document.getElementById('sec-label').value.trim() || null,
+        heading: document.getElementById('sec-heading').value.trim() || null,
+        description: document.getElementById('sec-description').value.trim() || null,
+        checklist: checklist,
+        image_url: document.getElementById('sec-image-url').value.trim() || null,
+        btn1_text: document.getElementById('sec-btn1-text').value.trim() || null,
+        btn1_link: document.getElementById('sec-btn1-link').value.trim() || null,
+        btn2_text: document.getElementById('sec-btn2-text').value.trim() || null,
+        btn2_link: document.getElementById('sec-btn2-link').value.trim() || null,
+        active: document.getElementById('sec-active').checked,
+        updated_at: new Date().toISOString()
+      };
+
+      const btn = document.getElementById('save-section-btn');
+      btn.disabled = true;
+      btn.textContent = 'Saving...';
+
+      try {
+        let result;
+        if (id) {
+          result = await db.from('category_sections').update(data).eq('id', id);
+        } else {
+          result = await db.from('category_sections').insert(data);
+        }
+        if (result.error) throw result.error;
+
+        showToast(id ? 'Section updated!' : 'Section created!', 'success');
+        closeModal();
+        loadSections();
+      } catch (err) {
+        showToast('Error: ' + err.message, 'error');
+      }
+
+      btn.disabled = false;
+      btn.textContent = 'Save Section';
+    }
+
+    async function toggleSection(id, active) {
+      try {
+        const { error } = await db.from('category_sections').update({ active, updated_at: new Date().toISOString() }).eq('id', id);
+        if (error) throw error;
+        showToast(active ? 'Section activated' : 'Section hidden', 'success');
+        loadSections();
+      } catch (err) {
+        showToast('Error: ' + err.message, 'error');
+      }
+    }
+
+    async function deleteSection(id) {
+      if (!confirm('Delete this section? This cannot be undone.')) return;
+      try {
+        const { error } = await db.from('category_sections').delete().eq('id', id);
+        if (error) throw error;
+        showToast('Section deleted', 'success');
+        loadSections();
+      } catch (err) {
+        showToast('Error: ' + err.message, 'error');
+      }
+    }
+
+    // ── INIT ──
+    (async function() {
+      const user = await brRequireAdmin();
+      document.getElementById('user-name').textContent = user.user_metadata?.full_name || 'Admin';
+      document.getElementById('user-email').textContent = user.email;
+      document.getElementById('user-avatar').textContent = (user.email || 'A')[0].toUpperCase();
+      loadSections();
+    })();
+  </script>
+</body>
+</html>

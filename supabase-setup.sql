@@ -498,3 +498,37 @@ CREATE POLICY "storage_media_admin" ON storage.objects FOR ALL TO authenticated
   WITH CHECK (bucket_id = 'media' AND auth.email() = 'usman@gmail.com');
 CREATE POLICY "storage_media_public_read" ON storage.objects FOR SELECT TO anon
   USING (bucket_id = 'media');
+
+
+-- ============================================================
+-- SECTION 10: CATEGORY SECTIONS TABLE
+-- Stores editable hero sections for product/service category pages.
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS category_sections (
+  id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  page_name    TEXT NOT NULL UNIQUE,
+  section_label TEXT,
+  heading      TEXT,
+  description  TEXT,
+  checklist    JSONB DEFAULT '[]',
+  image_url    TEXT,
+  btn1_text    TEXT,
+  btn1_link    TEXT,
+  btn2_text    TEXT,
+  btn2_link    TEXT,
+  active       BOOLEAN DEFAULT true,
+  updated_at   TIMESTAMPTZ DEFAULT now()
+);
+
+ALTER TABLE category_sections ENABLE ROW LEVEL SECURITY;
+
+-- Public can read active sections
+CREATE POLICY "cat_sections_public_read" ON category_sections
+  FOR SELECT TO anon, authenticated USING (true);
+
+-- Admin full access
+CREATE POLICY "cat_sections_admin_all" ON category_sections
+  FOR ALL TO authenticated
+  USING (auth.email() = 'usman@gmail.com')
+  WITH CHECK (auth.email() = 'usman@gmail.com');

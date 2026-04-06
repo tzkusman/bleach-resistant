@@ -16,7 +16,7 @@ body {
   display: flex;
 }
 /* Hide admin content until auth check passes */
-body.admin-hidden { visibility: hidden; }
+body.admin-hidden { display: none !important; }
 a { color: #C7065C; text-decoration: none; }
 a:hover { text-decoration: underline; }
 img { max-width: 100%; height: auto; }

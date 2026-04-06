@@ -71,11 +71,12 @@ async function brRequireAuth() {
 async function brRequireAdmin() {
   const user = await brRequireAuth();
   if (!brIsAdmin(user)) {
-    window.location.href = 'home.html';
+    window.location.replace('home.html');
     throw new Error('Admin access required');
   }
   // Reveal admin page content (hidden by default via .admin-hidden)
   document.body.classList.remove('admin-hidden');
+  document.body.style.display = '';
   return user;
 }
 
