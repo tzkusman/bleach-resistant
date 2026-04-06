@@ -21,6 +21,8 @@
 12. [Step 9: Chat Widget](#12-step-9-chat-widget)
 13. [Step 10: Deployment](#13-step-10-deployment)
 14. [Prompt to Recreate This Project](#14-prompt-to-recreate-this-project)
+15. [Navigation System & Custom Pages](#15-navigation-system--custom-pages)
+16. [Cache Version Tracking](#16-cache-version-tracking)
 
 ---
 
@@ -43,7 +45,8 @@
 │                       │                          │
 │  ┌────────────────────┴───────────────────────┐  │
 │  │         content-loader.js                   │  │
-│  │  (Nav, slider, products, sections, chat)   │  │
+│  │  (Nav, slider, products, sections, chat,  │  │
+│  │   dynamic nav, page block renderer)         │  │
 │  └────────────────────┬───────────────────────┘  │
 └───────────────────────┼──────────────────────────┘
                         │ HTTPS (Supabase JS Client)
@@ -53,7 +56,7 @@
 │                                                   │
 │  ┌─────────┐  ┌──────────┐  ┌─────────────────┐  │
 │  │  Auth   │  │ Postgres │  │    Storage       │  │
-│  │(email/  │  │ (8 tables│  │  (media,         │  │
+│  │(email/  │  │(11 tables│  │  (media,         │  │
 │  │password)│  │  + RLS)  │  │   attachments)   │  │
 │  └─────────┘  └──────────┘  └─────────────────┘  │
 └───────────────────────────────────────────────────┘
@@ -125,10 +128,11 @@ project/
 ├── admin-sections.html       ← Page section editor
 ├── admin-pages.html          ← Visual page editor
 ├── admin-media.html          ← Media library
-├── admin-navigation.html     ← Nav menu editor
+├── admin-navigation.html     ← Nav menu editor + Page Creator + Page Builder
 ├── admin-settings.html       ← Site settings (branding, SEO, etc.)
 ├── admin-analytics.html      ← Analytics dashboard
 │
+├── page.html                 ← Dynamic page renderer (for custom pages)
 ├── sitemap.xml               ← SEO sitemap
 └── favicon.svg               ← Site icon
 ```
@@ -477,7 +481,7 @@ Every public page follows this structure:
   <meta name="description" content="SEO description here">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="overhaul.css?v=6">
+  <link rel="stylesheet" href="overhaul.css?v=7">
 </head>
 <body>
   <!-- Navbar (same on every page) -->
@@ -517,7 +521,7 @@ Every public page follows this structure:
   <!-- Scripts (same on every page) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js?v=7"></script>
-  <script src="content-loader.js?v=12"></script>
+  <script src="content-loader.js?v=15"></script>
   <script>
     // Page-specific calls
     brLoadCategorySection();
@@ -540,8 +544,8 @@ Each product/service category page:
 
 Always version your CSS and JS files:
 ```html
-<link rel="stylesheet" href="overhaul.css?v=6">
-<script src="content-loader.js?v=12"></script>
+<link rel="stylesheet" href="overhaul.css?v=7">
+<script src="content-loader.js?v=15"></script>
 ```
 Bump the version number every time you change the file. This forces browsers to download the new version.
 
@@ -968,9 +972,9 @@ ADMIN PANEL (10+ pages):
 - Analytics dashboard
 
 DATABASE (Supabase Postgres):
-- 8 tables: orders, contacts, products, hero_slides, category_sections, page_content, site_settings, media
+- 11 tables: orders, contacts, products, hero_slides, category_sections, page_content, site_settings, media, nav_items, custom_pages, page_blocks
 - Row Level Security on every table
-- Public read for products/slides/sections/settings
+- Public read for products/slides/sections/settings/nav_items/published pages
 - Admin-only write for everything
 - Storage buckets: order-attachments (public), media (admin)
 
@@ -978,16 +982,28 @@ CSS DESIGN SYSTEM:
 - Custom properties for colors, shadows, radii, transitions
 - Consistent component classes (buttons, cards, grids, badges, forms)
 - Scroll-triggered animations via IntersectionObserver
-- Responsive breakpoints (1024px, 768px, 480px)
+- Responsive breakpoints (1200px, 1100px, 1024px, 768px, 480px)
+- Auto-adjusting navbar with CSS clamp() (scales gap/padding/font-size)
+- Hamburger menu at 1100px (supports 8+ nav items)
 - Separate admin.css for admin panel
 
 DYNAMIC CONTENT (content-loader.js):
 - brLoadProducts(containerId, options) — fetch and render products
 - brLoadCategorySection() — replace static content with DB sections
 - brLoadHeroSlider() — build slider from DB slides
+- brLoadDynamicNav() — replace static nav with DB-managed navigation
+- brRenderPageBlocks(container, page, blocks) — render custom page blocks (11 block types)
 - Content overrides from page_content table
 - Auth-aware navbar
 - Chat widget auto-injected on all public pages
+- Event delegation for mobile dropdown toggles (survives innerHTML replacement)
+
+NAVIGATION & CUSTOM PAGES:
+- Dynamic nav from nav_items table (admin-managed, replaces static HTML)
+- Custom pages created from admin with 8 templates and 11 block types
+- page.html renders custom pages via ?slug= parameter
+- Products auto-assigned to custom pages via page-{slug} category
+- URL rewrite: /p/{slug} → page.html?slug={slug}
 
 DEPLOYMENT:
 - Vercel auto-deploy from GitHub push
@@ -1022,3 +1038,140 @@ The entire site runs client-side with Supabase handling security via RLS.
 9. **Git push = deploy.** Vercel watches your repo. No CI/CD config needed. Push to master = live in 30 seconds.
 
 10. **Don't over-engineer.** This entire website is ~20 HTML files, 2 CSS files, 2 JS files, and 1 SQL file. That's it. No node_modules, no webpack, no Docker.
+
+---
+
+## 15. Navigation System & Custom Pages
+
+### 15.1 Dynamic Navigation
+
+The navbar is managed from the admin panel and stored in the `nav_items` table. On every public page, `brLoadDynamicNav()` replaces the static `<ul class="br-nav-links">` with items from the DB.
+
+**Database table: `nav_items`**
+```sql
+CREATE TABLE nav_items (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  label TEXT NOT NULL,
+  href TEXT NOT NULL DEFAULT '#',
+  parent_id UUID REFERENCES nav_items(id) ON DELETE CASCADE,
+  sort_order INT DEFAULT 0,
+  location TEXT DEFAULT 'main',   -- 'main' or 'footer'
+  target TEXT DEFAULT '_self',
+  icon TEXT,
+  active BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+**How it works (content-loader.js):**
+1. `brLoadDynamicNav()` queries `nav_items WHERE active=true AND location='main'`
+2. Splits into top-level (no parent_id) and children (parent_id set)
+3. Builds `<li>` HTML — dropdowns for items with children, plain links otherwise
+4. Replaces `.br-nav-links` innerHTML
+5. Highlights active link based on current URL
+6. Mobile dropdown toggles use event delegation on `.br-nav-links` (not per-element listeners) so they survive innerHTML replacement
+
+### 15.2 Custom Pages (Page Builder)
+
+Custom pages are created from admin-navigation.html and rendered by page.html.
+
+**Database tables:**
+```sql
+-- Pages
+CREATE TABLE custom_pages (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title TEXT NOT NULL,
+  slug TEXT UNIQUE NOT NULL,
+  description TEXT,
+  meta_description TEXT,
+  template TEXT DEFAULT 'blank',
+  status TEXT DEFAULT 'draft',   -- 'draft' or 'published'
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Blocks (each page has multiple blocks)
+CREATE TABLE page_blocks (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  page_id UUID REFERENCES custom_pages(id) ON DELETE CASCADE,
+  block_type TEXT NOT NULL,
+  content JSONB DEFAULT '{}',
+  sort_order INT DEFAULT 0,
+  active BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+**Block types (11 total):**
+hero, text, image-text, products, gallery, faq, cta, form, html, spacer, section
+
+**Templates (8 total):**
+blank, content, blog, product-showcase, gallery, landing, contact, faq
+
+**Rendering flow (page.html):**
+1. Reads `?slug=` from URL
+2. Fetches page from `custom_pages` + active blocks from `page_blocks`
+3. Calls `brRenderPageBlocks(container, page, blocks)` from content-loader.js
+4. Each block renders using existing CSS classes (br-section, br-hero, br-container, etc.)
+5. Product blocks auto-default category to `page-{slug}` if no explicit category set
+6. If no product block exists but products with category `page-{slug}` exist in DB, a product grid is auto-appended
+
+**URL routing (vercel.json):**
+```json
+{ "source": "/p/:slug", "destination": "/page.html?slug=:slug" }
+```
+So `/p/blog` renders the custom page with slug "blog".
+
+### 15.3 Product Categories → Pages
+
+Products are assigned to pages via the `category` field:
+
+| Category Value | Shows On Page | Type |
+|---------------|---------------|------|
+| `apparel` | product.html | Static |
+| `headgear` | headgear.html | Static |
+| `basicpoly` | basicpoly.html | Static |
+| `stockdesigns` | stockdesigns.html | Static |
+| `sublimation` | sublimationprinting.html | Static |
+| `design` | grapicdesign.html | Static |
+| `logos` | customlogos.html | Static |
+| `wraps` | wrapdesign.html | Static |
+| `page-blog` | /p/blog | Custom Page |
+| `page-{slug}` | /p/{slug} | Custom Page |
+
+The admin product form shows categories in optgroups: "Site Pages" (static pages with their .html filename shown) and "Custom Pages" (loaded dynamically from the `custom_pages` table).
+
+### 15.4 Responsive Navbar (Auto-Adjusting)
+
+The navbar auto-adjusts spacing based on the number of items using CSS `clamp()`:
+
+```css
+/* Nav links spacing scales with viewport */
+.br-nav-links { gap: clamp(0px, 0.3vw, 4px); }
+.br-nav-links > li > a {
+  font-size: clamp(0.7rem, 0.75vw + 0.15rem, 0.85rem);
+  padding: 8px clamp(6px, 0.7vw, 14px);
+}
+.br-nav-menu { gap: clamp(4px, 0.5vw, 8px); flex: 1 1 auto; }
+.br-nav-actions { gap: clamp(6px, 0.6vw, 12px); margin-left: clamp(8px, 1vw, 16px); }
+```
+
+**Breakpoints:**
+- **> 1200px** — Full desktop spacing
+- **1100–1200px** — Reduced padding/font-size for nav items
+- **< 1100px** — Hamburger menu (was 768px, raised to accommodate 8+ items)
+- **< 768px** — Layout adjustments (grids go single-column, etc.)
+
+This means as you add more pages to the navigation, the nav items automatically shrink their padding and font size. When items no longer fit, the hamburger menu kicks in at 1100px instead of waiting until 768px.
+
+---
+
+## 16. Cache Version Tracking
+
+Always bump version numbers when editing shared files:
+
+| File | Current Version | Usage |
+|------|----------------|-------|
+| `overhaul.css` | `?v=7` | All public pages |
+| `content-loader.js` | `?v=15` | All public pages |
+| `supabase-config.js` | `?v=7` | All pages |

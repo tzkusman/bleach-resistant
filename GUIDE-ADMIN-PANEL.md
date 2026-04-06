@@ -1096,6 +1096,7 @@ LAYOUT:
 - Fixed left sidebar (260px, dark navy #1a1a2e background)
   - Brand logo + name at top
   - Navigation links grouped by section (Main, Content, Settings)
+  - Now includes link to Page Builder under Content section
   - Active link highlighted with brand color border
   - User info + sign out button at bottom
 - Main content area (flex:1, light gray #f4f5f7 background)
@@ -1119,7 +1120,7 @@ PAGES NEEDED:
 6. Page Sections — CRUD per page, checklist textarea→JSON, image upload, live preview
 7. Media Library — Drag & drop upload grid, search, detail modal, copy URL
 8. Site Settings — Tabbed interface: business info, branding (color pickers), social, SEO, code injection, maintenance mode, backups
-9. Navigation Editor — Menu links CRUD
+9. Navigation Editor — Menu links CRUD + Page Creator + Block-based Page Builder
 10. Analytics — Stat cards with time range filter
 
 EVERY CRUD PAGE PATTERN:
@@ -1144,10 +1145,41 @@ CSS COMPONENTS:
 - Responsive: sidebar collapses at 768px
 
 DATABASE TABLES:
-[List your tables with columns]
+- orders, contacts, products, hero_slides, category_sections, page_content, site_settings, media, nav_items, custom_pages, page_blocks (11 total)
+
+NAVIGATION SYSTEM (admin-navigation.html — 5 tabs):
+- Tab 1: Navigation — CRUD for nav_items (label, href, parent, sort_order, target). Supports top-level + dropdown children.
+- Tab 2: Pages — List of custom pages with status badges (draft/published), edit/delete.
+- Tab 3: Page Builder — Block-based visual page editor:
+  - 8 templates: blank, content, blog, product-showcase, gallery, landing, contact, faq
+  - 11 block types: hero, text, image-text, products, gallery, faq, cta, form, html, spacer, section
+  - Drag to reorder blocks, inline content editing, live preview
+  - Product grid blocks auto-filter by page-{slug} category
+- Tab 4: Custom Links — External links or anchors
+- Tab 5: Redirects — URL redirect management
+
+CUSTOM PAGES RENDERING (page.html):
+- Reads slug from URL (?slug= or /p/{slug} via Vercel rewrite)
+- Fetches custom_pages + page_blocks from Supabase
+- Calls brRenderPageBlocks() to render blocks using existing CSS classes
+- Auto-appends product grid if products with page-{slug} category exist but no products block is defined
+- Draft preview mode with yellow banner
+
+PRODUCT CATEGORIES:
+- Admin product form shows categories in 2 optgroups:
+  - "Site Pages": 8 static page categories (apparel, headgear, basicpoly, etc.) with .html filename shown
+  - "Custom Pages": dynamically loaded from custom_pages table, uses page-{slug} as category value
+- Products assigned to page-{slug} automatically appear on that custom page
+- Custom category text input still available as fallback
+
+RESPONSIVE NAVBAR:
+- CSS clamp() for auto-adjusting gap, padding, and font-size based on viewport width
+- Hamburger menu triggers at 1100px (raised from 768px to accommodate 8+ nav items)
+- Intermediate breakpoint at 1200px for slightly reduced spacing
+- Event delegation on .br-nav-links for mobile dropdown toggles (survives innerHTML replacement by dynamic nav)
 
 RLS PATTERN:
-- Public SELECT for content tables (products, slides, sections, settings)
+- Public SELECT for content tables (products, slides, sections, settings, nav_items, published custom_pages/page_blocks)
 - Admin (auth.email() = 'admin@email.com') for ALL operations
 - Anon INSERT for orders and contacts (public forms)
 
