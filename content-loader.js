@@ -458,13 +458,22 @@
           btns += '<a href="' + esc(s.btn2_link || '#') + '" class="br-btn br-btn-' + (s.btn2_style || 'white') + ' br-btn-lg">' + esc(s.btn2_text) + '</a>';
         }
 
+        var imageHtml = '';
+        if (s.image_url) {
+          imageHtml = '<div class="br-hero-image"><img src="' + esc(s.image_url) + '" alt="' + esc(s.title || '') + '" loading="lazy"></div>';
+        }
+
+        var innerWrapper = s.image_url ? 'br-hero-split' : '';
         div.innerHTML =
           '<div class="br-hero-slide-bg" style="' + bgStyle + '"></div>' +
-          '<div class="br-container"><div class="br-hero-content">' +
-            badges +
-            '<h1>' + title + '</h1>' +
-            (s.subtitle ? '<p>' + esc(s.subtitle) + '</p>' : '') +
-            (btns ? '<div class="br-btn-group">' + btns + '</div>' : '') +
+          '<div class="br-container"><div class="' + (innerWrapper ? 'br-hero-split' : '') + '">' +
+            '<div class="br-hero-content">' +
+              badges +
+              '<h1>' + title + '</h1>' +
+              (s.subtitle ? '<p>' + esc(s.subtitle) + '</p>' : '') +
+              (btns ? '<div class="br-btn-group">' + btns + '</div>' : '') +
+            '</div>' +
+            imageHtml +
           '</div></div>';
 
         hero.appendChild(div);

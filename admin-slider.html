@@ -164,6 +164,20 @@
           </div>
         </div>
 
+        <!-- Product / Showcase Image -->
+        <div class="form-group">
+          <label>Product Image (shown on right side of slide)</label>
+          <div style="display:flex;gap:12px;align-items:flex-start;">
+            <div style="flex:1;">
+              <input type="file" id="slide-image-file" accept="image/*" style="margin-bottom:8px;">
+              <input type="text" id="slide-image-url" placeholder="Or paste image URL..." style="font-size:12px;">
+            </div>
+            <div id="slide-image-preview" style="width:120px;height:90px;border-radius:8px;overflow:hidden;background:#f0f0f0;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <span style="font-size:11px;color:#aaa;">No image</span>
+            </div>
+          </div>
+        </div>
+
         <div class="form-group" style="display:flex;align-items:center;gap:10px;">
           <input type="checkbox" id="slide-active" checked style="width:auto;">
           <label for="slide-active" style="margin:0;cursor:pointer;">Active (visible on site)</label>
@@ -248,7 +262,7 @@
               </div>
               <div style="font-size:12px;color:#888;">${brEscapeHtml(s.subtitle || '').substring(0, 80)}${(s.subtitle||'').length > 80 ? '...' : ''}</div>
               ${badges.length ? '<div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:4px;">' + badges.map(b => '<span style="font-size:10px;background:#f0f0f0;padding:2px 8px;border-radius:10px;">' + brEscapeHtml(b) + '</span>').join('') + '</div>' : ''}
-              <div style="font-size:11px;color:#bbb;margin-top:6px;">Order: ${s.sort_order} &middot; ${s.btn1_text ? 'Btn1: ' + brEscapeHtml(s.btn1_text) : 'No buttons'}</div>
+              <div style="font-size:11px;color:#bbb;margin-top:6px;">Order: ${s.sort_order} &middot; ${s.btn1_text ? 'Btn1: ' + brEscapeHtml(s.btn1_text) : 'No buttons'}${s.image_url ? ' &middot; &#x1F5BC; Has image' : ''}</div>
             </div>
             <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
               <button class="btn btn-sm btn-secondary" onclick="editSlide('${s.id}')">Edit</button>
@@ -283,6 +297,15 @@
       document.getElementById('slide-btn2-style').value = slide ? slide.btn2_style || 'white' : 'white';
       document.getElementById('slide-sort').value = slide ? slide.sort_order || 0 : allSlides.length;
       document.getElementById('slide-active').checked = slide ? slide.active !== false : true;
+      document.getElementById('slide-image-url').value = slide ? slide.image_url || '' : '';
+      document.getElementById('slide-image-file').value = '';
+      // Image preview
+      const preview = document.getElementById('slide-image-preview');
+      if (slide && slide.image_url) {
+        preview.innerHTML = '<img src="' + slide.image_url + '" style="width:100%;height:100%;object-fit:cover;">';
+      } else {
+        preview.innerHTML = '<span style="font-size:11px;color:#aaa;">No image</span>';
+      }
       updatePreview();
       document.getElementById('modal-overlay').classList.add('active');
     }
@@ -333,26 +356,61 @@
     });
     document.getElementById('slide-bg-type').addEventListener('change', updatePreview);
 
+    // Image file picker — preview and URL auto-fill
+    document.getElementById('slide-image-file').addEventListener('change', function() {
+      const file = this.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        document.getElementById('slide-image-preview').innerHTML =
+          '<img src="' + e.target.result + '" style="width:100%;height:100%;object-fit:cover;">';
+      };
+      reader.readAsDataURL(file);
+    });
+    document.getElementById('slide-image-url').addEventListener('input', function() {
+      const url = this.value.trim();
+      const preview = document.getElementById('slide-image-preview');
+      if (url) {
+        preview.innerHTML = '<img src="' + url + '" style="width:100%;height:100%;object-fit:cover;" onerror="this.parentElement.innerHTML=\'<span style=\\\'font-size:11px;color:#aaa;\\\'>Invalid URL</span>\'">';
+      } else {
+        preview.innerHTML = '<span style="font-size:11px;color:#aaa;">No image</span>';
+      }
+    });
+
     async function saveSlide() {
       const id = document.getElementById('slide-id').value;
       const badges = document.getElementById('slide-badges').value.split('\n').map(b => b.trim()).filter(Boolean);
 
-      const data = {
-        title: document.getElementById('slide-title').value.trim(),
-        highlight: document.getElementById('slide-highlight').value.trim() || null,
-        subtitle: document.getElementById('slide-subtitle').value.trim() || null,
-        badges: badges,
-        bg_type: document.getElementById('slide-bg-type').value,
-        bg_value: document.getElementById('slide-bg-value').value.trim() || null,
-        btn1_text: document.getElementById('slide-btn1-text').value.trim() || null,
-        btn1_link: document.getElementById('slide-btn1-link').value.trim() || null,
-        btn1_style: document.getElementById('slide-btn1-style').value,
-        btn2_text: document.getElementById('slide-btn2-text').value.trim() || null,
-        btn2_link: document.getElementById('slide-btn2-link').value.trim() || null,
-        btn2_style: document.getElementById('slide-btn2-style').value,
-        sort_order: parseInt(document.getElementById('slide-sort').value) || 0,
-        active: document.getElementById('slide-active').checked
-      };
+      const btn = document.getElementById('save-slide-btn');
+      btn.disabled = true;
+      btn.textContent = 'Saving...';
+
+      try {
+        // Handle image upload
+        let imageUrl = document.getElementById('slide-image-url').value.trim() || null;
+        const imageFile = document.getElementById('slide-image-file').files[0];
+        if (imageFile) {
+          const uploaded = await brUploadFile('media', imageFile, 'slides');
+          imageUrl = uploaded.url;
+        }
+
+        const data = {
+          title: document.getElementById('slide-title').value.trim(),
+          highlight: document.getElementById('slide-highlight').value.trim() || null,
+          subtitle: document.getElementById('slide-subtitle').value.trim() || null,
+          badges: badges,
+          bg_type: document.getElementById('slide-bg-type').value,
+          bg_value: document.getElementById('slide-bg-value').value.trim() || null,
+          btn1_text: document.getElementById('slide-btn1-text').value.trim() || null,
+          btn1_link: document.getElementById('slide-btn1-link').value.trim() || null,
+          btn1_style: document.getElementById('slide-btn1-style').value,
+          btn2_text: document.getElementById('slide-btn2-text').value.trim() || null,
+          btn2_link: document.getElementById('slide-btn2-link').value.trim() || null,
+          btn2_style: document.getElementById('slide-btn2-style').value,
+          image_url: imageUrl,
+          sort_order: parseInt(document.getElementById('slide-sort').value) || 0,
+          active: document.getElementById('slide-active').checked
+        };
 
       if (!data.title) { showToast('Title is required', 'error'); return; }
 

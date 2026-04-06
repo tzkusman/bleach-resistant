@@ -359,6 +359,42 @@ p { margin-bottom: 1rem; }
   max-width: 650px;
   padding: 60px 0;
 }
+/* Hero split layout — text left, image right */
+.br-hero-split {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  padding: 60px 0;
+  width: 100%;
+}
+.br-hero-split .br-hero-content {
+  flex: 1;
+  padding: 0;
+}
+.br-hero-image {
+  flex: 0 0 42%;
+  max-width: 480px;
+  position: relative;
+}
+.br-hero-image img {
+  width: 100%;
+  height: auto;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  object-fit: cover;
+  animation: heroImageFloat 6s ease-in-out infinite;
+}
+@keyframes heroImageFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+@media (max-width: 768px) {
+  .br-hero-split { flex-direction: column; gap: 24px; }
+  .br-hero-image { flex: none; max-width: 320px; width: 80%; order: -1; }
+  .br-hero-image img { border-radius: 12px; }
+}
 .br-hero h1 {
   font-size: clamp(2.5rem, 6vw, 4rem);
   font-weight: 900;

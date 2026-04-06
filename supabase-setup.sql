@@ -360,9 +360,13 @@ CREATE TABLE IF NOT EXISTS hero_slides (
   btn2_text    TEXT,
   btn2_link    TEXT,
   btn2_style   TEXT DEFAULT 'white',
+  image_url    TEXT,                   -- product/showcase image displayed on right side of slide
   sort_order   INTEGER DEFAULT 0,
   active       BOOLEAN DEFAULT true
 );
+
+-- Migration: add image_url if table already exists
+ALTER TABLE hero_slides ADD COLUMN IF NOT EXISTS image_url TEXT;
 
 -- Auto-update updated_at
 CREATE OR REPLACE FUNCTION update_hero_slides_updated_at()
