@@ -768,15 +768,19 @@
 
         case 'products':
           var gridId = 'pg-' + block.id.replace(/-/g,'').substring(0,8);
+          // If no explicit category and we have a page slug, auto-filter by page-{slug}
+          var prodCat = c.category || (page && page.slug ? 'page-' + page.slug : '');
           html += '<section class="br-section' + alt + '"><div class="br-container">';
           if (c.heading) html += '<h2 class="br-section-title" style="text-align:center;margin-bottom:32px">' + sanitize(c.heading) + '</h2>';
           html += '<div class="br-products-grid" id="' + gridId + '"></div></div></section>';
           // Schedule product loading after render
-          setTimeout(function() {
-            if (typeof window.brLoadProducts === 'function') {
-              window.brLoadProducts(gridId, { category: c.category, featured: c.featured_only, limit: c.limit || 12 });
-            }
-          }, 100);
+          (function(gid, cat, feat, lim) {
+            setTimeout(function() {
+              if (typeof window.brLoadProducts === 'function') {
+                window.brLoadProducts(gid, { category: cat, featured: feat, limit: lim || 12 });
+              }
+            }, 100);
+          })(gridId, prodCat, c.featured_only, c.limit);
           break;
 
         case 'gallery':

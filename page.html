@@ -137,7 +137,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js?v=7"></script>
-  <script src="content-loader.js?v=14"></script>
+  <script src="content-loader.js?v=15"></script>
   <script>
   /* ================================================================
      DYNAMIC PAGE RENDERER
@@ -183,6 +183,22 @@
       } else {
         // Fallback if brRenderPageBlocks not available yet
         main.innerHTML = '<div class="br-section"><div class="br-container"><h2>' + esc(page.title) + '</h2><p>' + esc(page.description || '') + '</p></div></div>';
+      }
+
+      // Auto-append product grid if products assigned to this page exist but no products block was rendered
+      var hasProductBlock = blocks.some(function(b) { return b.block_type === 'products'; });
+      if (!hasProductBlock) {
+        var pageCat = 'page-' + slug;
+        var prodCheck = await db.from('products').select('id', { count: 'exact', head: true }).eq('active', true).eq('category', pageCat);
+        if (prodCheck.count && prodCheck.count > 0) {
+          var autoGridId = 'auto-products-' + slug;
+          var section = document.createElement('div');
+          section.innerHTML = '<section class="br-section"><div class="br-container"><h2 class="br-section-title" style="text-align:center;margin-bottom:32px">Products</h2><div class="br-products-grid" id="' + autoGridId + '"></div></div></section>';
+          main.appendChild(section.firstElementChild);
+          if (typeof window.brLoadProducts === 'function') {
+            window.brLoadProducts(autoGridId, { category: pageCat });
+          }
+        }
       }
 
       // If preview, show banner
