@@ -558,39 +558,70 @@
       }
     };
 
-    /* ── Dynamic Categories ─────────────────────────────── */
-    var DEFAULT_CATS = [
-      {value:'apparel',label:'Apparel'},{value:'headgear',label:'Head Gear'},
-      {value:'basicpoly',label:'Basic Poly'},{value:'stockdesigns',label:'Stock Designs'},
-      {value:'sublimation',label:'Sublimation'},{value:'design',label:'Graphic Design'},
-      {value:'logos',label:'Custom Logos'},{value:'wraps',label:'Vehicle Wraps'}
+    /* ── Dynamic Categories (page-mapped + custom pages) ── */
+    var PAGE_CATS = [
+      {value:'apparel',label:'Apparel',page:'product.html'},
+      {value:'headgear',label:'Head Gear',page:'headgear.html'},
+      {value:'basicpoly',label:'Basic Poly',page:'basicpoly.html'},
+      {value:'stockdesigns',label:'Stock Designs',page:'stockdesigns.html'},
+      {value:'sublimation',label:'Sublimation',page:'sublimationprinting.html'},
+      {value:'design',label:'Graphic Design',page:'grapicdesign.html'},
+      {value:'logos',label:'Custom Logos',page:'customlogos.html'},
+      {value:'wraps',label:'Vehicle Wraps',page:'wrapdesign.html'}
     ];
+    var customPageCats = [];
+
+    async function loadCustomPageCats() {
+      try {
+        var r = await db.from('custom_pages').select('title,slug').order('title');
+        customPageCats = (r.data || []).map(function(p) {
+          return { value: 'page-' + p.slug, label: p.title, page: 'p/' + p.slug };
+        });
+      } catch(e) { customPageCats = []; }
+    }
 
     function populateCategoryDropdowns() {
-      // Merge defaults with any categories found in existing products
-      var cats = DEFAULT_CATS.map(function(c) { return c.value; });
-      var labels = {};
-      DEFAULT_CATS.forEach(function(c) { labels[c.value] = c.label; });
+      // Build full list: defaults + product-found cats + custom pages
+      var cats = PAGE_CATS.slice();
+      var knownValues = cats.map(function(c) { return c.value; });
+
+      // Add categories from existing products not in defaults
       allProducts.forEach(function(p) {
-        if (p.category && cats.indexOf(p.category) === -1) {
-          cats.push(p.category);
-          labels[p.category] = p.category.charAt(0).toUpperCase() + p.category.slice(1);
+        if (p.category && knownValues.indexOf(p.category) === -1) {
+          cats.push({ value: p.category, label: p.category.charAt(0).toUpperCase() + p.category.slice(1), page: '' });
+          knownValues.push(p.category);
         }
       });
-      cats.sort(function(a,b) { return (labels[a]||a).localeCompare(labels[b]||b); });
+
+      // Sort site pages alphabetically
+      cats.sort(function(a,b) { return a.label.localeCompare(b.label); });
+
+      // Build options HTML
+      var siteOpts = cats.map(function(c) {
+        var suffix = c.page ? ' (' + c.page + ')' : '';
+        return '<option value="'+brEscapeHtml(c.value)+'">'+brEscapeHtml(c.label)+suffix+'</option>';
+      }).join('');
+
+      var customOpts = '';
+      if (customPageCats.length > 0) {
+        customOpts = '<optgroup label="Custom Pages">' +
+          customPageCats.map(function(c) {
+            return '<option value="'+brEscapeHtml(c.value)+'">'+brEscapeHtml(c.label)+' (/'+c.page+')</option>';
+          }).join('') + '</optgroup>';
+      }
 
       // Filter dropdown
       var filter = document.getElementById('filter-category');
       var filterVal = filter.value;
       filter.innerHTML = '<option value="">All Categories</option>' +
-        cats.map(function(c) { return '<option value="'+c+'">'+brEscapeHtml(labels[c]||c)+'</option>'; }).join('');
+        '<optgroup label="Site Pages">' + siteOpts + '</optgroup>' + customOpts;
       filter.value = filterVal;
 
       // Modal form dropdown
       var form = document.getElementById('pf-category');
       var formVal = form.value;
       form.innerHTML = '<option value="">Select category</option>' +
-        cats.map(function(c) { return '<option value="'+c+'">'+brEscapeHtml(labels[c]||c)+'</option>'; }).join('');
+        '<optgroup label="Site Pages">' + siteOpts + '</optgroup>' + customOpts;
       form.value = formVal;
     }
 
@@ -600,7 +631,6 @@
       if (v) {
         var slug = v.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
         var sel = document.getElementById('pf-category');
-        // Add it as an option if not present
         var exists = Array.from(sel.options).find(function(o) { return o.value === slug; });
         if (!exists) {
           var opt = document.createElement('option');
@@ -620,7 +650,7 @@
         document.getElementById('user-name').textContent = name;
         document.getElementById('user-email').textContent = user.email;
         document.getElementById('user-avatar').textContent = name.charAt(0).toUpperCase();
-        await loadProducts();
+        await Promise.all([loadProducts(), loadCustomPageCats()]);
         populateCategoryDropdowns();
       } catch (err) {
         if (err.message !== 'Not authenticated') console.error(err);
