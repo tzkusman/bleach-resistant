@@ -656,4 +656,247 @@
     });
   })();
 
+  /* ── DYNAMIC NAVIGATION FROM DB ──────────────────────────── */
+  // If nav_items exist in DB, replace the static .br-nav-links HTML
+  window.brLoadDynamicNav = async function() {
+    if (typeof db === 'undefined') return;
+    try {
+      var result = await db.from('nav_items').select('*').eq('active', true).eq('location', 'main').order('sort_order');
+      if (result.error) throw result.error;
+      var items = result.data || [];
+      if (items.length === 0) return; // keep static HTML nav
+
+      var navLinks = document.querySelector('.br-nav-links');
+      if (!navLinks) return;
+
+      var topLevel = items.filter(function(i) { return !i.parent_id; });
+      var children = items.filter(function(i) { return i.parent_id; });
+      topLevel.sort(function(a,b) { return (a.sort_order||0) - (b.sort_order||0); });
+
+      var svgArrow = '<svg width="10" height="6" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>';
+      var html = '<li><a href="home.html">Home</a></li>';
+
+      topLevel.forEach(function(item) {
+        var kids = children.filter(function(c) { return c.parent_id === item.id; });
+        kids.sort(function(a,b) { return (a.sort_order||0) - (b.sort_order||0); });
+        var hrefAttr = ' href="' + item.href.replace(/"/g, '&quot;') + '"';
+        var targetAttr = item.target === '_blank' ? ' target="_blank" rel="noopener"' : '';
+
+        if (kids.length > 0) {
+          html += '<li class="br-dropdown"><a' + hrefAttr + '>' + (item.label||'').replace(/</g,'&lt;') + ' ' + svgArrow + '</a><ul class="br-dropdown-menu">';
+          kids.forEach(function(k) {
+            var kt = k.target === '_blank' ? ' target="_blank" rel="noopener"' : '';
+            html += '<li><a href="' + (k.href||'#').replace(/"/g,'&quot;') + '"' + kt + '>' + (k.label||'').replace(/</g,'&lt;') + '</a></li>';
+          });
+          html += '</ul></li>';
+        } else {
+          html += '<li><a' + hrefAttr + targetAttr + '>' + (item.label||'').replace(/</g,'&lt;') + '</a></li>';
+        }
+      });
+
+      navLinks.innerHTML = html;
+
+      // Re-set active link
+      var cp = window.location.pathname.split('/').pop() || 'home.html';
+      navLinks.querySelectorAll('a').forEach(function(a) {
+        if (a.getAttribute('href') === cp) a.classList.add('active');
+      });
+
+      // Re-bind mobile dropdown toggles
+      navLinks.querySelectorAll('.br-dropdown > a').forEach(function(link) {
+        link.addEventListener('click', function(e) {
+          if (window.innerWidth <= 768) {
+            e.preventDefault();
+            var parent = link.parentElement;
+            navLinks.querySelectorAll('.br-dropdown.open').forEach(function(d) { if (d !== parent) d.classList.remove('open'); });
+            parent.classList.toggle('open');
+          }
+        });
+      });
+    } catch(e) {
+      console.warn('[dynamic-nav]', e.message);
+    }
+  };
+
+  // Auto-invoke on non-admin public pages
+  if (typeof db !== 'undefined' && currentPage.indexOf('admin') !== 0 && currentPage !== 'login.html' && currentPage !== 'signup.html') {
+    window.brLoadDynamicNav();
+  }
+
+  /* ── RENDER PAGE BLOCKS (for custom pages) ───────────────── */
+  // Renders an array of page_blocks into a container element
+  window.brRenderPageBlocks = function(container, page, blocks) {
+    if (!container) return;
+    var html = '';
+
+    blocks.forEach(function(block, idx) {
+      var c = block.content || {};
+      var alt = idx % 2 === 1 ? ' br-section-alt' : '';
+
+      switch (block.block_type) {
+        case 'hero':
+          var bgStyle = '';
+          if (c.bg_type === 'image' && c.bg_value) bgStyle = 'background:url(' + c.bg_value.replace(/"/g,'') + ') center/cover no-repeat';
+          else if (c.bg_type === 'color') bgStyle = 'background:' + (c.bg_value || '#1a1a2e');
+          else bgStyle = 'background:' + (c.bg_value || 'linear-gradient(135deg,#1a1a2e,#0f3460)');
+          html += '<section class="br-hero" style="min-height:45vh;display:flex;align-items:center;' + bgStyle + '">' +
+            '<div class="br-hero-slide active" style="position:relative">' +
+            '<div class="br-container" style="position:relative;z-index:2;text-align:center;color:#fff;padding:60px 20px">';
+          if (c.title) html += '<h1 style="font-size:clamp(2rem,5vw,3.5rem);font-weight:900;margin-bottom:16px">' + sanitize(c.title) + '</h1>';
+          if (c.subtitle) html += '<p style="font-size:clamp(1rem,2vw,1.25rem);opacity:.9;max-width:700px;margin:0 auto 24px">' + sanitize(c.subtitle) + '</p>';
+          if (c.btn1_text || c.btn2_text) {
+            html += '<div class="br-btn-group" style="justify-content:center">';
+            if (c.btn1_text) html += '<a href="' + esc(c.btn1_link||'#') + '" class="br-btn br-btn-primary br-btn-lg">' + sanitize(c.btn1_text) + '</a>';
+            if (c.btn2_text) html += '<a href="' + esc(c.btn2_link||'#') + '" class="br-btn br-btn-outline br-btn-lg">' + sanitize(c.btn2_text) + '</a>';
+            html += '</div>';
+          }
+          html += '</div></div></section>';
+          break;
+
+        case 'text':
+          html += '<section class="br-section' + alt + '"><div class="br-container" style="max-width:800px;text-align:' + (c.align||'left') + '">';
+          if (c.heading) html += '<h2 class="br-section-title">' + sanitize(c.heading) + '</h2>';
+          if (c.body) html += '<div class="br-text-content" style="line-height:1.8;font-size:1.05rem">' + c.body + '</div>';
+          html += '</div></section>';
+          break;
+
+        case 'image-text':
+          var reversed = c.image_position === 'left';
+          html += '<section class="br-section' + alt + '"><div class="br-container"><div class="br-category-hero"' + (reversed ? ' style="direction:rtl"' : '') + '><div' + (reversed ? ' style="direction:ltr"' : '') + '>';
+          if (c.label) html += '<span class="br-label">' + sanitize(c.label) + '</span>';
+          if (c.heading) html += '<h2>' + sanitize(c.heading) + '</h2>';
+          if (c.description) html += '<p>' + sanitize(c.description) + '</p>';
+          if (c.checklist && c.checklist.length > 0) {
+            html += '<ul class="br-checklist">' + c.checklist.map(function(item) { return '<li>' + sanitize(item) + '</li>'; }).join('') + '</ul>';
+          }
+          if (c.btn_text) html += '<div class="br-btn-group"><a href="' + esc(c.btn_link||'#') + '" class="br-btn br-btn-primary">' + sanitize(c.btn_text) + '</a></div>';
+          html += '</div>';
+          if (c.image_url) html += '<div class="br-category-image"' + (reversed ? ' style="direction:ltr"' : '') + '><img src="' + esc(c.image_url) + '" alt="' + esc(c.heading||'') + '" loading="lazy"></div>';
+          html += '</div></div></section>';
+          break;
+
+        case 'products':
+          var gridId = 'pg-' + block.id.replace(/-/g,'').substring(0,8);
+          html += '<section class="br-section' + alt + '"><div class="br-container">';
+          if (c.heading) html += '<h2 class="br-section-title" style="text-align:center;margin-bottom:32px">' + sanitize(c.heading) + '</h2>';
+          html += '<div class="br-products-grid" id="' + gridId + '"></div></div></section>';
+          // Schedule product loading after render
+          setTimeout(function() {
+            if (typeof window.brLoadProducts === 'function') {
+              window.brLoadProducts(gridId, { category: c.category, featured: c.featured_only, limit: c.limit || 12 });
+            }
+          }, 100);
+          break;
+
+        case 'gallery':
+          var cols = c.columns || 3;
+          var images = c.images || [];
+          html += '<section class="br-section' + alt + '"><div class="br-container">';
+          if (c.heading) html += '<h2 class="br-section-title" style="text-align:center;margin-bottom:32px">' + sanitize(c.heading) + '</h2>';
+          html += '<div class="block-gallery block-gallery-' + cols + '">';
+          images.forEach(function(img) {
+            var url = typeof img === 'string' ? img : img.url;
+            var caption = typeof img === 'string' ? '' : img.caption || '';
+            html += '<div><img src="' + esc(url) + '" alt="' + esc(caption) + '" loading="lazy">';
+            if (caption) html += '<p style="text-align:center;font-size:13px;color:#888;margin-top:8px">' + sanitize(caption) + '</p>';
+            html += '</div>';
+          });
+          html += '</div></div></section>';
+          break;
+
+        case 'faq':
+          var items = c.items || [];
+          html += '<section class="br-section' + alt + '"><div class="br-container" style="max-width:800px">';
+          if (c.heading) html += '<h2 class="br-section-title" style="text-align:center;margin-bottom:32px">' + sanitize(c.heading) + '</h2>';
+          html += '<div class="br-faq-list">';
+          items.forEach(function(item) {
+            html += '<div class="br-faq-item"><button class="br-faq-question">' + sanitize(item.question) + '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button><div class="br-faq-answer"><p>' + sanitize(item.answer) + '</p></div></div>';
+          });
+          html += '</div></div></section>';
+          break;
+
+        case 'cta':
+          html += '<section class="br-cta-banner" style="background:' + (c.bg_color || '#1a1a2e') + ';padding:60px 20px;text-align:center;color:#fff"><div class="br-container">';
+          if (c.heading) html += '<h2 style="font-size:clamp(1.5rem,3vw,2.5rem);margin-bottom:12px">' + sanitize(c.heading) + '</h2>';
+          if (c.subtitle) html += '<p style="font-size:1.1rem;opacity:.9;margin-bottom:24px">' + sanitize(c.subtitle) + '</p>';
+          if (c.btn_text) html += '<a href="' + esc(c.btn_link||'#') + '" class="br-btn br-btn-primary br-btn-lg">' + sanitize(c.btn_text) + '</a>';
+          html += '</div></section>';
+          break;
+
+        case 'form':
+          html += '<section class="br-section' + alt + '"><div class="br-container" style="max-width:700px">';
+          if (c.heading) html += '<h2 class="br-section-title" style="text-align:center;margin-bottom:8px">' + sanitize(c.heading) + '</h2>';
+          if (c.subtitle) html += '<p style="text-align:center;color:#888;margin-bottom:32px">' + sanitize(c.subtitle) + '</p>';
+          html += '<form class="block-contact-form" onsubmit="return brSubmitBlockForm(event,this)">' +
+            '<div class="form-row"><label>Name</label><input type="text" name="name" required placeholder="Your name"></div>' +
+            '<div class="form-row"><label>Email</label><input type="email" name="email" required placeholder="your@email.com"></div>' +
+            '<div class="form-row"><label>Message</label><textarea name="message" rows="5" required placeholder="How can we help?"></textarea></div>' +
+            '<button type="submit" class="br-btn br-btn-primary br-btn-lg" style="width:100%">Send Message</button>' +
+            '</form>';
+          html += '</div></section>';
+          break;
+
+        case 'html':
+          html += '<section class="br-section' + alt + '"><div class="br-container">' + (c.code || '') + '</div></section>';
+          break;
+
+        case 'spacer':
+          html += '<div style="height:' + (parseInt(c.height) || 60) + 'px"></div>';
+          break;
+
+        case 'section':
+          var secId = 'cs-' + block.id.replace(/-/g,'').substring(0,8);
+          html += '<div id="' + secId + '"></div>';
+          if (c.section_label) {
+            setTimeout(function() {
+              if (typeof window.brLoadCategorySection === 'function') {
+                window.brLoadCategorySection(secId, c.section_label);
+              }
+            }, 100);
+          }
+          break;
+
+        default:
+          html += '<section class="br-section"><div class="br-container"><p style="color:#888">[Unknown block: ' + sanitize(block.block_type) + ']</p></div></section>';
+      }
+    });
+
+    container.innerHTML = html;
+
+    // Bind FAQ accordion toggles
+    container.querySelectorAll('.br-faq-question').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var item = this.closest('.br-faq-item');
+        var wasActive = item.classList.contains('active');
+        container.querySelectorAll('.br-faq-item').forEach(function(i) { i.classList.remove('active'); });
+        if (!wasActive) item.classList.add('active');
+      });
+    });
+
+    // Trigger scroll animations
+    container.querySelectorAll('[data-animate]').forEach(function(el) {
+      if (typeof animObserver !== 'undefined') animObserver.observe(el);
+    });
+
+    function esc(s) { return s ? s.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : ''; }
+    function sanitize(s) { return s ? s.replace(/</g,'&lt;').replace(/>/g,'&gt;') : ''; }
+  };
+
+  // Contact form handler for block forms
+  window.brSubmitBlockForm = async function(e, form) {
+    e.preventDefault();
+    var name = form.querySelector('[name="name"]').value.trim();
+    var email = form.querySelector('[name="email"]').value.trim();
+    var message = form.querySelector('[name="message"]').value.trim();
+    if (!name || !email || !message) return false;
+    try {
+      var r = await db.from('contacts').insert({ name: name, email: email, message: message, page_source: window.location.pathname.split('/').pop() || 'custom-page' });
+      if (r.error) throw r.error;
+      form.innerHTML = '<div style="text-align:center;padding:40px"><h3 style="color:#8DC63F">&#9989; Message Sent!</h3><p style="color:#888;margin-top:8px">Thanks ' + name.replace(/</g,'&lt;') + '! We\'ll get back to you soon.</p></div>';
+    } catch(err) {
+      alert('Error sending message: ' + err.message);
+    }
+    return false;
+  };
+
 })();

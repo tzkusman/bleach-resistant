@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="page-title">Loading&#x2026; &#x2014; Bleach Resistant</title>
+  <meta name="description" id="page-meta-desc" content="">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="overhaul.css?v=6">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-BKMJVM1TY0"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-BKMJVM1TY0');</script>
+  <style>
+    .page-loading{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:50vh;gap:16px;color:#888}
+    .page-loading .spinner{width:40px;height:40px;border:4px solid #eee;border-top-color:#C7065C;border-radius:50%;animation:spin .8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .page-error{text-align:center;padding:80px 20px;min-height:50vh}
+    .page-error h2{font-size:2rem;margin-bottom:12px}
+    .page-error p{color:#888;margin-bottom:24px}
+    .block-gallery{display:grid;gap:12px}
+    .block-gallery img{width:100%;border-radius:10px;object-fit:cover}
+    .block-gallery-2{grid-template-columns:repeat(2,1fr)}
+    .block-gallery-3{grid-template-columns:repeat(3,1fr)}
+    .block-gallery-4{grid-template-columns:repeat(4,1fr)}
+    @media(max-width:768px){.block-gallery-3,.block-gallery-4{grid-template-columns:repeat(2,1fr)}}
+    .block-contact-form{max-width:600px;margin:0 auto}
+    .block-contact-form .form-row{margin-bottom:16px}
+    .block-contact-form label{display:block;font-size:12px;font-weight:700;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px;color:#555}
+    .block-contact-form input,.block-contact-form textarea{width:100%;padding:12px 16px;border:1px solid #ddd;border-radius:8px;font-size:14px;font-family:inherit;box-sizing:border-box}
+    .block-contact-form input:focus,.block-contact-form textarea:focus{border-color:#C7065C;outline:none;box-shadow:0 0 0 3px rgba(199,6,92,.1)}
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="br-nav" id="navbar">
+    <div class="br-container">
+      <a href="home.html" class="br-logo">
+        <img src="favicon.svg" alt="BR" class="br-logo-icon">
+        <span>Bleach<strong>Resistant</strong></span>
+      </a>
+      <button class="br-nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="br-nav-menu" id="navMenu">
+        <ul class="br-nav-links">
+          <li><a href="home.html">Home</a></li>
+          <li class="br-dropdown">
+            <a href="product.html">Products <svg width="10" height="6" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></a>
+            <ul class="br-dropdown-menu">
+              <li><a href="headgear.html">Head Gear</a></li>
+              <li><a href="basicpoly.html">Basic Poly</a></li>
+              <li><a href="stockdesigns.html">Stock Designs</a></li>
+              <li><a href="fabricdescriptions.html">Fabric Guide</a></li>
+              <li><a href="sublimationprinting.html">Sublimation Printing</a></li>
+            </ul>
+          </li>
+          <li class="br-dropdown">
+            <a href="services.html">Services <svg width="10" height="6" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></a>
+            <ul class="br-dropdown-menu">
+              <li><a href="grapicdesign.html">Graphic Design</a></li>
+              <li><a href="customlogos.html">Custom Logos</a></li>
+              <li><a href="wrapdesign.html">Vehicle Wraps</a></li>
+            </ul>
+          </li>
+          <li><a href="copyofwashingsamples.html">Gallery</a></li>
+          <li><a href="About.html">About</a></li>
+          <li><a href="FAQs.html">FAQs</a></li>
+        </ul>
+        <div class="br-nav-actions">
+          <a href="order.html" class="br-btn br-btn-primary br-btn-sm">Order Now</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Page Content (rendered from DB blocks) -->
+  <main id="page-content">
+    <div class="page-loading" id="page-loader">
+      <div class="spinner"></div>
+      <p>Loading page&#x2026;</p>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="br-footer">
+    <div class="br-container">
+      <div class="br-footer-grid">
+        <div class="br-footer-brand">
+          <a href="home.html" class="br-logo"><img src="favicon.svg" alt="BR" class="br-logo-icon"><span>Bleach<strong>Resistant</strong></span></a>
+          <p>Premium custom sublimation printing. Affordable quality apparel for teams, businesses, and individuals in Guelph, Ontario and beyond.</p>
+        </div>
+        <div class="br-footer-links">
+          <h4>Products</h4>
+          <ul>
+            <li><a href="product.html">All Products</a></li>
+            <li><a href="headgear.html">Head Gear</a></li>
+            <li><a href="basicpoly.html">Basic Poly</a></li>
+            <li><a href="stockdesigns.html">Stock Designs</a></li>
+            <li><a href="sublimationprinting.html">Sublimation</a></li>
+          </ul>
+        </div>
+        <div class="br-footer-links">
+          <h4>Services</h4>
+          <ul>
+            <li><a href="services.html">All Services</a></li>
+            <li><a href="grapicdesign.html">Graphic Design</a></li>
+            <li><a href="customlogos.html">Custom Logos</a></li>
+            <li><a href="wrapdesign.html">Vehicle Wraps</a></li>
+            <li><a href="sizechart.html">Size Chart</a></li>
+          </ul>
+        </div>
+        <div class="br-footer-links">
+          <h4>Company</h4>
+          <ul>
+            <li><a href="About.html">About Us</a></li>
+            <li><a href="FAQs.html">FAQs</a></li>
+            <li><a href="order.html">Get a Quote</a></li>
+            <li><a href="privacypolicy.html">Privacy Policy</a></li>
+            <li><a href="termsconditions.html">Terms &amp; Conditions</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="br-footer-bottom">
+        <p>&copy; 2026 Bleach Resistant. All rights reserved.</p>
+        <div class="br-footer-bottom-links">
+          <a href="privacypolicy.html">Privacy</a>
+          <a href="termsconditions.html">Terms</a>
+          <a href="sitemap.xml">Sitemap</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js?v=7"></script>
+  <script src="content-loader.js?v=13"></script>
+  <script>
+  /* ================================================================
+     DYNAMIC PAGE RENDERER
+     Reads slug from URL, fetches custom_pages + page_blocks from
+     Supabase, then renders each block using brRenderPageBlocks().
+     ================================================================ */
+  (async function() {
+    var params = new URLSearchParams(window.location.search);
+    var slug = params.get('slug');
+    var isPreview = params.get('preview') === '1';
+    var main = document.getElementById('page-content');
+    var loader = document.getElementById('page-loader');
+
+    if (!slug) {
+      main.innerHTML = '<div class="page-error"><h2>Page Not Found</h2><p>No page slug specified.</p><a href="home.html" class="br-btn br-btn-primary">Go Home</a></div>';
+      return;
+    }
+
+    try {
+      // Fetch page
+      var query = db.from('custom_pages').select('*').eq('slug', slug);
+      if (!isPreview) query = query.eq('status', 'published');
+      var pageResult = await query.single();
+
+      if (pageResult.error || !pageResult.data) {
+        main.innerHTML = '<div class="page-error"><h2>Page Not Found</h2><p>The page "/' + slug.replace(/[<>"'&]/g, '') + '" could not be found or is not published.</p><a href="home.html" class="br-btn br-btn-primary">Go Home</a></div>';
+        return;
+      }
+
+      var page = pageResult.data;
+
+      // Set document title and meta
+      document.title = page.title + ' \u2014 Bleach Resistant';
+      document.getElementById('page-meta-desc').setAttribute('content', page.meta_description || page.description || '');
+
+      // Fetch blocks
+      var blocksResult = await db.from('page_blocks').select('*').eq('page_id', page.id).eq('active', true).order('sort_order', { ascending: true });
+      var blocks = (blocksResult.data || []);
+
+      // Render blocks
+      if (typeof window.brRenderPageBlocks === 'function') {
+        window.brRenderPageBlocks(main, page, blocks);
+      } else {
+        // Fallback if brRenderPageBlocks not available yet
+        main.innerHTML = '<div class="br-section"><div class="br-container"><h2>' + esc(page.title) + '</h2><p>' + esc(page.description || '') + '</p></div></div>';
+      }
+
+      // If preview, show banner
+      if (isPreview && page.status === 'draft') {
+        var banner = document.createElement('div');
+        banner.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#ff9800;color:#fff;text-align:center;padding:10px;z-index:9999;font-weight:700;font-size:13px';
+        banner.innerHTML = '\u{1F4CB} PREVIEW MODE \u2014 This page is in draft and not visible to the public. <a href="admin-navigation.html?build=' + page.id + '" style="color:#fff;text-decoration:underline;margin-left:12px">Edit in Admin</a>';
+        document.body.prepend(banner);
+      }
+    } catch(e) {
+      console.error('[page-renderer]', e);
+      main.innerHTML = '<div class="page-error"><h2>Error Loading Page</h2><p>' + (e.message || 'Unknown error') + '</p><a href="home.html" class="br-btn br-btn-primary">Go Home</a></div>';
+    }
+
+    function esc(s) { if (!s) return ''; var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+  })();
+  </script>
+</body>
+</html>

@@ -561,3 +561,104 @@ GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE category_sections TO authenticated
 ALTER TABLE category_sections ADD COLUMN IF NOT EXISTS sort_order INTEGER DEFAULT 0;
 ALTER TABLE category_sections ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ DEFAULT NOW();
 ALTER TABLE category_sections DROP CONSTRAINT IF EXISTS category_sections_page_name_key;
+
+
+-- ============================================================
+-- SECTION 12: NAVIGATION + CUSTOM PAGES + PAGE BLOCKS
+-- Dynamic navigation, page creator, and block-based page builder.
+-- ============================================================
+
+-- Navigation menu items (replaces hard-coded NAV_ITEMS array)
+CREATE TABLE IF NOT EXISTS nav_items (
+  id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  label      TEXT NOT NULL,
+  href       TEXT NOT NULL,
+  parent_id  UUID REFERENCES nav_items(id) ON DELETE CASCADE,
+  sort_order INTEGER DEFAULT 0,
+  target     TEXT DEFAULT '_self',
+  location   TEXT DEFAULT 'main',     -- 'main', 'footer'
+  icon       TEXT,
+  active     BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE nav_items ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "nav_items_public_read" ON nav_items
+  FOR SELECT TO anon, authenticated USING (true);
+
+CREATE POLICY "nav_items_admin_all" ON nav_items
+  FOR ALL TO authenticated
+  USING (auth.email() = 'usman@gmail.com')
+  WITH CHECK (auth.email() = 'usman@gmail.com');
+
+GRANT SELECT ON TABLE nav_items TO anon;
+GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE nav_items TO authenticated;
+
+
+-- Custom pages (admin-created dynamic pages)
+CREATE TABLE IF NOT EXISTS custom_pages (
+  id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title            TEXT NOT NULL,
+  slug             TEXT UNIQUE NOT NULL,
+  description      TEXT,
+  meta_description TEXT,
+  template         TEXT DEFAULT 'blank',
+  status           TEXT DEFAULT 'draft',   -- 'draft' or 'published'
+  featured_image   TEXT,
+  created_at       TIMESTAMPTZ DEFAULT NOW(),
+  updated_at       TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE OR REPLACE FUNCTION update_custom_pages_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN NEW.updated_at = NOW(); RETURN NEW; END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_custom_pages_updated ON custom_pages;
+CREATE TRIGGER trg_custom_pages_updated
+  BEFORE UPDATE ON custom_pages
+  FOR EACH ROW EXECUTE FUNCTION update_custom_pages_updated_at();
+
+ALTER TABLE custom_pages ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "custom_pages_public_read" ON custom_pages
+  FOR SELECT TO anon
+  USING (status = 'published');
+
+CREATE POLICY "custom_pages_auth_read" ON custom_pages
+  FOR SELECT TO authenticated
+  USING (true);
+
+CREATE POLICY "custom_pages_admin_all" ON custom_pages
+  FOR ALL TO authenticated
+  USING (auth.email() = 'usman@gmail.com')
+  WITH CHECK (auth.email() = 'usman@gmail.com');
+
+GRANT SELECT ON TABLE custom_pages TO anon;
+GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE custom_pages TO authenticated;
+
+
+-- Page blocks (content builder blocks for custom pages)
+CREATE TABLE IF NOT EXISTS page_blocks (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  page_id     UUID NOT NULL REFERENCES custom_pages(id) ON DELETE CASCADE,
+  block_type  TEXT NOT NULL,   -- hero, text, image-text, products, gallery, faq, cta, form, html, spacer
+  content     JSONB DEFAULT '{}',
+  sort_order  INTEGER DEFAULT 0,
+  active      BOOLEAN DEFAULT true,
+  created_at  TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE page_blocks ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "page_blocks_public_read" ON page_blocks
+  FOR SELECT TO anon, authenticated USING (true);
+
+CREATE POLICY "page_blocks_admin_all" ON page_blocks
+  FOR ALL TO authenticated
+  USING (auth.email() = 'usman@gmail.com')
+  WITH CHECK (auth.email() = 'usman@gmail.com');
+
+GRANT SELECT ON TABLE page_blocks TO anon;
+GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE page_blocks TO authenticated;

@@ -3,87 +3,82 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Navigation & Pages &#x2014; Bleach Resistant Admin</title>
+  <title>Navigation &amp; Pages &#x2014; Bleach Resistant Admin</title>
   <link rel="icon" href="favicon.svg" type="image/png">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="admin.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js?v=7"></script>
   <style>
-    .page-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
-    .page-card {
-      background: #fff; border-radius: 12px; border: 1px solid #e5e5e5; padding: 20px;
-      transition: all 0.2s; position: relative;
-    }
-    .page-card:hover { border-color: #C7065C; box-shadow: 0 4px 16px rgba(199,6,92,0.1); }
-    .page-card h4 { margin: 0 0 6px; font-size: 15px; font-weight: 700; }
-    .page-card .page-file { font-size: 12px; color: #888; font-family: monospace; margin-bottom: 12px; }
-    .page-card .page-desc { font-size: 13px; color: #555; line-height: 1.5; margin-bottom: 14px; }
-    .page-card .page-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-    .page-badge {
-      display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px;
-      border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px;
-    }
-    .badge-nav { background: #e8f5e9; color: #2e7d32; }
-    .badge-hidden { background: #fff3e0; color: #e65100; }
-    .badge-custom { background: #e3f2fd; color: #1565c0; }
+    .page-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px}
+    .page-card{background:#fff;border-radius:12px;border:1px solid #e5e5e5;padding:20px;transition:all .2s;position:relative}
+    .page-card:hover{border-color:#C7065C;box-shadow:0 4px 16px rgba(199,6,92,.1)}
+    .page-card h4{margin:0 0 6px;font-size:15px;font-weight:700}
+    .page-card .page-file{font-size:12px;color:#888;font-family:monospace;margin-bottom:12px}
+    .page-card .page-desc{font-size:13px;color:#555;line-height:1.5;margin-bottom:14px}
+    .page-card .page-actions{display:flex;gap:8px;flex-wrap:wrap}
+    .page-badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;text-transform:uppercase;letter-spacing:.5px}
+    .badge-nav{background:#e8f5e9;color:#2e7d32}.badge-hidden{background:#fff3e0;color:#e65100}
+    .badge-draft{background:#fce4ec;color:#c62828}.badge-published{background:#e8f5e9;color:#2e7d32}
+    .badge-custom{background:#e3f2fd;color:#1565c0}
 
-    .link-list { background: #fff; border-radius: 12px; border: 1px solid #e5e5e5; overflow: hidden; }
-    .link-row {
-      display: flex; align-items: center; padding: 12px 20px; border-bottom: 1px solid #f0f0f0;
-      gap: 16px; transition: background 0.15s;
-    }
-    .link-row:hover { background: #fef7fa; }
-    .link-row:last-child { border-bottom: none; }
-    .link-label { flex: 1; font-weight: 600; font-size: 14px; }
-    .link-target { font-size: 12px; color: #888; font-family: monospace; }
-    .link-type { font-size: 11px; padding: 2px 8px; border-radius: 4px; background: #f0f0f0; color: #555; }
+    .link-list{background:#fff;border-radius:12px;border:1px solid #e5e5e5;overflow:hidden}
+    .link-row{display:flex;align-items:center;padding:12px 20px;border-bottom:1px solid #f0f0f0;gap:16px;transition:background .15s}
+    .link-row:hover{background:#fef7fa}.link-row:last-child{border-bottom:none}
+    .link-label{flex:1;font-weight:600;font-size:14px}
+    .link-target{font-size:12px;color:#888;font-family:monospace}
+    .link-type{font-size:11px;padding:2px 8px;border-radius:4px;background:#f0f0f0;color:#555}
+    .link-child{padding-left:48px;background:#fafafa}
 
-    .tabs-bar { display: flex; gap: 0; border-bottom: 2px solid #eee; margin-bottom: 24px; }
-    .tabs-bar button {
-      padding: 10px 24px; border: none; background: none; cursor: pointer;
-      font-size: 14px; font-weight: 600; color: #888; border-bottom: 2px solid transparent;
-      margin-bottom: -2px; transition: all 0.2s;
-    }
-    .tabs-bar button.active { color: #C7065C; border-bottom-color: #C7065C; }
-    .tab-panel { display: none; }
-    .tab-panel.active { display: block; }
+    .tabs-bar{display:flex;gap:0;border-bottom:2px solid #eee;margin-bottom:24px}
+    .tabs-bar button{padding:10px 24px;border:none;background:none;cursor:pointer;font-size:14px;font-weight:600;color:#888;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s;font-family:inherit}
+    .tabs-bar button.active{color:#C7065C;border-bottom-color:#C7065C}
+    .tab-panel{display:none}.tab-panel.active{display:block}
 
-    .modal-overlay {
-      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5);
-      z-index: 1000; align-items: center; justify-content: center;
-    }
-    .modal-overlay.show { display: flex; }
-    .modal-box {
-      background: #fff; border-radius: 16px; width: 90%; max-width: 560px;
-      padding: 32px; box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-    }
-    .modal-box h3 { margin: 0 0 20px; font-size: 18px; }
-    .form-group { margin-bottom: 16px; }
-    .form-group label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 6px; color: #555; text-transform: uppercase; letter-spacing: 0.5px; }
-    .form-group input, .form-group select, .form-group textarea {
-      width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 8px;
-      font-size: 14px; font-family: inherit; box-sizing: border-box;
-    }
-    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-      border-color: #C7065C; outline: none; box-shadow: 0 0 0 3px rgba(199,6,92,0.1);
-    }
-    .form-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px; }
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center}
+    .modal-overlay.show{display:flex}
+    .modal-box{background:#fff;border-radius:16px;width:90%;max-width:600px;max-height:90vh;overflow-y:auto;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+    .modal-box h3{margin:0 0 20px;font-size:18px}
+    .form-group{margin-bottom:16px}
+    .form-group label{display:block;font-size:12px;font-weight:700;margin-bottom:6px;color:#555;text-transform:uppercase;letter-spacing:.5px}
+    .form-group input,.form-group select,.form-group textarea{width:100%;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;font-family:inherit;box-sizing:border-box}
+    .form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:#C7065C;outline:none;box-shadow:0 0 0 3px rgba(199,6,92,.1)}
+    .form-actions{display:flex;gap:12px;justify-content:flex-end;margin-top:20px}
 
-    .nav-preview {
-      background: #242323; border-radius: 12px; padding: 16px 24px;
-      display: flex; gap: 16px; flex-wrap: wrap; align-items: center; margin-bottom: 24px;
-    }
-    .nav-preview-item {
-      color: #8DC63F; font-size: 13px; font-weight: 600; font-family: Montserrat, sans-serif;
-      cursor: default; padding: 6px 12px; border-radius: 4px; transition: background 0.15s;
-    }
-    .nav-preview-item:hover { background: rgba(255,255,255,0.1); }
-    .nav-preview-item.has-sub::after { content: ' &#x25BE;'; font-size: 10px; }
-    .quick-stats { display: flex; gap: 24px; margin-bottom: 24px; flex-wrap: wrap; }
-    .quick-stat { text-align: center; }
-    .quick-stat .num { font-size: 28px; font-weight: 800; color: #C7065C; }
-    .quick-stat .label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
+    .nav-preview{background:#242323;border-radius:12px;padding:16px 24px;display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin-bottom:24px}
+    .nav-preview-item{color:#8DC63F;font-size:13px;font-weight:600;cursor:default;padding:6px 12px;border-radius:4px;transition:background .15s}
+    .nav-preview-item:hover{background:rgba(255,255,255,.1)}.nav-preview-item.has-sub::after{content:' ▾';font-size:10px}
+    .quick-stats{display:flex;gap:24px;margin-bottom:24px;flex-wrap:wrap}
+    .quick-stat{text-align:center}.quick-stat .num{font-size:28px;font-weight:800;color:#C7065C}
+    .quick-stat .label{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.5px}
+
+    /* Page Builder */
+    .builder-bar{display:flex;align-items:center;gap:16px;padding:16px 0;border-bottom:1px solid #eee;margin-bottom:24px}
+    .builder-bar h3{margin:0;font-size:16px;flex:1}
+    .block-list{display:flex;flex-direction:column;gap:12px}
+    .block-item{background:#fff;border:1px solid #e5e5e5;border-radius:10px;overflow:hidden;transition:border-color .2s}
+    .block-item:hover{border-color:#C7065C}
+    .block-header{display:flex;align-items:center;gap:12px;padding:14px 18px;cursor:pointer}
+    .block-icon{font-size:20px;width:32px;text-align:center}
+    .block-type-name{font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.5px;color:#555}
+    .block-preview{flex:1;font-size:12px;color:#999;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .block-actions{display:flex;gap:4px}
+    .block-actions button{background:none;border:1px solid #ddd;border-radius:6px;width:28px;height:28px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+    .block-actions button:hover{background:#f0f0f0}
+    .block-editor{display:none;padding:18px;border-top:1px solid #eee;background:#fafafa}
+    .block-editor.open{display:block}
+
+    .block-picker-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .block-picker-item{display:flex;flex-direction:column;align-items:center;gap:8px;padding:20px 12px;border:1px solid #e5e5e5;border-radius:10px;cursor:pointer;transition:all .15s;text-align:center}
+    .block-picker-item:hover{border-color:#C7065C;background:#fef7fa}
+    .block-picker-item .bp-icon{font-size:28px}
+    .block-picker-item .bp-name{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.3px}
+
+    .inline-add{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+    .inline-add input,.inline-add textarea{flex:1;min-width:160px}
+    .removable-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+    .removable-row input,.removable-row textarea{flex:1}
+    .remove-btn{background:#e74c3c;color:#fff;border:none;border-radius:6px;width:28px;height:28px;cursor:pointer;font-size:14px;flex-shrink:0}
   </style>
 </head>
 <body class="admin-hidden" style="display:none">
@@ -111,10 +106,7 @@
     <div class="sidebar-footer">
       <div class="user-info">
         <div class="user-avatar" id="user-avatar">A</div>
-        <div>
-          <div style="font-size:12px;font-weight:600;" id="user-name">Admin</div>
-          <div class="user-email" id="user-email">loading&#x2026;</div>
-        </div>
+        <div><div style="font-size:12px;font-weight:600" id="user-name">Admin</div><div class="user-email" id="user-email">loading&#x2026;</div></div>
       </div>
       <button class="btn btn-secondary btn-sm btn-block" onclick="brSignOut()">Sign Out</button>
     </div>
@@ -123,173 +115,200 @@
   <div class="main-content">
     <div class="topbar">
       <div>
-        <h1>Navigation & Pages</h1>
-        <div class="breadcrumb">Manage your site pages, navigation menus, and external links</div>
+        <h1 id="page-heading">Navigation &amp; Pages</h1>
+        <div class="breadcrumb" id="page-breadcrumb">Manage navigation menus, create pages, and build content</div>
       </div>
-      <div class="topbar-actions">
+      <div class="topbar-actions" id="topbar-actions">
         <button class="btn btn-primary btn-sm" onclick="showCreatePageModal()">+ Create New Page</button>
       </div>
     </div>
 
     <div class="content-area">
-
       <!-- Quick Stats -->
-      <div class="quick-stats">
-        <div class="quick-stat"><div class="num" id="stat-pages">20</div><div class="label">Site Pages</div></div>
-        <div class="quick-stat"><div class="num" id="stat-nav-items">6</div><div class="label">Nav Items</div></div>
-        <div class="quick-stat"><div class="num" id="stat-dropdowns">2</div><div class="label">Dropdown Menus</div></div>
-        <div class="quick-stat"><div class="num" id="stat-links">0</div><div class="label">Custom Links</div></div>
+      <div class="quick-stats" id="quick-stats">
+        <div class="quick-stat"><div class="num" id="stat-nav">0</div><div class="label">Nav Items</div></div>
+        <div class="quick-stat"><div class="num" id="stat-pages">0</div><div class="label">Custom Pages</div></div>
+        <div class="quick-stat"><div class="num" id="stat-published">0</div><div class="label">Published</div></div>
+        <div class="quick-stat"><div class="num" id="stat-blocks">0</div><div class="label">Total Blocks</div></div>
       </div>
 
-      <!-- Nav Preview -->
-      <div style="margin-bottom:8px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#888;">Live Navigation Preview</div>
-      <div class="nav-preview" id="nav-preview">
-        <div class="nav-preview-item has-sub">PRODUCTS</div>
-        <div class="nav-preview-item has-sub">SERVICES</div>
-        <div class="nav-preview-item">SHOWCASE</div>
-        <div class="nav-preview-item">ORDER</div>
-        <div class="nav-preview-item">SIZE CHART</div>
-        <div class="nav-preview-item">FAQs</div>
-      </div>
+      <!-- Live Nav Preview -->
+      <div style="margin-bottom:8px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#888">Live Navigation Preview</div>
+      <div class="nav-preview" id="nav-preview"></div>
 
       <!-- Tabs -->
-      <div class="tabs-bar">
-        <button class="active" onclick="switchTab('pages')">All Pages</button>
-        <button onclick="switchTab('navigation')">Navigation Menu</button>
+      <div class="tabs-bar" id="tabs-bar">
+        <button class="active" onclick="switchTab('navigation')">Navigation</button>
+        <button onclick="switchTab('pages')">Pages</button>
+        <button onclick="switchTab('builder')" id="tab-btn-builder" style="display:none">Page Builder</button>
         <button onclick="switchTab('links')">Custom Links</button>
         <button onclick="switchTab('redirects')">Redirects</button>
       </div>
 
-      <!-- Tab: All Pages -->
-      <div class="tab-panel active" id="tab-pages">
-        <div class="page-grid" id="pages-grid"></div>
+      <!-- Tab: Navigation Menu -->
+      <div class="tab-panel active" id="tab-navigation">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+          <div>
+            <h3 style="margin:0;font-size:16px">Navigation Menu Items</h3>
+            <p style="font-size:13px;color:#888;margin:4px 0 0">Items from the database render on all public pages. When empty, the static HTML nav is used.</p>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="openNavEditor()">+ Add Nav Item</button>
+        </div>
+        <div class="link-list" id="nav-items-list"><div style="padding:40px;text-align:center;color:#888">Loading&#x2026;</div></div>
       </div>
 
-      <!-- Tab: Navigation Menu -->
-      <div class="tab-panel" id="tab-navigation">
-        <div class="table-card" style="padding:20px;">
-          <h3 style="margin:0 0 16px;font-size:16px;">Main Navigation Items</h3>
-          <p style="font-size:13px;color:#888;margin:0 0 20px;">These items appear in the top navigation bar. Drag to reorder.</p>
-          <div class="link-list" id="nav-items-list"></div>
+      <!-- Tab: Pages -->
+      <div class="tab-panel" id="tab-pages">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+          <div>
+            <h3 style="margin:0;font-size:16px">All Pages</h3>
+            <p style="font-size:13px;color:#888;margin:4px 0 0">Static site pages and custom dynamic pages</p>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="showCreatePageModal()">+ Create Page</button>
         </div>
-        <div class="table-card" style="padding:20px;margin-top:20px;">
-          <h3 style="margin:0 0 16px;font-size:16px;">Products Dropdown</h3>
-          <div class="link-list" id="products-dropdown-list"></div>
+        <h4 style="font-size:13px;text-transform:uppercase;color:#888;letter-spacing:.5px;margin:24px 0 12px">Custom Pages (dynamic)</h4>
+        <div class="page-grid" id="custom-pages-grid"><div style="padding:40px;text-align:center;color:#888">No custom pages yet. Click "+ Create Page" to start.</div></div>
+        <h4 style="font-size:13px;text-transform:uppercase;color:#888;letter-spacing:.5px;margin:32px 0 12px">Static Pages (HTML files)</h4>
+        <div class="page-grid" id="static-pages-grid"></div>
+      </div>
+
+      <!-- Tab: Page Builder -->
+      <div class="tab-panel" id="tab-builder">
+        <div class="builder-bar">
+          <button class="btn btn-secondary btn-sm" onclick="closeBuilder()">&#x2190; Back to Pages</button>
+          <h3 id="builder-title">Page Builder</h3>
+          <button class="btn btn-sm btn-secondary" onclick="previewPage()">Preview</button>
         </div>
-        <div class="table-card" style="padding:20px;margin-top:20px;">
-          <h3 style="margin:0 0 16px;font-size:16px;">Services Dropdown</h3>
-          <div class="link-list" id="services-dropdown-list"></div>
+        <div class="block-list" id="block-list"></div>
+        <div style="margin-top:16px;text-align:center">
+          <button class="btn btn-primary" onclick="showBlockPicker()">+ Add Block</button>
         </div>
       </div>
 
       <!-- Tab: Custom Links -->
       <div class="tab-panel" id="tab-links">
-        <div class="table-card" style="padding:20px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-            <div>
-              <h3 style="margin:0;font-size:16px;">Custom Links</h3>
-              <p style="font-size:13px;color:#888;margin:4px 0 0;">Manage external URLs, social media links, and custom redirects</p>
-            </div>
+        <div class="table-card" style="padding:20px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+            <div><h3 style="margin:0;font-size:16px">Custom Links</h3><p style="font-size:13px;color:#888;margin:4px 0 0">External URLs, social media, custom navigation items</p></div>
             <button class="btn btn-primary btn-sm" onclick="showAddLinkModal()">+ Add Link</button>
           </div>
-          <div class="link-list" id="custom-links-list">
-            <div style="padding:40px;text-align:center;color:#888;">
-              <p style="font-size:14px;">No custom links yet</p>
-              <p style="font-size:12px;">Click "Add Link" to create external links, social media URLs, or custom navigation items</p>
-            </div>
-          </div>
+          <div class="link-list" id="custom-links-list"><div style="padding:40px;text-align:center;color:#888"><p>No custom links yet</p></div></div>
         </div>
       </div>
 
       <!-- Tab: Redirects -->
       <div class="tab-panel" id="tab-redirects">
-        <div class="table-card" style="padding:20px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-            <div>
-              <h3 style="margin:0;font-size:16px;">URL Redirects</h3>
-              <p style="font-size:13px;color:#888;margin:4px 0 0;">Redirect old URLs to new pages</p>
-            </div>
+        <div class="table-card" style="padding:20px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+            <div><h3 style="margin:0;font-size:16px">URL Redirects</h3><p style="font-size:13px;color:#888;margin:4px 0 0">Redirect old URLs to new pages</p></div>
             <button class="btn btn-primary btn-sm" onclick="showAddRedirectModal()">+ Add Redirect</button>
           </div>
-          <div class="link-list" id="redirects-list">
-            <div style="padding:40px;text-align:center;color:#888;">
-              <p style="font-size:14px;">No redirects configured</p>
-              <p style="font-size:12px;">Add redirects to forward old URLs to current pages</p>
-            </div>
-          </div>
+          <div class="link-list" id="redirects-list"><div style="padding:40px;text-align:center;color:#888"><p>No redirects configured</p></div></div>
         </div>
       </div>
-
     </div>
   </div>
 
-  <!-- Create Page Modal -->
-  <div class="modal-overlay" id="create-page-modal">
+  <!-- ═══ NAV ITEM EDITOR MODAL ═══ -->
+  <div class="modal-overlay" id="nav-modal">
     <div class="modal-box">
-      <h3>Create New Page</h3>
+      <h3 id="nav-modal-title">Add Nav Item</h3>
+      <input type="hidden" id="nav-edit-id">
+      <div class="form-group"><label>Label</label><input type="text" id="nav-label" placeholder="e.g. Products"></div>
       <div class="form-group">
-        <label>Page Title</label>
-        <input type="text" id="new-page-title" placeholder="e.g. Contact Us">
-      </div>
-      <div class="form-group">
-        <label>File Name</label>
-        <input type="text" id="new-page-file" placeholder="e.g. contact.html" pattern="[a-zA-Z0-9_-]+\.html">
-        <small style="color:#888;font-size:11px;">Must end in .html &#x2014; letters, numbers, hyphens only</small>
-      </div>
-      <div class="form-group">
-        <label>Template</label>
-        <select id="new-page-template">
-          <option value="blank">Blank Page</option>
-          <option value="content">Content Page (text + images)</option>
-          <option value="contact">Contact Form Page</option>
-          <option value="gallery">Gallery Page</option>
-          <option value="landing">Landing Page</option>
+        <label>Link To</label>
+        <select id="nav-href-type" onchange="toggleNavHref()">
+          <option value="page">Existing Page</option>
+          <option value="custom-page">Custom Page</option>
+          <option value="custom-url">Custom URL</option>
         </select>
       </div>
-      <div class="form-group">
-        <label>Add to Navigation?</label>
-        <select id="new-page-nav">
-          <option value="no">No &#x2014; Hidden page</option>
-          <option value="main">Yes &#x2014; Main navigation</option>
-          <option value="products">Yes &#x2014; Products dropdown</option>
-          <option value="services">Yes &#x2014; Services dropdown</option>
-          <option value="footer">Yes &#x2014; Footer only</option>
-        </select>
+      <div class="form-group" id="nav-page-group">
+        <label>Page</label>
+        <select id="nav-href-page"></select>
       </div>
+      <div class="form-group" id="nav-custom-page-group" style="display:none">
+        <label>Custom Page</label>
+        <select id="nav-href-custom-page"></select>
+      </div>
+      <div class="form-group" id="nav-custom-url-group" style="display:none">
+        <label>URL</label>
+        <input type="text" id="nav-href-url" placeholder="https://example.com">
+      </div>
+      <div class="form-group">
+        <label>Parent (for dropdowns)</label>
+        <select id="nav-parent"><option value="">None (top-level item)</option></select>
+      </div>
+      <div class="form-group"><label>Open In</label><select id="nav-target"><option value="_self">Same Tab</option><option value="_blank">New Tab</option></select></div>
+      <div class="form-group"><label>Sort Order</label><input type="number" id="nav-sort" value="0" min="0"></div>
       <div class="form-actions">
         <button class="btn btn-secondary btn-sm" onclick="closeModals()">Cancel</button>
-        <button class="btn btn-primary btn-sm" onclick="createNewPage()">Create Page</button>
+        <button class="btn btn-primary btn-sm" id="nav-save-btn" onclick="saveNavItem()">Save</button>
       </div>
     </div>
   </div>
 
-  <!-- Add Link Modal -->
+  <!-- ═══ CREATE PAGE MODAL ═══ -->
+  <div class="modal-overlay" id="page-modal">
+    <div class="modal-box">
+      <h3 id="page-modal-title">Create New Page</h3>
+      <input type="hidden" id="page-edit-id">
+      <div class="form-group"><label>Page Title</label><input type="text" id="pg-title" placeholder="e.g. Our Blog" oninput="autoSlug()"></div>
+      <div class="form-group"><label>URL Slug</label><input type="text" id="pg-slug" placeholder="our-blog"><small style="color:#888;font-size:11px">Viewable at /p/<span id="slug-preview">your-slug</span></small></div>
+      <div class="form-group"><label>Description</label><textarea id="pg-desc" rows="2" placeholder="Short page description"></textarea></div>
+      <div class="form-group"><label>Meta Description (SEO)</label><textarea id="pg-meta" rows="2" placeholder="Search engine description"></textarea></div>
+      <div class="form-group">
+        <label>Template</label>
+        <select id="pg-template">
+          <option value="blank">Blank Page</option>
+          <option value="content">Content Page (hero + text + CTA)</option>
+          <option value="blog">Blog Post (hero + text)</option>
+          <option value="product-showcase">Product Showcase (hero + products + CTA)</option>
+          <option value="gallery">Gallery (hero + gallery grid)</option>
+          <option value="landing">Landing Page (hero + features + products + CTA)</option>
+          <option value="contact">Contact Page (hero + contact form)</option>
+          <option value="faq">FAQ Page (hero + accordion)</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Featured Image</label><input type="text" id="pg-image" placeholder="Image URL (optional)"><input type="file" id="pg-image-file" accept="image/*" style="margin-top:8px"></div>
+      <div class="form-group"><label>Status</label><select id="pg-status"><option value="draft">Draft</option><option value="published">Published</option></select></div>
+      <div class="form-actions">
+        <button class="btn btn-secondary btn-sm" onclick="closeModals()">Cancel</button>
+        <button class="btn btn-primary btn-sm" id="page-save-btn" onclick="savePage()">Create Page</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ BLOCK PICKER MODAL ═══ -->
+  <div class="modal-overlay" id="block-picker-modal">
+    <div class="modal-box" style="max-width:680px">
+      <h3>Add Content Block</h3>
+      <p style="font-size:13px;color:#888;margin:0 0 20px">Choose a block type to add to your page</p>
+      <div class="block-picker-grid">
+        <div class="block-picker-item" onclick="addBlock('hero')"><div class="bp-icon">&#x1F3AF;</div><div class="bp-name">Hero Banner</div></div>
+        <div class="block-picker-item" onclick="addBlock('text')"><div class="bp-icon">&#x1F4DD;</div><div class="bp-name">Text / HTML</div></div>
+        <div class="block-picker-item" onclick="addBlock('image-text')"><div class="bp-icon">&#x1F5BC;&#xFE0F;</div><div class="bp-name">Image + Text</div></div>
+        <div class="block-picker-item" onclick="addBlock('products')"><div class="bp-icon">&#x1F6CD;&#xFE0F;</div><div class="bp-name">Product Grid</div></div>
+        <div class="block-picker-item" onclick="addBlock('gallery')"><div class="bp-icon">&#x1F4F7;</div><div class="bp-name">Gallery</div></div>
+        <div class="block-picker-item" onclick="addBlock('faq')"><div class="bp-icon">&#x2753;</div><div class="bp-name">FAQ Accordion</div></div>
+        <div class="block-picker-item" onclick="addBlock('cta')"><div class="bp-icon">&#x1F4E3;</div><div class="bp-name">Call to Action</div></div>
+        <div class="block-picker-item" onclick="addBlock('form')"><div class="bp-icon">&#x1F4E8;</div><div class="bp-name">Contact Form</div></div>
+        <div class="block-picker-item" onclick="addBlock('html')"><div class="bp-icon">&#x1F4BB;</div><div class="bp-name">Raw HTML</div></div>
+        <div class="block-picker-item" onclick="addBlock('spacer')"><div class="bp-icon">&#x2195;&#xFE0F;</div><div class="bp-name">Spacer</div></div>
+        <div class="block-picker-item" onclick="addBlock('section')"><div class="bp-icon">&#x1F4D0;</div><div class="bp-name">Page Section</div></div>
+      </div>
+      <div class="form-actions" style="margin-top:20px"><button class="btn btn-secondary btn-sm" onclick="closeModals()">Cancel</button></div>
+    </div>
+  </div>
+
+  <!-- ═══ CUSTOM LINK MODAL ═══ -->
   <div class="modal-overlay" id="add-link-modal">
     <div class="modal-box">
       <h3>Add Custom Link</h3>
-      <div class="form-group">
-        <label>Link Label</label>
-        <input type="text" id="link-label" placeholder="e.g. Our Instagram">
-      </div>
-      <div class="form-group">
-        <label>URL</label>
-        <input type="url" id="link-url" placeholder="https://instagram.com/yourpage">
-      </div>
-      <div class="form-group">
-        <label>Open In</label>
-        <select id="link-target">
-          <option value="_blank">New Tab</option>
-          <option value="_self">Same Window</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Location</label>
-        <select id="link-location">
-          <option value="footer">Footer</option>
-          <option value="navigation">Main Navigation</option>
-          <option value="social">Social Media Bar</option>
-        </select>
-      </div>
+      <div class="form-group"><label>Link Label</label><input type="text" id="link-label" placeholder="e.g. Our Instagram"></div>
+      <div class="form-group"><label>URL</label><input type="url" id="link-url" placeholder="https://instagram.com/yourpage"></div>
+      <div class="form-group"><label>Open In</label><select id="link-target"><option value="_blank">New Tab</option><option value="_self">Same Window</option></select></div>
+      <div class="form-group"><label>Location</label><select id="link-location"><option value="footer">Footer</option><option value="navigation">Main Navigation</option><option value="social">Social Media Bar</option></select></div>
       <div class="form-actions">
         <button class="btn btn-secondary btn-sm" onclick="closeModals()">Cancel</button>
         <button class="btn btn-primary btn-sm" onclick="saveCustomLink()">Save Link</button>
@@ -297,25 +316,13 @@
     </div>
   </div>
 
-  <!-- Add Redirect Modal -->
+  <!-- ═══ REDIRECT MODAL ═══ -->
   <div class="modal-overlay" id="add-redirect-modal">
     <div class="modal-box">
       <h3>Add URL Redirect</h3>
-      <div class="form-group">
-        <label>From Path</label>
-        <input type="text" id="redirect-from" placeholder="/old-page">
-      </div>
-      <div class="form-group">
-        <label>To Path</label>
-        <input type="text" id="redirect-to" placeholder="/new-page.html">
-      </div>
-      <div class="form-group">
-        <label>Type</label>
-        <select id="redirect-type">
-          <option value="301">301 &#x2014; Permanent Redirect</option>
-          <option value="302">302 &#x2014; Temporary Redirect</option>
-        </select>
-      </div>
+      <div class="form-group"><label>From Path</label><input type="text" id="redirect-from" placeholder="/old-page"></div>
+      <div class="form-group"><label>To Path</label><input type="text" id="redirect-to" placeholder="/new-page.html"></div>
+      <div class="form-group"><label>Type</label><select id="redirect-type"><option value="301">301 &#x2014; Permanent Redirect</option><option value="302">302 &#x2014; Temporary Redirect</option></select></div>
       <div class="form-actions">
         <button class="btn btn-secondary btn-sm" onclick="closeModals()">Cancel</button>
         <button class="btn btn-primary btn-sm" onclick="saveRedirect()">Save Redirect</button>
@@ -326,262 +333,946 @@
   <div id="toast" class="toast"></div>
 
 <script>
-// ===== Site Pages Data =====
-const SITE_PAGES = [
-  { file: 'home.html', title: 'Home', desc: 'Main landing page with hero slider, CTA buttons, and company overview', nav: 'main', type: 'landing' },
-  { file: 'finprint.html', title: 'Showcase', desc: 'Instagram gallery feed and feature product showcase', nav: 'main', type: 'gallery' },
-  { file: 'About.html', title: 'About Us', desc: 'Company history, team info, and brand story', nav: 'hidden', type: 'content' },
-  { file: 'services.html', title: 'Services', desc: 'Overview of all services offered', nav: 'main', type: 'content' },
-  { file: 'product.html', title: 'Products', desc: 'Main products landing page', nav: 'dropdown', type: 'content' },
-  { file: 'Pricelist.html', title: 'Price List', desc: 'Complete pricing for all products and services', nav: 'products', type: 'content' },
-  { file: 'headgear.html', title: 'Head Gear', desc: 'Hats, caps, toques and headwear products', nav: 'products', type: 'product' },
-  { file: 'basicpoly.html', title: 'Basics & Poly', desc: 'Basic polyester and cotton garment options', nav: 'products', type: 'product' },
-  { file: 'stockdesigns.html', title: 'Stock Designs', desc: 'Pre-made design templates and patterns', nav: 'products', type: 'product' },
-  { file: 'fabricdescriptions.html', title: 'Fabric Descriptions', desc: 'Detailed fabric types, weights, and characteristics', nav: 'products', type: 'content' },
-  { file: 'sublimationprinting.html', title: 'Sublimation Printing', desc: 'Full sublimation printing process and options', nav: 'products', type: 'content' },
-  { file: 'grapicdesign.html', title: 'Logos & Graphic Design', desc: 'Custom logo and graphic design services', nav: 'services', type: 'content' },
-  { file: 'customlogos.html', title: 'Logo Showcase', desc: 'Portfolio of custom logo designs', nav: 'services', type: 'gallery' },
-  { file: 'wrapdesign.html', title: 'Wrap Design', desc: 'Vehicle and equipment wrap design services', nav: 'services', type: 'content' },
-  { file: 'copyofwashingsamples.html', title: 'Showcase / Washing', desc: 'Washing and care sample results showcase', nav: 'main', type: 'gallery' },
-  { file: 'sizechart.html', title: 'Size Chart', desc: 'Complete sizing guide for all garments', nav: 'main', type: 'content' },
-  { file: 'order.html', title: 'Order', desc: 'Order form for new and returning clients', nav: 'main', type: 'form' },
-  { file: 'FAQs.html', title: 'FAQs', desc: 'Frequently asked questions and answers', nav: 'main', type: 'content' },
-  { file: 'privacypolicy.html', title: 'Privacy Policy', desc: 'Privacy policy and data handling information', nav: 'footer', type: 'legal' },
-  { file: 'termsconditions.html', title: 'Terms & Conditions', desc: 'Terms of service and conditions of use', nav: 'footer', type: 'legal' }
+/* ================================================================
+   ADMIN NAVIGATION + PAGES + PAGE BUILDER
+   Complete CRUD for nav items, custom pages, and content blocks
+   ================================================================ */
+
+// =========== STATIC PAGES (file-based, read-only reference) ===========
+var STATIC_PAGES = [
+  { file:'home.html', title:'Home', desc:'Main landing page with hero slider' },
+  { file:'product.html', title:'Products', desc:'Main products landing page' },
+  { file:'Pricelist.html', title:'Price List', desc:'Complete pricing for all products' },
+  { file:'headgear.html', title:'Head Gear', desc:'Hats, caps, toques and headwear' },
+  { file:'basicpoly.html', title:'Basics & Poly', desc:'Basic polyester and cotton garments' },
+  { file:'stockdesigns.html', title:'Stock Designs', desc:'Pre-made design templates' },
+  { file:'fabricdescriptions.html', title:'Fabric Descriptions', desc:'Fabric types and info' },
+  { file:'sublimationprinting.html', title:'Sublimation Printing', desc:'Printing process and options' },
+  { file:'services.html', title:'Services', desc:'Overview of all services' },
+  { file:'grapicdesign.html', title:'Graphic Design', desc:'Custom design services' },
+  { file:'customlogos.html', title:'Custom Logos', desc:'Logo design portfolio' },
+  { file:'wrapdesign.html', title:'Vehicle Wraps', desc:'Wrap design services' },
+  { file:'copyofwashingsamples.html', title:'Showcase / Washing', desc:'Washing sample results' },
+  { file:'sizechart.html', title:'Size Chart', desc:'Complete sizing guide' },
+  { file:'order.html', title:'Order', desc:'Order form for clients' },
+  { file:'FAQs.html', title:'FAQs', desc:'Frequently asked questions' },
+  { file:'About.html', title:'About Us', desc:'Company info and brand story' },
+  { file:'privacypolicy.html', title:'Privacy Policy', desc:'Privacy policy' },
+  { file:'termsconditions.html', title:'Terms & Conditions', desc:'Terms of service' },
+  { file:'finprint.html', title:'Gallery Feed', desc:'Instagram gallery feed' }
 ];
 
-const NAV_ITEMS = [
-  { label: 'PRODUCTS', file: 'Pricelist.html', type: 'dropdown', children: ['Pricelist.html','headgear.html','basicpoly.html','stockdesigns.html','fabricdescriptions.html','sublimationprinting.html'] },
-  { label: 'SERVICES', file: 'services.html', type: 'dropdown', children: ['grapicdesign.html','customlogos.html','wrapdesign.html'] },
-  { label: 'SHOWCASE', file: 'copyofwashingsamples.html', type: 'link' },
-  { label: 'ORDER', file: 'order.html', type: 'link' },
-  { label: 'SIZE CHART', file: 'sizechart.html', type: 'link' },
-  { label: 'FAQs', file: 'FAQs.html', type: 'link' }
-];
+// =========== TEMPLATE DEFINITIONS ===========
+var TEMPLATES = {
+  'blank':            { name:'Blank', blocks:[] },
+  'content':          { name:'Content Page', blocks:[
+    {block_type:'hero',content:{title:'Page Title',subtitle:'Your page description here',bg_type:'gradient',bg_value:'linear-gradient(135deg,#1a1a2e,#0f3460)'}},
+    {block_type:'text',content:{heading:'',body:'<p>Start writing your content here.</p>',align:'left'}},
+    {block_type:'cta', content:{heading:'Ready to get started?',subtitle:'Contact us today',btn_text:'Order Now',btn_link:'order.html',bg_color:'#1a1a2e'}}
+  ]},
+  'blog':             { name:'Blog Post', blocks:[
+    {block_type:'hero',content:{title:'Blog Post Title',subtitle:'Published on '+new Date().toLocaleDateString(),bg_type:'gradient',bg_value:'linear-gradient(135deg,#1a1a2e,#0f3460)'}},
+    {block_type:'text',content:{heading:'',body:'<p>Write your blog post content here. Use HTML for formatting: &lt;h3&gt;, &lt;p&gt;, &lt;ul&gt;, &lt;img&gt;, etc.</p>',align:'left'}}
+  ]},
+  'product-showcase': { name:'Product Showcase', blocks:[
+    {block_type:'hero',content:{title:'Our Products',subtitle:'Browse our collection',bg_type:'gradient',bg_value:'linear-gradient(135deg,#1a1a2e,#0f3460)'}},
+    {block_type:'products',content:{heading:'Featured Products',category:'',featured_only:false,limit:12}},
+    {block_type:'cta',content:{heading:'Need something custom?',subtitle:'We design anything you need',btn_text:'Get a Quote',btn_link:'order.html',bg_color:'#C7065C'}}
+  ]},
+  'gallery':          { name:'Gallery', blocks:[
+    {block_type:'hero',content:{title:'Gallery',subtitle:'See our work',bg_type:'gradient',bg_value:'linear-gradient(135deg,#1a1a2e,#0f3460)'}},
+    {block_type:'gallery',content:{heading:'Our Work',columns:3,images:[]}}
+  ]},
+  'landing':          { name:'Landing Page', blocks:[
+    {block_type:'hero',content:{title:'Welcome',subtitle:'Your landing page description',bg_type:'gradient',bg_value:'linear-gradient(135deg,#1a1a2e,#0f3460)',btn1_text:'Get Started',btn1_link:'order.html'}},
+    {block_type:'image-text',content:{label:'About Us',heading:'Why Choose Us',description:'Describe your value proposition here.',image_url:'',image_position:'right',checklist:['Quality Materials','Fast Turnaround','Custom Designs'],btn_text:'Learn More',btn_link:'#'}},
+    {block_type:'products',content:{heading:'Our Products',category:'',featured_only:true,limit:6}},
+    {block_type:'cta',content:{heading:'Ready to order?',subtitle:'',btn_text:'Order Now',btn_link:'order.html',bg_color:'#1a1a2e'}}
+  ]},
+  'contact':          { name:'Contact Page', blocks:[
+    {block_type:'hero',content:{title:'Contact Us',subtitle:'Get in touch with our team',bg_type:'gradient',bg_value:'linear-gradient(135deg,#1a1a2e,#0f3460)'}},
+    {block_type:'form',content:{heading:'Send us a message',subtitle:"We'll get back to you as soon as possible"}}
+  ]},
+  'faq':              { name:'FAQ Page', blocks:[
+    {block_type:'hero',content:{title:'Frequently Asked Questions',subtitle:'Find answers to common questions',bg_type:'gradient',bg_value:'linear-gradient(135deg,#1a1a2e,#0f3460)'}},
+    {block_type:'faq',content:{heading:'',items:[{question:'Sample question?',answer:'Sample answer.'}]}}
+  ]}
+};
 
-// ===== Custom links/redirects stored in Supabase =====
-let customLinks = [];
-let customRedirects = [];
+var BLOCK_ICONS = {hero:'\u{1F3AF}',text:'\u{1F4DD}','image-text':'\u{1F5BC}\uFE0F',products:'\u{1F6CD}\uFE0F',gallery:'\u{1F4F7}',faq:'\u{2753}',cta:'\u{1F4E3}',form:'\u{1F4E8}',html:'\u{1F4BB}',spacer:'\u{2195}\uFE0F',section:'\u{1F4D0}'};
+var BLOCK_NAMES = {hero:'Hero Banner',text:'Text / HTML','image-text':'Image + Text',products:'Product Grid',gallery:'Gallery',faq:'FAQ Accordion',cta:'Call to Action',form:'Contact Form',html:'Raw HTML',spacer:'Spacer',section:'Page Section'};
 
+// =========== STATE ===========
+var navItems = [];
+var customPages = [];
+var customLinks = [];
+var customRedirects = [];
+var currentBuilderId = null;
+var pageBlocks = [];
+var openBlockId = null;
+
+// =========== HELPERS ===========
+function esc(s) { if (!s) return ''; var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
 function showToast(msg, type) {
-  const t = document.getElementById('toast');
+  var t = document.getElementById('toast');
   t.className = 'toast toast-' + (type || 'info');
   t.textContent = msg;
   t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3000);
+  setTimeout(function() { t.classList.remove('show'); }, 3000);
 }
-
+function closeModals() { document.querySelectorAll('.modal-overlay').forEach(function(m) { m.classList.remove('show'); }); }
 function switchTab(name) {
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tabs-bar button').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
+  document.querySelectorAll('.tabs-bar button').forEach(function(b) { b.classList.remove('active'); });
   document.getElementById('tab-' + name).classList.add('active');
-  event.target.classList.add('active');
+  // Find the correct tab button
+  var btns = document.querySelectorAll('.tabs-bar button');
+  btns.forEach(function(b) { if (b.textContent.toLowerCase().replace(/\s/g,'').indexOf(name) >= 0 || b.getAttribute('onclick').indexOf("'" + name + "'") >= 0) b.classList.add('active'); });
 }
 
-function renderPages() {
-  const grid = document.getElementById('pages-grid');
-  grid.innerHTML = SITE_PAGES.map(p => {
-    let badge = '';
-    if (p.nav === 'main') badge = '<span class="page-badge badge-nav">Main Nav</span>';
-    else if (p.nav === 'products') badge = '<span class="page-badge badge-nav">Products</span>';
-    else if (p.nav === 'services') badge = '<span class="page-badge badge-nav">Services</span>';
-    else if (p.nav === 'hidden') badge = '<span class="page-badge badge-hidden">Hidden</span>';
-    else if (p.nav === 'footer') badge = '<span class="page-badge badge-hidden">Footer Only</span>';
+function allPageOptions() {
+  var opts = '';
+  STATIC_PAGES.forEach(function(p) { opts += '<option value="'+esc(p.file)+'">'+esc(p.title)+' ('+esc(p.file)+')</option>'; });
+  return opts;
+}
 
-    return `<div class="page-card">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">
-        <h4>${esc(p.title)}</h4>
-        ${badge}
-      </div>
-      <div class="page-file">${esc(p.file)}</div>
-      <div class="page-desc">${esc(p.desc)}</div>
-      <div class="page-actions">
-        <a href="${esc(p.file)}" target="_blank" class="btn btn-sm btn-secondary">View</a>
-        <a href="admin-pages.html?page=${encodeURIComponent(p.file)}" class="btn btn-sm btn-primary">Edit Content</a>
-      </div>
-    </div>`;
+function customPageOptions() {
+  var opts = '';
+  customPages.forEach(function(p) { opts += '<option value="p/'+esc(p.slug)+'">'+esc(p.title)+' (/p/'+esc(p.slug)+')</option>'; });
+  return opts;
+}
+
+// =========== NAV PREVIEW ===========
+function renderNavPreview() {
+  var el = document.getElementById('nav-preview');
+  var top = navItems.filter(function(n) { return !n.parent_id && n.active; });
+  var children = navItems.filter(function(n) { return n.parent_id && n.active; });
+  top.sort(function(a,b) { return (a.sort_order||0)-(b.sort_order||0); });
+  if (top.length === 0) {
+    el.innerHTML = '<span style="color:#888;font-size:13px">No nav items yet. Add items to see the live preview.</span>';
+    return;
+  }
+  el.innerHTML = top.map(function(item) {
+    var kids = children.filter(function(c) { return c.parent_id === item.id; });
+    return '<div class="nav-preview-item' + (kids.length ? ' has-sub' : '') + '">' + esc(item.label) + '</div>';
   }).join('');
 }
 
-function renderNavigation() {
-  // Main nav items
-  const navList = document.getElementById('nav-items-list');
-  navList.innerHTML = NAV_ITEMS.map((item, i) => `
-    <div class="link-row">
-      <span style="color:#C7065C;font-size:16px;cursor:grab;">&#x2630;</span>
-      <span class="link-label">${esc(item.label)}</span>
-      <span class="link-target">${esc(item.file)}</span>
-      <span class="link-type">${item.type === 'dropdown' ? 'Dropdown (' + item.children.length + ')' : 'Link'}</span>
-    </div>
-  `).join('');
+// ====================================================================
+//  NAVIGATION TAB — CRUD for nav_items table
+// ====================================================================
+async function loadNavItems() {
+  try {
+    var r = await db.from('nav_items').select('*').order('sort_order', { ascending: true });
+    if (r.error) throw r.error;
+    navItems = r.data || [];
+  } catch(e) { console.warn('[nav]', e.message); navItems = []; }
+  renderNavItems();
+  renderNavPreview();
+  document.getElementById('stat-nav').textContent = navItems.filter(function(n) { return !n.parent_id; }).length;
+}
 
-  // Products dropdown
-  const prodItem = NAV_ITEMS.find(n => n.label === 'PRODUCTS');
-  const prodList = document.getElementById('products-dropdown-list');
-  if (prodItem) {
-    prodList.innerHTML = prodItem.children.map(file => {
-      const page = SITE_PAGES.find(p => p.file === file);
-      return `<div class="link-row">
-        <span style="color:#C7065C;font-size:16px;cursor:grab;">&#x2630;</span>
-        <span class="link-label">${page ? esc(page.title) : esc(file)}</span>
-        <span class="link-target">${esc(file)}</span>
-      </div>`;
-    }).join('');
+function renderNavItems() {
+  var list = document.getElementById('nav-items-list');
+  if (navItems.length === 0) {
+    list.innerHTML = '<div style="padding:40px;text-align:center;color:#888"><p style="font-size:14px">No navigation items yet</p><p style="font-size:12px">Click "+ Add Nav Item" to build your navigation menu. When the DB has items, they replace the static HTML nav on all public pages.</p><button class="btn btn-primary btn-sm" style="margin-top:12px" onclick="seedDefaultNav()">Seed Default Nav</button></div>';
+    return;
   }
+  var top = navItems.filter(function(n) { return !n.parent_id; });
+  top.sort(function(a,b) { return (a.sort_order||0)-(b.sort_order||0); });
+  var html = '';
+  top.forEach(function(item) {
+    var kids = navItems.filter(function(c) { return c.parent_id === item.id; });
+    kids.sort(function(a,b) { return (a.sort_order||0)-(b.sort_order||0); });
+    html += '<div class="link-row">' +
+      '<span style="color:#C7065C;font-size:16px;cursor:grab">&#x2630;</span>' +
+      '<span class="link-label">' + esc(item.label) + '</span>' +
+      '<span class="link-target">' + esc(item.href) + '</span>' +
+      '<span class="link-type">' + (kids.length ? 'Dropdown (' + kids.length + ')' : 'Link') + '</span>' +
+      (item.active ? '<span class="page-badge badge-published">Active</span>' : '<span class="page-badge badge-draft">Inactive</span>') +
+      '<button class="btn btn-sm btn-secondary" onclick="openNavEditor(\'' + item.id + '\')">Edit</button>' +
+      '<button class="btn btn-sm btn-secondary" style="color:#e53935" onclick="deleteNavItem(\'' + item.id + '\')">Delete</button>' +
+      '</div>';
+    kids.forEach(function(kid) {
+      html += '<div class="link-row link-child">' +
+        '<span style="color:#888;font-size:12px">&#x2514;</span>' +
+        '<span class="link-label">' + esc(kid.label) + '</span>' +
+        '<span class="link-target">' + esc(kid.href) + '</span>' +
+        '<span class="link-type">Child</span>' +
+        '<button class="btn btn-sm btn-secondary" onclick="openNavEditor(\'' + kid.id + '\')">Edit</button>' +
+        '<button class="btn btn-sm btn-secondary" style="color:#e53935" onclick="deleteNavItem(\'' + kid.id + '\')">Delete</button>' +
+        '</div>';
+    });
+  });
+  list.innerHTML = html;
+}
 
-  // Services dropdown
-  const svcItem = NAV_ITEMS.find(n => n.label === 'SERVICES');
-  const svcList = document.getElementById('services-dropdown-list');
-  if (svcItem) {
-    svcList.innerHTML = svcItem.children.map(file => {
-      const page = SITE_PAGES.find(p => p.file === file);
-      return `<div class="link-row">
-        <span style="color:#C7065C;font-size:16px;cursor:grab;">&#x2630;</span>
-        <span class="link-label">${page ? esc(page.title) : esc(file)}</span>
-        <span class="link-target">${esc(file)}</span>
-      </div>`;
-    }).join('');
+function toggleNavHref() {
+  var v = document.getElementById('nav-href-type').value;
+  document.getElementById('nav-page-group').style.display = v === 'page' ? '' : 'none';
+  document.getElementById('nav-custom-page-group').style.display = v === 'custom-page' ? '' : 'none';
+  document.getElementById('nav-custom-url-group').style.display = v === 'custom-url' ? '' : 'none';
+}
+
+function openNavEditor(id) {
+  var item = id ? navItems.find(function(n) { return n.id === id; }) : null;
+  document.getElementById('nav-modal-title').textContent = item ? 'Edit Nav Item' : 'Add Nav Item';
+  document.getElementById('nav-edit-id').value = item ? item.id : '';
+  document.getElementById('nav-label').value = item ? item.label : '';
+  document.getElementById('nav-target').value = item ? item.target || '_self' : '_self';
+  document.getElementById('nav-sort').value = item ? item.sort_order || 0 : navItems.length;
+
+  // Populate page selects
+  document.getElementById('nav-href-page').innerHTML = allPageOptions();
+  document.getElementById('nav-href-custom-page').innerHTML = customPageOptions() || '<option value="">No custom pages yet</option>';
+
+  // Set href type and value
+  if (item) {
+    var href = item.href || '';
+    var isCustomPage = customPages.find(function(p) { return 'p/' + p.slug === href; });
+    var isStaticPage = STATIC_PAGES.find(function(p) { return p.file === href; });
+    if (isStaticPage) {
+      document.getElementById('nav-href-type').value = 'page';
+      document.getElementById('nav-href-page').value = href;
+    } else if (isCustomPage) {
+      document.getElementById('nav-href-type').value = 'custom-page';
+      document.getElementById('nav-href-custom-page').value = href;
+    } else {
+      document.getElementById('nav-href-type').value = 'custom-url';
+      document.getElementById('nav-href-url').value = href;
+    }
+  } else {
+    document.getElementById('nav-href-type').value = 'page';
+    document.getElementById('nav-href-url').value = '';
+  }
+  toggleNavHref();
+
+  // Parent selector (only top-level items, exclude self)
+  var parentSelect = document.getElementById('nav-parent');
+  var topLevel = navItems.filter(function(n) { return !n.parent_id && (!item || n.id !== item.id); });
+  parentSelect.innerHTML = '<option value="">None (top-level item)</option>' +
+    topLevel.map(function(n) { return '<option value="'+n.id+'">Under: '+esc(n.label)+'</option>'; }).join('');
+  parentSelect.value = item && item.parent_id ? item.parent_id : '';
+
+  document.getElementById('nav-modal').classList.add('show');
+}
+
+async function saveNavItem() {
+  var id = document.getElementById('nav-edit-id').value;
+  var label = document.getElementById('nav-label').value.trim();
+  var hrefType = document.getElementById('nav-href-type').value;
+  var href = '';
+  if (hrefType === 'page') href = document.getElementById('nav-href-page').value;
+  else if (hrefType === 'custom-page') href = document.getElementById('nav-href-custom-page').value;
+  else href = document.getElementById('nav-href-url').value.trim();
+
+  if (!label) { showToast('Label is required', 'error'); return; }
+  if (!href) { showToast('Link target is required', 'error'); return; }
+
+  var parentId = document.getElementById('nav-parent').value || null;
+  var target = document.getElementById('nav-target').value;
+  var sortOrder = parseInt(document.getElementById('nav-sort').value) || 0;
+
+  var btn = document.getElementById('nav-save-btn');
+  btn.disabled = true; btn.textContent = 'Saving...';
+
+  try {
+    var data = { label: label, href: href, parent_id: parentId, target: target, sort_order: sortOrder, active: true };
+    var result;
+    if (id) {
+      result = await db.from('nav_items').update(data).eq('id', id);
+    } else {
+      result = await db.from('nav_items').insert(data);
+    }
+    if (result.error) throw result.error;
+    showToast(id ? 'Updated!' : 'Nav item added!', 'success');
+    closeModals();
+    loadNavItems();
+  } catch(e) {
+    showToast('Error: ' + e.message, 'error');
+  }
+  btn.disabled = false; btn.textContent = 'Save';
+}
+
+async function deleteNavItem(id) {
+  if (!confirm('Delete this nav item? Children will also be removed.')) return;
+  try {
+    var r = await db.from('nav_items').delete().eq('id', id);
+    if (r.error) throw r.error;
+    showToast('Deleted', 'success');
+    loadNavItems();
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+}
+
+async function seedDefaultNav() {
+  if (!confirm('This will add the default nav items (Products, Services, Showcase, Order, Size Chart, FAQs) to the database. Continue?')) return;
+  try {
+    // Insert top-level items
+    var items = [
+      { label:'Products', href:'product.html', sort_order:0, target:'_self' },
+      { label:'Services', href:'services.html', sort_order:1, target:'_self' },
+      { label:'Showcase', href:'copyofwashingsamples.html', sort_order:2, target:'_self' },
+      { label:'Order', href:'order.html', sort_order:3, target:'_self' },
+      { label:'Size Chart', href:'sizechart.html', sort_order:4, target:'_self' },
+      { label:'FAQs', href:'FAQs.html', sort_order:5, target:'_self' }
+    ];
+    var r = await db.from('nav_items').insert(items).select();
+    if (r.error) throw r.error;
+
+    var productsId = r.data.find(function(n) { return n.label === 'Products'; }).id;
+    var servicesId = r.data.find(function(n) { return n.label === 'Services'; }).id;
+
+    // Insert dropdown children
+    var children = [
+      { label:'Head Gear', href:'headgear.html', parent_id:productsId, sort_order:0 },
+      { label:'Basic Poly', href:'basicpoly.html', parent_id:productsId, sort_order:1 },
+      { label:'Stock Designs', href:'stockdesigns.html', parent_id:productsId, sort_order:2 },
+      { label:'Fabric Guide', href:'fabricdescriptions.html', parent_id:productsId, sort_order:3 },
+      { label:'Sublimation Printing', href:'sublimationprinting.html', parent_id:productsId, sort_order:4 },
+      { label:'Graphic Design', href:'grapicdesign.html', parent_id:servicesId, sort_order:0 },
+      { label:'Custom Logos', href:'customlogos.html', parent_id:servicesId, sort_order:1 },
+      { label:'Vehicle Wraps', href:'wrapdesign.html', parent_id:servicesId, sort_order:2 }
+    ];
+    var r2 = await db.from('nav_items').insert(children);
+    if (r2.error) throw r2.error;
+
+    showToast('Default nav seeded! Public pages will now use DB navigation.', 'success');
+    loadNavItems();
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+}
+
+// ====================================================================
+//  PAGES TAB — CRUD for custom_pages table
+// ====================================================================
+async function loadPages() {
+  try {
+    var r = await db.from('custom_pages').select('*').order('created_at', { ascending: false });
+    if (r.error) throw r.error;
+    customPages = r.data || [];
+  } catch(e) { console.warn('[pages]', e.message); customPages = []; }
+  renderCustomPages();
+  renderStaticPages();
+  document.getElementById('stat-pages').textContent = customPages.length;
+  document.getElementById('stat-published').textContent = customPages.filter(function(p) { return p.status === 'published'; }).length;
+}
+
+function renderCustomPages() {
+  var grid = document.getElementById('custom-pages-grid');
+  if (customPages.length === 0) {
+    grid.innerHTML = '<div style="padding:40px;text-align:center;color:#888;grid-column:1/-1"><p>No custom pages yet.</p><button class="btn btn-primary btn-sm" onclick="showCreatePageModal()">+ Create First Page</button></div>';
+    return;
+  }
+  grid.innerHTML = customPages.map(function(p) {
+    var statusBadge = p.status === 'published'
+      ? '<span class="page-badge badge-published">Published</span>'
+      : '<span class="page-badge badge-draft">Draft</span>';
+    return '<div class="page-card">' +
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px"><h4>' + esc(p.title) + '</h4>' + statusBadge + '</div>' +
+      '<div class="page-file">/p/' + esc(p.slug) + '</div>' +
+      '<div class="page-desc">' + esc(p.description || 'No description') + '</div>' +
+      '<div style="font-size:11px;color:#aaa;margin-bottom:12px">Template: ' + esc(p.template) + ' &bull; Created: ' + new Date(p.created_at).toLocaleDateString() + '</div>' +
+      '<div class="page-actions">' +
+        '<a href="page.html?slug=' + encodeURIComponent(p.slug) + '" target="_blank" class="btn btn-sm btn-secondary">View</a>' +
+        '<button class="btn btn-sm btn-primary" onclick="openBuilder(\'' + p.id + '\')">Edit Blocks</button>' +
+        '<button class="btn btn-sm btn-secondary" onclick="editPageSettings(\'' + p.id + '\')">Settings</button>' +
+        '<button class="btn btn-sm btn-secondary" style="color:#e53935" onclick="deletePage(\'' + p.id + '\')">Delete</button>' +
+      '</div></div>';
+  }).join('');
+}
+
+function renderStaticPages() {
+  var grid = document.getElementById('static-pages-grid');
+  grid.innerHTML = STATIC_PAGES.map(function(p) {
+    return '<div class="page-card">' +
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px"><h4>' + esc(p.title) + '</h4><span class="page-badge badge-custom">Static</span></div>' +
+      '<div class="page-file">' + esc(p.file) + '</div>' +
+      '<div class="page-desc">' + esc(p.desc) + '</div>' +
+      '<div class="page-actions">' +
+        '<a href="' + esc(p.file) + '" target="_blank" class="btn btn-sm btn-secondary">View</a>' +
+        '<a href="admin-pages.html?page=' + encodeURIComponent(p.file) + '" class="btn btn-sm btn-primary">Edit Content</a>' +
+      '</div></div>';
+  }).join('');
+}
+
+function autoSlug() {
+  var title = document.getElementById('pg-title').value;
+  var slugField = document.getElementById('pg-slug');
+  if (!document.getElementById('page-edit-id').value) {
+    slugField.value = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  }
+  document.getElementById('slug-preview').textContent = slugField.value || 'your-slug';
+}
+
+function showCreatePageModal() {
+  document.getElementById('page-modal-title').textContent = 'Create New Page';
+  document.getElementById('page-save-btn').textContent = 'Create Page';
+  document.getElementById('page-edit-id').value = '';
+  document.getElementById('pg-title').value = '';
+  document.getElementById('pg-slug').value = '';
+  document.getElementById('pg-desc').value = '';
+  document.getElementById('pg-meta').value = '';
+  document.getElementById('pg-template').value = 'blank';
+  document.getElementById('pg-image').value = '';
+  document.getElementById('pg-status').value = 'draft';
+  document.getElementById('slug-preview').textContent = 'your-slug';
+  document.getElementById('page-modal').classList.add('show');
+}
+
+function editPageSettings(id) {
+  var page = customPages.find(function(p) { return p.id === id; });
+  if (!page) return;
+  document.getElementById('page-modal-title').textContent = 'Edit Page Settings';
+  document.getElementById('page-save-btn').textContent = 'Save Changes';
+  document.getElementById('page-edit-id').value = page.id;
+  document.getElementById('pg-title').value = page.title;
+  document.getElementById('pg-slug').value = page.slug;
+  document.getElementById('pg-desc').value = page.description || '';
+  document.getElementById('pg-meta').value = page.meta_description || '';
+  document.getElementById('pg-template').value = page.template;
+  document.getElementById('pg-image').value = page.featured_image || '';
+  document.getElementById('pg-status').value = page.status;
+  document.getElementById('slug-preview').textContent = page.slug;
+  document.getElementById('page-modal').classList.add('show');
+}
+
+async function savePage() {
+  var id = document.getElementById('page-edit-id').value;
+  var title = document.getElementById('pg-title').value.trim();
+  var slug = document.getElementById('pg-slug').value.trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
+  var template = document.getElementById('pg-template').value;
+
+  if (!title) { showToast('Title is required', 'error'); return; }
+  if (!slug) { showToast('Slug is required', 'error'); return; }
+
+  var btn = document.getElementById('page-save-btn');
+  btn.disabled = true; btn.textContent = 'Saving...';
+
+  try {
+    var data = {
+      title: title, slug: slug,
+      description: document.getElementById('pg-desc').value.trim(),
+      meta_description: document.getElementById('pg-meta').value.trim(),
+      template: template,
+      featured_image: document.getElementById('pg-image').value.trim(),
+      status: document.getElementById('pg-status').value
+    };
+
+    if (id) {
+      var r = await db.from('custom_pages').update(data).eq('id', id);
+      if (r.error) throw r.error;
+      showToast('Page updated!', 'success');
+    } else {
+      var r = await db.from('custom_pages').insert(data).select();
+      if (r.error) throw r.error;
+      var newPage = r.data[0];
+
+      // Auto-create template blocks
+      var tmpl = TEMPLATES[template];
+      if (tmpl && tmpl.blocks.length > 0) {
+        var blocks = tmpl.blocks.map(function(b, i) {
+          return { page_id: newPage.id, block_type: b.block_type, content: b.content, sort_order: i };
+        });
+        var rb = await db.from('page_blocks').insert(blocks);
+        if (rb.error) console.warn('Block creation error:', rb.error.message);
+      }
+      showToast('Page created! Click "Edit Blocks" to customize.', 'success');
+    }
+    closeModals();
+    loadPages();
+    loadBlockCount();
+  } catch(e) {
+    showToast('Error: ' + e.message, 'error');
+  }
+  btn.disabled = false; btn.textContent = id ? 'Save Changes' : 'Create Page';
+}
+
+async function deletePage(id) {
+  if (!confirm('Delete this page and all its blocks? This cannot be undone.')) return;
+  try {
+    var r = await db.from('custom_pages').delete().eq('id', id);
+    if (r.error) throw r.error;
+    showToast('Page deleted', 'success');
+    if (currentBuilderId === id) closeBuilder();
+    loadPages();
+    loadBlockCount();
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+}
+
+// Image upload for page featured image
+document.getElementById('pg-image-file').addEventListener('change', async function() {
+  var file = this.files[0]; if (!file) return;
+  try {
+    var result = await brUploadFile('media', file, 'pages');
+    document.getElementById('pg-image').value = result.url;
+    showToast('Image uploaded!', 'success');
+  } catch(e) { showToast('Upload error: ' + e.message, 'error'); }
+});
+
+// ====================================================================
+//  PAGE BUILDER — Block editor for custom pages
+// ====================================================================
+async function openBuilder(pageId) {
+  currentBuilderId = pageId;
+  var page = customPages.find(function(p) { return p.id === pageId; });
+  if (!page) { showToast('Page not found', 'error'); return; }
+
+  document.getElementById('builder-title').textContent = 'Building: ' + page.title;
+  document.getElementById('tab-btn-builder').style.display = '';
+  switchTab('builder');
+  await loadBlocks();
+}
+
+function closeBuilder() {
+  currentBuilderId = null;
+  openBlockId = null;
+  document.getElementById('tab-btn-builder').style.display = 'none';
+  switchTab('pages');
+}
+
+function previewPage() {
+  var page = customPages.find(function(p) { return p.id === currentBuilderId; });
+  if (page) window.open('page.html?slug=' + encodeURIComponent(page.slug) + '&preview=1', '_blank');
+}
+
+async function loadBlocks() {
+  if (!currentBuilderId) return;
+  try {
+    var r = await db.from('page_blocks').select('*').eq('page_id', currentBuilderId).order('sort_order', { ascending: true });
+    if (r.error) throw r.error;
+    pageBlocks = r.data || [];
+  } catch(e) { console.warn('[blocks]', e.message); pageBlocks = []; }
+  renderBlocks();
+}
+
+async function loadBlockCount() {
+  try {
+    var r = await db.from('page_blocks').select('id', { count: 'exact', head: true });
+    document.getElementById('stat-blocks').textContent = r.count || 0;
+  } catch(e) {}
+}
+
+function renderBlocks() {
+  var list = document.getElementById('block-list');
+  if (pageBlocks.length === 0) {
+    list.innerHTML = '<div style="padding:40px;text-align:center;color:#888"><p>No blocks yet. Click "+ Add Block" to start building.</p></div>';
+    return;
+  }
+  list.innerHTML = pageBlocks.map(function(b, idx) {
+    var c = b.content || {};
+    var preview = c.title || c.heading || c.body || c.btn_text || c.code || '';
+    if (preview.length > 60) preview = preview.substring(0, 60) + '...';
+    preview = preview.replace(/<[^>]+>/g, ''); // strip HTML tags
+    var isOpen = openBlockId === b.id;
+
+    return '<div class="block-item" data-id="' + b.id + '">' +
+      '<div class="block-header" onclick="toggleBlock(\'' + b.id + '\')">' +
+        '<span class="block-icon">' + (BLOCK_ICONS[b.block_type] || '\u{1F4E6}') + '</span>' +
+        '<span class="block-type-name">' + esc(BLOCK_NAMES[b.block_type] || b.block_type) + '</span>' +
+        '<span class="block-preview">' + esc(preview) + '</span>' +
+        '<div class="block-actions">' +
+          (idx > 0 ? '<button onclick="event.stopPropagation();moveBlock(\'' + b.id + '\',-1)" title="Move up">&uarr;</button>' : '') +
+          (idx < pageBlocks.length - 1 ? '<button onclick="event.stopPropagation();moveBlock(\'' + b.id + '\',1)" title="Move down">&darr;</button>' : '') +
+          '<button onclick="event.stopPropagation();deleteBlock(\'' + b.id + '\')" title="Delete" style="color:#e53935">&times;</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="block-editor' + (isOpen ? ' open' : '') + '" id="editor-' + b.id + '">' +
+        getBlockEditorHtml(b.block_type, c, b.id) +
+        '<div class="form-actions" style="margin-top:16px"><button class="btn btn-primary btn-sm" onclick="saveBlockContent(\'' + b.id + '\',\'' + b.block_type + '\')">Save Block</button></div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function toggleBlock(id) {
+  openBlockId = openBlockId === id ? null : id;
+  renderBlocks();
+}
+
+function showBlockPicker() {
+  document.getElementById('block-picker-modal').classList.add('show');
+}
+
+async function addBlock(type) {
+  closeModals();
+  if (!currentBuilderId) return;
+  var defaultContent = {};
+  var tmpl = Object.values(TEMPLATES).find(function(t) { return t.blocks.find(function(b) { return b.block_type === type; }); });
+  if (tmpl) {
+    var found = tmpl.blocks.find(function(b) { return b.block_type === type; });
+    if (found) defaultContent = JSON.parse(JSON.stringify(found.content));
+  }
+  if (type === 'spacer' && !defaultContent.height) defaultContent.height = 60;
+  if (type === 'html' && !defaultContent.code) defaultContent.code = '<div>Your HTML here</div>';
+
+  try {
+    var r = await db.from('page_blocks').insert({
+      page_id: currentBuilderId,
+      block_type: type,
+      content: defaultContent,
+      sort_order: pageBlocks.length
+    }).select();
+    if (r.error) throw r.error;
+    showToast(BLOCK_NAMES[type] + ' added!', 'success');
+    openBlockId = r.data[0].id;
+    await loadBlocks();
+    loadBlockCount();
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+}
+
+async function moveBlock(id, direction) {
+  var idx = pageBlocks.findIndex(function(b) { return b.id === id; });
+  var newIdx = idx + direction;
+  if (newIdx < 0 || newIdx >= pageBlocks.length) return;
+  var a = pageBlocks[idx], b = pageBlocks[newIdx];
+  try {
+    await db.from('page_blocks').update({ sort_order: newIdx }).eq('id', a.id);
+    await db.from('page_blocks').update({ sort_order: idx }).eq('id', b.id);
+    await loadBlocks();
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+}
+
+async function deleteBlock(id) {
+  if (!confirm('Delete this block?')) return;
+  try {
+    var r = await db.from('page_blocks').delete().eq('id', id);
+    if (r.error) throw r.error;
+    showToast('Block deleted', 'success');
+    if (openBlockId === id) openBlockId = null;
+    await loadBlocks();
+    loadBlockCount();
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+}
+
+async function saveBlockContent(id, type) {
+  var content = readBlockContent(type, id);
+  if (!content) return;
+  try {
+    var r = await db.from('page_blocks').update({ content: content }).eq('id', id);
+    if (r.error) throw r.error;
+    // Update local state
+    var block = pageBlocks.find(function(b) { return b.id === id; });
+    if (block) block.content = content;
+    showToast('Block saved!', 'success');
+    renderBlocks(); // re-render to update preview text
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+}
+
+// ====================================================================
+//  BLOCK EDITOR FORMS — generate HTML for each block type
+// ====================================================================
+function fld(id, label, type, value, extra) {
+  extra = extra || '';
+  var v = value === undefined || value === null ? '' : value;
+  if (type === 'textarea') return '<div class="form-group"><label>' + esc(label) + '</label><textarea id="' + id + '" rows="4" ' + extra + '>' + esc(String(v)) + '</textarea></div>';
+  if (type === 'select') return ''; // handled separately
+  if (type === 'checkbox') return '<div class="form-group"><label style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="' + id + '"' + (v ? ' checked' : '') + ' style="width:auto"> ' + esc(label) + '</label></div>';
+  return '<div class="form-group"><label>' + esc(label) + '</label><input type="' + (type || 'text') + '" id="' + id + '" value="' + esc(String(v)) + '" ' + extra + '></div>';
+}
+
+function selectFld(id, label, options, value) {
+  return '<div class="form-group"><label>' + esc(label) + '</label><select id="' + id + '">' +
+    options.map(function(o) {
+      var val = typeof o === 'string' ? o : o.value;
+      var text = typeof o === 'string' ? o : o.label;
+      return '<option value="' + esc(val) + '"' + (val === value ? ' selected' : '') + '>' + esc(text) + '</option>';
+    }).join('') + '</select></div>';
+}
+
+function getBlockEditorHtml(type, c, blockId) {
+  var p = 'be-' + blockId + '-'; // prefix for IDs
+  c = c || {};
+  switch(type) {
+    case 'hero':
+      return fld(p+'title','Title','text',c.title) +
+        fld(p+'subtitle','Subtitle','textarea',c.subtitle) +
+        selectFld(p+'bg_type','Background Type',[{value:'gradient',label:'Gradient'},{value:'image',label:'Image'},{value:'color',label:'Solid Color'}],c.bg_type||'gradient') +
+        fld(p+'bg_value','Background Value','text',c.bg_value,'placeholder="linear-gradient(...) or image URL or #hex"') +
+        fld(p+'btn1_text','Button 1 Text','text',c.btn1_text) + fld(p+'btn1_link','Button 1 Link','text',c.btn1_link) +
+        fld(p+'btn2_text','Button 2 Text','text',c.btn2_text) + fld(p+'btn2_link','Button 2 Link','text',c.btn2_link) +
+        fld(p+'image_url','Hero Image URL','text',c.image_url,'placeholder="Optional product/showcase image"') +
+        '<div class="form-group"><label>Hero Image Upload</label><input type="file" accept="image/*" onchange="uploadBlockImage(this,\'' + p + 'image_url\')"></div>';
+
+    case 'text':
+      return fld(p+'heading','Heading (optional)','text',c.heading) +
+        fld(p+'body','Body (HTML allowed)','textarea',c.body) +
+        selectFld(p+'align','Alignment',[{value:'left',label:'Left'},{value:'center',label:'Center'},{value:'right',label:'Right'}],c.align||'left');
+
+    case 'image-text':
+      var checklistStr = (c.checklist || []).join('\n');
+      return fld(p+'label','Section Label','text',c.label) +
+        fld(p+'heading','Heading','text',c.heading) +
+        fld(p+'description','Description','textarea',c.description) +
+        fld(p+'checklist','Checklist (one per line)','textarea',checklistStr) +
+        fld(p+'image_url','Image URL','text',c.image_url) +
+        '<div class="form-group"><label>Image Upload</label><input type="file" accept="image/*" onchange="uploadBlockImage(this,\'' + p + 'image_url\')"></div>' +
+        selectFld(p+'image_position','Image Position',[{value:'right',label:'Right'},{value:'left',label:'Left'}],c.image_position||'right') +
+        fld(p+'btn_text','Button Text','text',c.btn_text) + fld(p+'btn_link','Button Link','text',c.btn_link);
+
+    case 'products':
+      return fld(p+'heading','Heading','text',c.heading) +
+        fld(p+'category','Category Filter (empty=all)','text',c.category,'placeholder="e.g. apparel, headgear"') +
+        fld(p+'featured_only','Featured Only','checkbox',c.featured_only) +
+        fld(p+'limit','Limit','number',c.limit||12);
+
+    case 'gallery':
+      var galleryHtml = fld(p+'heading','Heading','text',c.heading) +
+        selectFld(p+'columns','Columns',[{value:'2',label:'2'},{value:'3',label:'3'},{value:'4',label:'4'}],String(c.columns||3));
+      // Images list
+      var images = c.images || [];
+      galleryHtml += '<div class="form-group"><label>Images</label><div id="' + p + 'images">';
+      images.forEach(function(img, i) {
+        galleryHtml += '<div class="removable-row"><input type="text" value="' + esc(img.url||img) + '" data-gallery-url><input type="text" value="' + esc(img.caption||'') + '" placeholder="Caption" data-gallery-caption><button class="remove-btn" onclick="this.parentElement.remove()">&times;</button></div>';
+      });
+      galleryHtml += '</div>';
+      galleryHtml += '<div style="margin-top:8px"><button class="btn btn-sm btn-secondary" onclick="addGalleryRow(\'' + p + 'images\')">+ Add Image</button> <input type="file" accept="image/*" multiple onchange="uploadGalleryImages(this,\'' + p + 'images\')" style="font-size:12px"></div></div>';
+      return galleryHtml;
+
+    case 'faq':
+      var items = c.items || [];
+      var faqHtml = fld(p+'heading','Heading','text',c.heading);
+      faqHtml += '<div class="form-group"><label>Q&amp;A Items</label><div id="' + p + 'items">';
+      items.forEach(function(item, i) {
+        faqHtml += '<div class="removable-row" style="flex-direction:column;align-items:stretch">' +
+          '<div style="display:flex;gap:8px"><input type="text" value="' + esc(item.question) + '" placeholder="Question" data-faq-q><button class="remove-btn" onclick="this.closest(\'.removable-row\').remove()">&times;</button></div>' +
+          '<textarea rows="2" placeholder="Answer" data-faq-a>' + esc(item.answer) + '</textarea></div>';
+      });
+      faqHtml += '</div>';
+      faqHtml += '<button class="btn btn-sm btn-secondary" style="margin-top:8px" onclick="addFaqRow(\'' + p + 'items\')">+ Add Q&amp;A</button></div>';
+      return faqHtml;
+
+    case 'cta':
+      return fld(p+'heading','Heading','text',c.heading) +
+        fld(p+'subtitle','Subtitle','text',c.subtitle) +
+        fld(p+'btn_text','Button Text','text',c.btn_text) + fld(p+'btn_link','Button Link','text',c.btn_link) +
+        fld(p+'bg_color','Background Color','color',c.bg_color||'#1a1a2e');
+
+    case 'form':
+      return fld(p+'heading','Heading','text',c.heading) +
+        fld(p+'subtitle','Subtitle','text',c.subtitle);
+
+    case 'html':
+      return fld(p+'code','HTML Code','textarea',c.code);
+
+    case 'spacer':
+      return fld(p+'height','Height (px)','number',c.height||60);
+
+    case 'section':
+      return fld(p+'section_label','Section Label','text',c.section_label||'') +
+        '<p style="font-size:12px;color:#888">This block loads a category section from the database. Use admin-sections.html to manage section content.</p>';
+
+    default:
+      return '<p style="color:#888">Unknown block type: ' + esc(type) + '</p>';
   }
 }
 
+function readBlockContent(type, blockId) {
+  var p = 'be-' + blockId + '-';
+  var g = function(id) { var el = document.getElementById(p+id); return el ? el.value.trim() : ''; };
+  var gChk = function(id) { var el = document.getElementById(p+id); return el ? el.checked : false; };
+
+  switch(type) {
+    case 'hero':
+      return { title:g('title'), subtitle:g('subtitle'), bg_type:g('bg_type'), bg_value:g('bg_value'),
+        btn1_text:g('btn1_text'), btn1_link:g('btn1_link'), btn2_text:g('btn2_text'), btn2_link:g('btn2_link'), image_url:g('image_url') };
+    case 'text':
+      return { heading:g('heading'), body:g('body'), align:g('align') };
+    case 'image-text':
+      var cl = g('checklist').split('\n').map(function(s){return s.trim()}).filter(Boolean);
+      return { label:g('label'), heading:g('heading'), description:g('description'), checklist:cl,
+        image_url:g('image_url'), image_position:g('image_position'), btn_text:g('btn_text'), btn_link:g('btn_link') };
+    case 'products':
+      return { heading:g('heading'), category:g('category'), featured_only:gChk('featured_only'), limit:parseInt(g('limit'))||12 };
+    case 'gallery':
+      var imgs = [];
+      var container = document.getElementById(p+'images');
+      if (container) {
+        container.querySelectorAll('.removable-row').forEach(function(row) {
+          var url = row.querySelector('[data-gallery-url]'); var cap = row.querySelector('[data-gallery-caption]');
+          if (url && url.value.trim()) imgs.push({ url: url.value.trim(), caption: cap ? cap.value.trim() : '' });
+        });
+      }
+      return { heading:g('heading'), columns:parseInt(g('columns'))||3, images:imgs };
+    case 'faq':
+      var items = [];
+      var container = document.getElementById(p+'items');
+      if (container) {
+        container.querySelectorAll('.removable-row').forEach(function(row) {
+          var q = row.querySelector('[data-faq-q]'); var a = row.querySelector('[data-faq-a]');
+          if (q && q.value.trim()) items.push({ question: q.value.trim(), answer: a ? a.value.trim() : '' });
+        });
+      }
+      return { heading:g('heading'), items:items };
+    case 'cta':
+      return { heading:g('heading'), subtitle:g('subtitle'), btn_text:g('btn_text'), btn_link:g('btn_link'), bg_color:g('bg_color') };
+    case 'form':
+      return { heading:g('heading'), subtitle:g('subtitle') };
+    case 'html':
+      return { code:g('code') };
+    case 'spacer':
+      return { height:parseInt(g('height'))||60 };
+    case 'section':
+      return { section_label:g('section_label') };
+    default: return {};
+  }
+}
+
+// Helper: add gallery image row
+function addGalleryRow(containerId) {
+  var container = document.getElementById(containerId);
+  if (!container) return;
+  var row = document.createElement('div');
+  row.className = 'removable-row';
+  row.innerHTML = '<input type="text" placeholder="Image URL" data-gallery-url><input type="text" placeholder="Caption" data-gallery-caption><button class="remove-btn" onclick="this.parentElement.remove()">&times;</button>';
+  container.appendChild(row);
+}
+
+// Helper: upload gallery images (multi-file)
+async function uploadGalleryImages(input, containerId) {
+  var files = Array.from(input.files);
+  for (var i = 0; i < files.length; i++) {
+    try {
+      var result = await brUploadFile('media', files[i], 'gallery');
+      var container = document.getElementById(containerId);
+      var row = document.createElement('div');
+      row.className = 'removable-row';
+      row.innerHTML = '<input type="text" value="' + esc(result.url) + '" data-gallery-url><input type="text" placeholder="Caption" data-gallery-caption><button class="remove-btn" onclick="this.parentElement.remove()">&times;</button>';
+      container.appendChild(row);
+    } catch(e) { showToast('Upload error: ' + e.message, 'error'); }
+  }
+  input.value = '';
+}
+
+// Helper: add FAQ row
+function addFaqRow(containerId) {
+  var container = document.getElementById(containerId);
+  if (!container) return;
+  var row = document.createElement('div');
+  row.className = 'removable-row';
+  row.style.cssText = 'flex-direction:column;align-items:stretch';
+  row.innerHTML = '<div style="display:flex;gap:8px"><input type="text" placeholder="Question" data-faq-q><button class="remove-btn" onclick="this.closest(\'.removable-row\').remove()">&times;</button></div><textarea rows="2" placeholder="Answer" data-faq-a></textarea>';
+  container.appendChild(row);
+}
+
+// Helper: upload image for block field
+async function uploadBlockImage(input, targetId) {
+  var file = input.files[0]; if (!file) return;
+  try {
+    var result = await brUploadFile('media', file, 'blocks');
+    document.getElementById(targetId).value = result.url;
+    showToast('Image uploaded!', 'success');
+  } catch(e) { showToast('Upload error: ' + e.message, 'error'); }
+}
+
+// ====================================================================
+//  CUSTOM LINKS (stored in site_settings.key = 'custom_links')
+// ====================================================================
 async function loadCustomLinks() {
   try {
-    const { data } = await db.from('site_settings').select('*').eq('setting_key', 'custom_links').single();
-    if (data) customLinks = JSON.parse(data.setting_value || '[]');
+    var r = await db.from('site_settings').select('*').eq('key', 'custom_links').single();
+    if (r.data) customLinks = JSON.parse(r.data.value || '[]');
   } catch(e) {}
   renderCustomLinks();
 }
 
 function renderCustomLinks() {
-  const list = document.getElementById('custom-links-list');
+  var list = document.getElementById('custom-links-list');
   if (customLinks.length === 0) {
-    list.innerHTML = '<div style="padding:40px;text-align:center;color:#888;"><p style="font-size:14px;">No custom links yet</p></div>';
+    list.innerHTML = '<div style="padding:40px;text-align:center;color:#888"><p>No custom links yet</p></div>';
     return;
   }
-  list.innerHTML = customLinks.map((link, i) => `
-    <div class="link-row">
-      <span class="link-label">${esc(link.label)}</span>
-      <span class="link-target">${esc(link.url)}</span>
-      <span class="link-type">${esc(link.location)}</span>
-      <button class="btn btn-sm btn-secondary" onclick="deleteCustomLink(${i})" style="color:#e53935;">Delete</button>
-    </div>
-  `).join('');
-  document.getElementById('stat-links').textContent = customLinks.length;
+  list.innerHTML = customLinks.map(function(link, i) {
+    return '<div class="link-row">' +
+      '<span class="link-label">' + esc(link.label) + '</span>' +
+      '<span class="link-target">' + esc(link.url) + '</span>' +
+      '<span class="link-type">' + esc(link.location) + '</span>' +
+      '<button class="btn btn-sm btn-secondary" onclick="deleteCustomLink(' + i + ')" style="color:#e53935">Delete</button></div>';
+  }).join('');
 }
 
 async function saveCustomLink() {
-  const label = document.getElementById('link-label').value.trim();
-  const url = document.getElementById('link-url').value.trim();
-  const target = document.getElementById('link-target').value;
-  const location = document.getElementById('link-location').value;
-
+  var label = document.getElementById('link-label').value.trim();
+  var url = document.getElementById('link-url').value.trim();
   if (!label || !url) { showToast('Label and URL required', 'error'); return; }
-
-  customLinks.push({ label, url, target, location });
-  await db.from('site_settings').upsert({ setting_key: 'custom_links', setting_value: JSON.stringify(customLinks) }, { onConflict: 'setting_key' });
-  renderCustomLinks();
-  closeModals();
-  showToast('Link added!', 'success');
+  customLinks.push({ label:label, url:url, target:document.getElementById('link-target').value, location:document.getElementById('link-location').value });
+  await db.from('site_settings').upsert({ key:'custom_links', value:JSON.stringify(customLinks) }, { onConflict:'key' });
+  renderCustomLinks(); closeModals(); showToast('Link added!', 'success');
 }
 
 async function deleteCustomLink(idx) {
   customLinks.splice(idx, 1);
-  await db.from('site_settings').upsert({ setting_key: 'custom_links', setting_value: JSON.stringify(customLinks) }, { onConflict: 'setting_key' });
-  renderCustomLinks();
-  showToast('Link removed', 'success');
+  await db.from('site_settings').upsert({ key:'custom_links', value:JSON.stringify(customLinks) }, { onConflict:'key' });
+  renderCustomLinks(); showToast('Link removed', 'success');
 }
 
+function showAddLinkModal() { document.getElementById('add-link-modal').classList.add('show'); }
+
+// ====================================================================
+//  REDIRECTS (stored in site_settings.key = 'redirects')
+// ====================================================================
 async function loadRedirects() {
   try {
-    const { data } = await db.from('site_settings').select('*').eq('setting_key', 'redirects').single();
-    if (data) customRedirects = JSON.parse(data.setting_value || '[]');
+    var r = await db.from('site_settings').select('*').eq('key', 'redirects').single();
+    if (r.data) customRedirects = JSON.parse(r.data.value || '[]');
   } catch(e) {}
   renderRedirects();
 }
 
 function renderRedirects() {
-  const list = document.getElementById('redirects-list');
+  var list = document.getElementById('redirects-list');
   if (customRedirects.length === 0) {
-    list.innerHTML = '<div style="padding:40px;text-align:center;color:#888;"><p style="font-size:14px;">No redirects configured</p></div>';
+    list.innerHTML = '<div style="padding:40px;text-align:center;color:#888"><p>No redirects configured</p></div>';
     return;
   }
-  list.innerHTML = customRedirects.map((r, i) => `
-    <div class="link-row">
-      <span class="link-label" style="font-family:monospace;">${esc(r.from)}</span>
-      <span style="color:#888;">&#x2192;</span>
-      <span class="link-target">${esc(r.to)}</span>
-      <span class="link-type">${r.type}</span>
-      <button class="btn btn-sm btn-secondary" onclick="deleteRedirect(${i})" style="color:#e53935;">Delete</button>
-    </div>
-  `).join('');
+  list.innerHTML = customRedirects.map(function(r, i) {
+    return '<div class="link-row">' +
+      '<span class="link-label" style="font-family:monospace">' + esc(r.from) + '</span>' +
+      '<span style="color:#888">&rarr;</span>' +
+      '<span class="link-target">' + esc(r.to) + '</span>' +
+      '<span class="link-type">' + r.type + '</span>' +
+      '<button class="btn btn-sm btn-secondary" onclick="deleteRedirect(' + i + ')" style="color:#e53935">Delete</button></div>';
+  }).join('');
 }
 
 async function saveRedirect() {
-  const from = document.getElementById('redirect-from').value.trim();
-  const to = document.getElementById('redirect-to').value.trim();
-  const type = document.getElementById('redirect-type').value;
+  var from = document.getElementById('redirect-from').value.trim();
+  var to = document.getElementById('redirect-to').value.trim();
   if (!from || !to) { showToast('Both paths required', 'error'); return; }
-  customRedirects.push({ from, to, type });
-  await db.from('site_settings').upsert({ setting_key: 'redirects', setting_value: JSON.stringify(customRedirects) }, { onConflict: 'setting_key' });
-  renderRedirects();
-  closeModals();
-  showToast('Redirect saved!', 'success');
+  customRedirects.push({ from:from, to:to, type:document.getElementById('redirect-type').value });
+  await db.from('site_settings').upsert({ key:'redirects', value:JSON.stringify(customRedirects) }, { onConflict:'key' });
+  renderRedirects(); closeModals(); showToast('Redirect saved!', 'success');
 }
 
 async function deleteRedirect(idx) {
   customRedirects.splice(idx, 1);
-  await db.from('site_settings').upsert({ setting_key: 'redirects', setting_value: JSON.stringify(customRedirects) }, { onConflict: 'setting_key' });
-  renderRedirects();
-  showToast('Redirect removed', 'success');
+  await db.from('site_settings').upsert({ key:'redirects', value:JSON.stringify(customRedirects) }, { onConflict:'key' });
+  renderRedirects(); showToast('Redirect removed', 'success');
 }
 
-function showCreatePageModal() { document.getElementById('create-page-modal').classList.add('show'); }
-function showAddLinkModal() { document.getElementById('add-link-modal').classList.add('show'); }
 function showAddRedirectModal() { document.getElementById('add-redirect-modal').classList.add('show'); }
-function closeModals() { document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('show')); }
 
-function createNewPage() {
-  const title = document.getElementById('new-page-title').value.trim();
-  const file = document.getElementById('new-page-file').value.trim();
-  const template = document.getElementById('new-page-template').value;
-
-  if (!title || !file) { showToast('Title and filename are required', 'error'); return; }
-  if (!/^[a-zA-Z0-9_-]+\.html$/.test(file)) { showToast('Invalid filename &#x2014; use letters, numbers, hyphens, ending in .html', 'error'); return; }
-  if (SITE_PAGES.find(p => p.file === file)) { showToast('A page with that filename already exists', 'error'); return; }
-
-  showToast('Page "' + title + '" registered! Use the visual editor to customize content.', 'success');
-  SITE_PAGES.push({ file, title, desc: 'Custom page created via admin panel', nav: document.getElementById('new-page-nav').value, type: template });
-  renderPages();
-  closeModals();
-  document.getElementById('stat-pages').textContent = SITE_PAGES.length;
-}
-
-function esc(s) {
-  if (!s) return '';
-  const d = document.createElement('div');
-  d.textContent = s;
-  return d.innerHTML;
-}
-
-// ===== Init =====
-(async () => {
+// ====================================================================
+//  INIT
+// ====================================================================
+(async function() {
   try {
-    const user = await brRequireAdmin();
-    const name = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Admin';
+    var user = await brRequireAdmin();
+    var name = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Admin';
     document.getElementById('user-name').textContent = name;
     document.getElementById('user-email').textContent = user.email;
     document.getElementById('user-avatar').textContent = name.charAt(0).toUpperCase();
 
-    renderPages();
-    renderNavigation();
-    await Promise.all([loadCustomLinks(), loadRedirects()]);
-  } catch(e) {
-    console.error('Init error:', e);
-  }
+    // Load everything
+    await Promise.all([loadNavItems(), loadPages(), loadCustomLinks(), loadRedirects(), loadBlockCount()]);
+
+    // Check URL for ?build=pageId deeplink
+    var params = new URLSearchParams(window.location.search);
+    var buildId = params.get('build');
+    if (buildId) openBuilder(buildId);
+  } catch(e) { console.error('Init error:', e); }
 })();
 
 // Close modals on overlay click
-document.querySelectorAll('.modal-overlay').forEach(m => {
+document.querySelectorAll('.modal-overlay').forEach(function(m) {
   m.addEventListener('click', function(e) { if (e.target === this) closeModals(); });
 });
 </script>
