@@ -139,6 +139,8 @@ p { margin-bottom: 1rem; }
   align-items: center;
   justify-content: space-between;
   height: 100%;
+  max-width: 100%;
+  padding: 0 24px;
 }
 .br-logo {
   display: flex;
