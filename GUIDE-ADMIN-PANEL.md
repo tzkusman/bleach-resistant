@@ -1173,7 +1173,9 @@ PRODUCT CATEGORIES:
 - Custom category text input still available as fallback
 
 RESPONSIVE NAVBAR:
-- CSS clamp() for auto-adjusting gap, padding, and font-size based on viewport width
+- Navbar container uses max-width:none + width:100% + margin:0 to override .br-container's 1200px centering
+- Logo at far left edge, nav items + actions at far right, padding: 0 40px
+- Fixed font-size (0.82rem) and padding (8px 12px) for nav links
 - Hamburger menu triggers at 1100px (raised from 768px to accommodate 8+ nav items)
 - Intermediate breakpoint at 1200px for slightly reduced spacing
 - Event delegation on .br-nav-links for mobile dropdown toggles (survives innerHTML replacement by dynamic nav)

@@ -481,7 +481,7 @@ Every public page follows this structure:
   <meta name="description" content="SEO description here">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="overhaul.css?v=7">
+  <link rel="stylesheet" href="overhaul.css?v=10">
 </head>
 <body>
   <!-- Navbar (same on every page) -->
@@ -544,7 +544,7 @@ Each product/service category page:
 
 Always version your CSS and JS files:
 ```html
-<link rel="stylesheet" href="overhaul.css?v=7">
+<link rel="stylesheet" href="overhaul.css?v=10">
 <script src="content-loader.js?v=15"></script>
 ```
 Bump the version number every time you change the file. This forces browsers to download the new version.
@@ -925,94 +925,456 @@ git push origin master
 
 ## 14. Prompt to Recreate This Project
 
-Use this prompt with any AI assistant to create a similar project from scratch:
+> **Give this ENTIRE section to any AI assistant to recreate the project from scratch.**
+> It contains every detail — architecture, file structure, database schema, CSS patterns, JS functions, admin panel, deployment, and wiring.
+
+### Quick Summary Prompt (for a short conversation)
 
 ```
-Create a complete business website with admin panel using ONLY:
-- Static HTML files (no framework, no build step)
-- Vanilla CSS with design tokens (CSS custom properties)
-- Vanilla JavaScript (no libraries except Supabase JS SDK)
-- Supabase for database, auth, and file storage
-- Vercel for hosting
+Create a custom sublimation printing business website (Bleach Resistant brand) with:
+- Static HTML files only (no framework, no build step, no npm)
+- Vanilla CSS with design tokens + admin.css
+- Vanilla JS + Supabase JS SDK (CDN)
+- Supabase for database (11 tables with RLS), auth (email/password), storage (2 buckets)
+- Vercel for hosting (auto-deploy from GitHub)
+- 20+ public pages, 10 admin pages, client account dashboard
+- Dynamic content loaded from DB (hero slider, products, sections, navigation, custom pages)
+- Chat widget on all public pages
+- Full-width responsive navbar with hamburger at 1100px
+See GUIDE-PROJECT.md and GUIDE-ADMIN-PANEL.md for complete architecture and wiring.
+```
 
-The website needs:
+---
 
-PUBLIC PAGES:
-- Homepage with dynamic hero slider (slides managed from admin)
-- Product catalog with dynamic category tabs from DB
-- Individual product detail page
-- Multiple category/service pages (each loads dynamic sections from admin)
-- Multi-step order wizard form (conditional fields per service type, file upload)
-- FAQ page with accordion
-- About, Contact, Privacy, Terms pages
-- Chat widget on every page (saves to DB, admin can reply)
+### FULL Detailed Recreation Prompt (copy everything below)
 
-AUTH SYSTEM:
-- Email/password login/signup via Supabase Auth
-- Admin guard: single admin email checked on every admin page
-- Admin pages hidden with display:none until auth confirmed
-- Auth-aware navbar (shows "My Account" when logged in)
+```
+=== BLEACH RESISTANT — COMPLETE PROJECT RECREATION PROMPT ===
 
-CLIENT ACCOUNT:
-- Order history (fetched by user_id and email)
-- Profile editing (saves to auth.user_metadata)
-- Password change
+You are building a complete business website with admin panel for a custom
+sublimation printing company called "Bleach Resistant" based in Guelph, Ontario, Canada.
 
-ADMIN PANEL (10+ pages):
-- Dashboard with stat cards and recent activity
-- Products CRUD (image upload to Supabase Storage, gallery, categories)
-- Orders management (search, filter, status update, CSV export)
-- Contacts/messages with admin reply feature
-- Hero slider CRUD with image upload
-- Page sections editor (admin creates sections for any page)
-- Visual page editor (iframe preview, click-to-select elements)
-- Media library (drag & drop upload, search)
-- Navigation menu editor
-- Site settings (business info, branding colors, SEO, social media, custom code injection, maintenance mode, backup/export)
-- Analytics dashboard
+============================
+TECHNOLOGY RULES (STRICT)
+============================
 
-DATABASE (Supabase Postgres):
-- 11 tables: orders, contacts, products, hero_slides, category_sections, page_content, site_settings, media, nav_items, custom_pages, page_blocks
-- Row Level Security on every table
-- Public read for products/slides/sections/settings/nav_items/published pages
-- Admin-only write for everything
-- Storage buckets: order-attachments (public), media (admin)
+Use ONLY these technologies:
+- Static HTML files (1 file = 1 page, no framework, no build step)
+- Vanilla CSS with CSS custom properties (design tokens)
+- Vanilla JavaScript (ES5-compatible, no imports, no modules)
+- Supabase JS SDK v2 loaded from CDN (not npm)
+- Supabase for: Postgres database, Auth (email/password), Storage (file uploads)
+- Vercel for static hosting (auto-deploy from GitHub push)
+- Google Fonts: Montserrat (headings) + Poppins (body)
 
-CSS DESIGN SYSTEM:
-- Custom properties for colors, shadows, radii, transitions
-- Consistent component classes (buttons, cards, grids, badges, forms)
-- Scroll-triggered animations via IntersectionObserver
-- Responsive breakpoints (1200px, 1100px, 1024px, 768px, 480px)
-- Auto-adjusting navbar with CSS clamp() (scales gap/padding/font-size)
-- Hamburger menu at 1100px (supports 8+ nav items)
-- Separate admin.css for admin panel
+DO NOT USE: Node.js, npm, React, Next.js, Express, MongoDB, Docker, webpack,
+TypeScript, ES modules, import statements, or any build tools.
 
-DYNAMIC CONTENT (content-loader.js):
-- brLoadProducts(containerId, options) — fetch and render products
-- brLoadCategorySection() — replace static content with DB sections
-- brLoadHeroSlider() — build slider from DB slides
-- brLoadDynamicNav() — replace static nav with DB-managed navigation
-- brRenderPageBlocks(container, page, blocks) — render custom page blocks (11 block types)
-- Content overrides from page_content table
-- Auth-aware navbar
-- Chat widget auto-injected on all public pages
-- Event delegation for mobile dropdown toggles (survives innerHTML replacement)
+============================
+ARCHITECTURE OVERVIEW
+============================
 
-NAVIGATION & CUSTOM PAGES:
-- Dynamic nav from nav_items table (admin-managed, replaces static HTML)
-- Custom pages created from admin with 8 templates and 11 block types
-- page.html renders custom pages via ?slug= parameter
-- Products auto-assigned to custom pages via page-{slug} category
-- URL rewrite: /p/{slug} → page.html?slug={slug}
+Browser → supabase-config.js (client init + auth helpers)
+       → content-loader.js (all dynamic content: nav, slider, products, sections, chat, page blocks)
+       → overhaul.css (public design system, 1300+ lines)
+       → admin.css (admin panel design system, 1000+ lines)
+       → Supabase (Postgres 11 tables + RLS + Auth + Storage)
+       → Vercel (static CDN, auto-deploy)
 
-DEPLOYMENT:
-- Vercel auto-deploy from GitHub push
-- Cache busting via ?v=N query params on CSS/JS
-- No environment variables needed (Supabase anon key is safe with RLS)
+Security: Zero backend code. RLS policies on every table enforce access control.
+Admin pages: body starts display:none, revealed only after brRequireAdmin() confirms admin email.
 
-Every admin page should be self-contained HTML with inline <script>.
-No npm, no Node.js, no bundler, no framework.
-The entire site runs client-side with Supabase handling security via RLS.
+============================
+FILE STRUCTURE
+============================
+
+project/
+├── overhaul.css              ← Public design system (design tokens, navbar, hero, products, services, FAQ, footer, responsive)
+├── admin.css                 ← Admin panel styles (sidebar, tables, modals, stats, forms, toasts)
+├── supabase-config.js        ← Supabase client init, brGetUser(), brRequireAdmin(), brUploadFile(), brSignOut()
+├── content-loader.js         ← brLoadProducts(), brLoadHeroSlider(), brLoadCategorySection(), brLoadDynamicNav(), brRenderPageBlocks(), chat widget, scroll animations, auth-aware navbar
+├── supabase-setup.sql        ← Complete DB schema (11 tables + RLS + grants)
+├── vercel.json               ← URL rewrites (/p/:slug → page.html?slug=:slug) + security headers
+│
+├── home.html                 ← Homepage: hero slider, featured products, services preview, stats, CTA
+├── product.html              ← All products with category tabs (filter by category)
+├── product-detail.html       ← Single product view (?id=UUID)
+├── order.html                ← Multi-step order wizard (4 steps, file upload, conditional fields per service type)
+├── account.html              ← Client dashboard (order history, profile edit, password change)
+├── login.html                ← Login page (Supabase Auth email/password)
+├── signup.html               ← Registration page
+│
+├── headgear.html             ← Category page (dynamic sections from DB)
+├── basicpoly.html            ← Category page
+├── stockdesigns.html         ← Category page
+├── fabricdescriptions.html   ← Category page
+├── sublimationprinting.html  ← Category page
+├── services.html             ← Services overview page
+├── grapicdesign.html         ← Service page
+├── customlogos.html          ← Service page
+├── wrapdesign.html           ← Service page
+├── copyofwashingsamples.html ← Gallery page
+├── About.html                ← About page
+├── FAQs.html                 ← FAQ with accordion
+├── Pricelist.html            ← Pricing page
+├── sizechart.html            ← Size chart page
+├── finprint.html             ← Info page
+├── privacypolicy.html        ← Privacy policy
+├── termsconditions.html      ← Terms & conditions
+│
+├── page.html                 ← Dynamic page renderer (reads ?slug= or /p/:slug, fetches custom_pages + page_blocks from DB)
+│
+├── admin.html                ← Admin dashboard (stat cards, recent orders, recent contacts)
+├── admin-products.html       ← Products CRUD (image upload, gallery, optgroup categories: Site Pages + Custom Pages from DB)
+├── admin-orders.html         ← Orders management (status update, search, filter, CSV export, pagination)
+├── admin-contacts.html       ← Contacts + admin reply feature (replied_at timestamp)
+├── admin-slider.html         ← Hero slider CRUD (bg image upload, badges JSON, 2 CTAs)
+├── admin-sections.html       ← Page sections editor (per-page, checklist JSON, image upload)
+├── admin-pages.html          ← Visual page editor (iframe preview, click-to-select)
+├── admin-media.html          ← Media library (drag & drop, grid, search, copy URL)
+├── admin-navigation.html     ← 5 tabs: Nav Items CRUD, Pages list, Page Builder (8 templates, 11 block types), Custom Links, Redirects
+├── admin-settings.html       ← Tabbed: Business info, Branding (color pickers), Social, SEO, Code injection, Maintenance mode, Backup/export
+├── admin-analytics.html      ← Analytics dashboard with time range filter
+│
+├── sitemap.xml               ← SEO sitemap
+└── favicon.svg               ← Site icon
+
+============================
+DATABASE SCHEMA (11 TABLES)
+============================
+
+All tables follow this pattern:
+- UUID primary key with gen_random_uuid()
+- created_at TIMESTAMPTZ DEFAULT NOW()
+- Enable RLS on every table
+- Public SELECT for content tables (anon role)
+- ALL operations for admin (auth.email() = 'admin-email')
+- Anon INSERT for orders + contacts (public forms)
+
+TABLE 1: products
+  id, created_at, updated_at, name, slug (unique), description, category, price_from, price_to,
+  image_url, gallery (JSONB array of URLs), features (JSONB array), active, sort_order, badge_text
+  -- category values: 'apparel', 'headgear', 'basicpoly', 'stockdesigns', 'sublimation', 'design', 'logos', 'wraps', 'page-{slug}'
+
+TABLE 2: orders
+  id, created_at, first_name, last_name, email, phone, company, service_type, source_page,
+  product_name, quantity, sizes (JSONB), colors, design_notes, attachment_url,
+  preferred_date, rush_order, delivery_method, address fields,
+  status (new/in-progress/completed/cancelled), admin_notes, total_amount, user_id (nullable)
+
+TABLE 3: contacts
+  id, created_at, name, email, phone, company, message, page_source,
+  status (new/read/replied), admin_reply, replied_at, read_at
+
+TABLE 4: hero_slides
+  id, created_at, title, subtitle, bg_type (image/gradient/video), bg_value,
+  badges (JSONB array), cta1_text, cta1_link, cta2_text, cta2_link,
+  overlay_opacity, text_align, active, sort_order
+
+TABLE 5: category_sections
+  id, created_at, updated_at, page (e.g. 'headgear.html'), section_title, section_subtitle,
+  description, image_url, checklist (JSONB array), badge_text, layout (image-left/image-right/full),
+  active, sort_order
+
+TABLE 6: page_content
+  id, created_at, page, section_key, content (JSONB), active
+
+TABLE 7: site_settings
+  id, key (unique), value (TEXT), updated_at
+  -- Key-value pairs: business_name, business_email, phone, address, primary_color, logo_url,
+  --   meta_title, meta_description, facebook_url, instagram_url, custom_head_code, maintenance_mode, etc.
+
+TABLE 8: media
+  id, created_at, filename, url, file_type, file_size, alt_text, folder, uploaded_by
+
+TABLE 9: nav_items
+  id, label, href, parent_id (self-reference for dropdowns), sort_order, location ('main'/'footer'),
+  target ('_self'/'_blank'), icon, active, created_at
+
+TABLE 10: custom_pages
+  id, title, slug (unique), description, meta_description, template
+  (blank/content/blog/product-showcase/gallery/landing/contact/faq),
+  status (draft/published), created_at, updated_at
+
+TABLE 11: page_blocks
+  id, page_id (FK → custom_pages ON DELETE CASCADE), block_type
+  (hero/text/image-text/products/gallery/faq/cta/form/html/spacer/section),
+  content (JSONB), sort_order, active, created_at
+
+STORAGE BUCKETS:
+  - 'order-attachments': public read, authenticated upload
+  - 'media': authenticated read/write (admin media library)
+
+============================
+CSS DESIGN SYSTEM (overhaul.css)
+============================
+
+DESIGN TOKENS (CSS custom properties):
+  --br-primary: #C7065C (brand pink)
+  --br-primary-dark: #9a0447
+  --br-primary-light: #e8337d
+  --br-dark: #1a1a2e
+  --font-heading: 'Montserrat', sans-serif
+  --font-body: 'Poppins', sans-serif
+  --nav-height: 80px (68px on mobile)
+  --container-max: 1200px (BUT navbar overrides to max-width: none)
+  --section-pad: 100px 0
+  Shadows: --shadow-xs through --shadow-xl
+  Radii: --radius-sm(6px), --radius(10px), --radius-lg(16px), --radius-xl(24px), --radius-full(9999px)
+  Transitions: --transition(0.3s), --transition-slow(0.6s)
+
+NAVBAR (CRITICAL — full-width edge-to-edge):
+  .br-nav { position: fixed; top:0; z-index:1000; backdrop-filter:blur(20px); }
+  .br-nav > .br-container {
+    display: flex; justify-content: space-between;
+    max-width: none;  /* Override .br-container's 1200px */
+    width: 100%; margin: 0; padding: 0 40px;
+  }
+  .br-logo { flex-shrink: 0; }
+  .br-nav-menu { display: flex; gap: 6px; }
+  .br-nav-links > li > a { font-size: 0.82rem; padding: 8px 12px; white-space: nowrap; }
+  .br-nav-actions { flex-shrink: 0; margin-left: 12px; }
+  .br-nav-toggle { display: none; } /* Shown at 1100px */
+
+RESPONSIVE BREAKPOINTS:
+  @media (max-width: 1200px) { nav padding: 8px 8px, font: 0.78rem }
+  @media (max-width: 1100px) { hamburger menu, nav-height: 68px, off-canvas drawer }
+  @media (max-width: 1024px) { section padding reduced, grid-4 → 2 columns }
+  @media (max-width: 768px)  { grid-2/3 → 1 column, footer stacks }
+  @media (max-width: 480px)  { container padding: 0 16px, products grid → 1 column }
+
+COMPONENTS:
+  .br-btn (primary, outline, white, dark, sm, lg, block)
+  .br-product-card (image, overlay, badge, info, footer)
+  .br-service-card (icon, hover effects)
+  .br-faq-item (accordion, .active toggles max-height)
+  .br-hero (full-height slider, badges, arrows, dots)
+  .br-gallery-grid + .br-lightbox
+  .br-table-wrap + .br-table
+  .br-stats, .br-steps, .br-tabs
+  .br-form (inputs, textareas, grid layout)
+  [data-animate] (fade-up, fade-left, fade-right, scale-up) via IntersectionObserver
+  .br-cta-banner (gradient dark background with radial glow)
+  .br-footer (4-column grid, social icons, bottom bar)
+
+============================
+JS: supabase-config.js
+============================
+
+Loaded on every page. Provides:
+  - var db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  - async brGetUser() → returns user object or null
+  - async brRequireAdmin() → checks email, redirects if not admin, reveals body
+  - async brUploadFile(bucket, file, folder) → returns {url, path}
+  - brSignOut() → sign out + redirect to home
+  - var ADMIN_EMAIL = 'usman@gmail.com'
+
+============================
+JS: content-loader.js
+============================
+
+Single IIFE that runs on DOMContentLoaded. Provides:
+
+1. SCROLL ANIMATIONS:
+   IntersectionObserver watches [data-animate] elements, adds .animated class + stagger index
+
+2. NAVBAR:
+   - Scroll detection → .scrolled class on .br-nav
+   - Auth-aware: if user logged in, shows "My Account" link; if admin, shows "Admin" link
+   - Mobile toggle: click navToggle → toggle .open on navMenu + .active on toggle + overlay
+   - Event delegation on .br-nav-links for mobile dropdown toggles (click on dropdown arrow)
+
+3. brLoadHeroSlider():
+   - Fetches active hero_slides ordered by sort_order
+   - Builds slide HTML with background image/gradient, title, subtitle, badges, CTA buttons
+   - Auto-rotates every 5 seconds, arrow/dot navigation
+
+4. brLoadProducts(containerId, options):
+   - options: { limit, category, showTabs, page }
+   - Fetches products from DB, renders .br-product-card grid
+   - If showTabs: builds category tab buttons for filtering
+
+5. brLoadCategorySection():
+   - Reads data-section-page attribute from elements
+   - Fetches category_sections for that page
+   - Renders sections with image, checklist, badge, layout (image-left/image-right)
+
+6. brLoadDynamicNav():
+   - Queries nav_items WHERE active=true AND location='main'
+   - Builds HTML: top-level items + dropdown menus for items with children
+   - Replaces .br-nav-links innerHTML
+   - Highlights active link based on current URL
+   - Auto-invoked on all public pages (not admin, login, signup)
+
+7. brRenderPageBlocks(container, page, blocks):
+   - Renders 11 block types into HTML using existing CSS classes
+   - Product blocks auto-default category to page-{slug} when no explicit category set
+   - Each block renders as a .br-section with appropriate inner content
+
+8. CHAT WIDGET:
+   - Skips admin/login/signup pages
+   - Creates floating button + expandable panel with name/email/message form
+   - Submits to contacts table
+   - Shows confirmation message in chat bubble
+
+9. PAGE-SPECIFIC AUTO-LOADERS:
+   - Home page: loads slider, featured products, category sections
+   - Product page: loads all products with tabs
+   - Category pages (headgear, basicpoly, etc.): loads sections + category products
+   - page.html: loads custom_pages + page_blocks, auto-appends products if page-{slug} products exist
+
+============================
+ADMIN PANEL PATTERN
+============================
+
+Every admin page is self-contained HTML with inline <script>. Pattern:
+
+HTML structure:
+  <body style="display:none">
+    <div class="sidebar"> (same copy-paste on every admin page)
+      Brand header, nav links with icons, sign out button
+    </div>
+    <div class="main-content">
+      <div class="topbar"> Page title + action button </div>
+      <div class="content"> Tables/cards + modal form </div>
+    </div>
+    <div class="toast" id="toast"></div>
+  </body>
+
+JS pattern:
+  1. brRequireAdmin() → guard
+  2. let allItems = [] → global state
+  3. loadItems() → db.from('table').select('*') → allItems = data → renderItems()
+  4. renderItems() → build HTML table rows from allItems, wire action buttons
+  5. openEditor(item?) → populate modal form (empty = create, filled = edit)
+  6. saveItem() → validate → db.from('table').insert() or .update() → reload
+  7. deleteItem(id) → confirm → db.from('table').delete() → reload
+  8. filterItems() → client-side search on allItems
+  9. showToast(msg, type) → success/error notification
+  10. esc(str) → HTML escape for XSS prevention
+
+ADMIN PAGES:
+  admin.html              → 4 stat cards (products, orders, contacts, media) + recent orders table + recent contacts
+  admin-products.html     → CRUD table, modal with: name, slug (auto-gen), category (2 optgroups: Site Pages + Custom Pages from DB), price range, image upload + gallery, features textarea→JSON, badge, active toggle
+  admin-orders.html       → Read table, status badges (color-coded), view modal, status dropdown update, CSV export, pagination (25/page), search
+  admin-contacts.html     → Table + reply textarea, marks as read on view, CSV export
+  admin-slider.html       → CRUD: title, subtitle, bg type (image/gradient/video), badge JSON array editor, CTA buttons, overlay opacity, image upload
+  admin-sections.html     → Per-page CRUD: select page → CRUD sections for that page. Image upload, checklist textarea, layout toggle, preview
+  admin-pages.html        → Visual editor: iframe loads page, click elements to select, edit content inline
+  admin-media.html        → Drag & drop upload grid, search filter, detail modal (alt text, URL copy), delete
+  admin-navigation.html   → 5 TABS:
+    Tab 1: Nav Items — CRUD for nav_items (label, href, parent dropdown, sort_order, target)
+    Tab 2: Pages — List custom_pages with status badge, edit/delete
+    Tab 3: Page Builder — Select page → add/reorder/edit blocks (11 types), template selector (8 templates)
+    Tab 4: Custom Links — External link management
+    Tab 5: Redirects — URL redirect management
+  admin-settings.html     → 6 TABS: Business Info, Branding (live color pickers), Social Links, SEO, Code Injection (head/body), Maintenance Mode + Backup (export all tables as JSON)
+  admin-analytics.html    → Stat cards with time range filter (7d/30d/90d/all)
+
+============================
+PRODUCT CATEGORIES SYSTEM
+============================
+
+Products have a 'category' field. The admin product form shows categories in 2 optgroups:
+
+"Site Pages" optgroup (hardcoded, maps to static page files):
+  apparel     → product.html
+  headgear    → headgear.html
+  basicpoly   → basicpoly.html
+  stockdesigns → stockdesigns.html
+  sublimation → sublimationprinting.html
+  design      → grapicdesign.html
+  logos       → customlogos.html
+  wraps       → wrapdesign.html
+
+"Custom Pages" optgroup (dynamic, loaded from custom_pages DB table):
+  page-{slug} → /p/{slug} (rendered by page.html)
+
+When page.html renders a custom page:
+  1. Product blocks auto-default category filter to page-{slug}
+  2. If no product block exists but products with page-{slug} category exist, auto-append a product grid
+
+The admin product form loads custom pages via: db.from('custom_pages').select('title,slug').order('title')
+Each option: <option value="page-{slug}">{title}</option>
+
+============================
+NAVIGATION SYSTEM
+============================
+
+Static HTML nav is in every page file as fallback.
+On load, brLoadDynamicNav() replaces it with DB-managed nav items.
+If DB returns 0 items, static nav is kept.
+
+Mobile dropdown toggles use EVENT DELEGATION on .br-nav-links (not per-element click handlers).
+This is critical because brLoadDynamicNav() replaces innerHTML, which would destroy per-element listeners.
+
+============================
+CUSTOM PAGES (PAGE BUILDER)
+============================
+
+Created from admin-navigation.html Tab 3.
+Rendered by page.html via brRenderPageBlocks().
+
+URL routing (vercel.json): /p/:slug → page.html?slug=:slug
+
+Templates (8): blank, content, blog, product-showcase, gallery, landing, contact, faq
+Block types (11): hero, text, image-text, products, gallery, faq, cta, form, html, spacer, section
+
+Each block's content is stored as JSONB in page_blocks.content column.
+Blocks render using existing CSS classes from overhaul.css (br-section, br-hero, br-container, etc.)
+
+============================
+DEPLOYMENT & CACHE BUSTING
+============================
+
+GitHub repo → Vercel auto-deploy on push to master (~30 seconds)
+
+Cache busting: Every CSS/JS file is referenced with ?v=N query param.
+When editing shared files, bump the version across ALL HTML files:
+  overhaul.css?v=10
+  content-loader.js?v=15
+  supabase-config.js?v=7
+
+vercel.json:
+{
+  "rewrites": [
+    { "source": "/p/:slug", "destination": "/page.html?slug=:slug" },
+    { "source": "/(.*)", "destination": "/$1" }
+  ],
+  "headers": [
+    { "source": "/(.*)", "headers": [
+      { "key": "X-Frame-Options", "value": "DENY" },
+      { "key": "X-Content-Type-Options", "value": "nosniff" }
+    ]}
+  ]
+}
+
+============================
+KEY PATTERNS & RULES
+============================
+
+1. RLS IS YOUR BACKEND. No Express/Node needed. Supabase RLS policies enforce all access control.
+2. ONE FILE PER FEATURE. Each admin page is self-contained. Copy-paste to reuse.
+3. CACHE BUST RELIGIOUSLY. Every CSS/JS change needs ?v=N bump on ALL HTML files.
+4. START HIDDEN, REVEAL AFTER AUTH. Admin pages: body { display: none } → revealed by brRequireAdmin().
+5. FALLBACK TO STATIC. Dynamic loaders keep static HTML as fallback if DB fails.
+6. KEY-VALUE SETTINGS. site_settings uses {key, value} pairs, not a wide table.
+7. UPLOAD PATTERN. timestamp-random.ext → Supabase Storage → public URL → save in table.
+8. TOAST FOR FEEDBACK. Every admin action shows success/error toast notification.
+9. EVENT DELEGATION. Mobile nav dropdown toggles use delegation so they survive innerHTML replacement.
+10. NO OVER-ENGINEERING. ~25 HTML files, 2 CSS files, 2 JS files, 1 SQL file. That's the entire project.
+11. HTML ESCAPE EVERYTHING. Use esc() function for all user-generated content to prevent XSS.
+12. NAVBAR FULL WIDTH. .br-nav > .br-container uses max-width:none to override the 1200px container.
+
+============================
+SUPABASE CONFIG VALUES
+============================
+
+Project URL: https://dbppxzkkgdtnmikkviyt.supabase.co
+Anon Key: (in supabase-config.js — safe to expose with RLS)
+Admin Email: usman@gmail.com
+Live URL: https://bleach-resistant.vercel.app
+GitHub: tzkusman/bleach-resistant (master branch)
 ```
 
 ---
@@ -1141,28 +1503,49 @@ Products are assigned to pages via the `category` field:
 
 The admin product form shows categories in optgroups: "Site Pages" (static pages with their .html filename shown) and "Custom Pages" (loaded dynamically from the `custom_pages` table).
 
-### 15.4 Responsive Navbar (Auto-Adjusting)
+### 15.4 Responsive Navbar (Full-Width, Edge-to-Edge)
 
-The navbar auto-adjusts spacing based on the number of items using CSS `clamp()`:
+The navbar spans the full viewport width with logo at the far left and nav items at the far right. The nav container overrides the default `.br-container` max-width:
 
 ```css
-/* Nav links spacing scales with viewport */
-.br-nav-links { gap: clamp(0px, 0.3vw, 4px); }
-.br-nav-links > li > a {
-  font-size: clamp(0.7rem, 0.75vw + 0.15rem, 0.85rem);
-  padding: 8px clamp(6px, 0.7vw, 14px);
+/* Navbar container — full width, no centering */
+.br-nav > .br-container {
+  max-width: none;      /* Override .br-container's 1200px */
+  width: 100%;
+  margin: 0;            /* No auto-centering */
+  padding: 0 40px;      /* Breathing room at edges */
 }
-.br-nav-menu { gap: clamp(4px, 0.5vw, 8px); flex: 1 1 auto; }
-.br-nav-actions { gap: clamp(6px, 0.6vw, 12px); margin-left: clamp(8px, 1vw, 16px); }
+
+/* Fixed sizing for nav links */
+.br-nav-links > li > a {
+  font-size: 0.82rem;
+  padding: 8px 12px;
+  white-space: nowrap;
+}
+
+/* Intermediate breakpoint — tighter spacing */
+@media (max-width: 1200px) {
+  .br-nav-links > li > a { padding: 8px 8px; font-size: 0.78rem; }
+  .br-nav-actions .br-btn { font-size: 0.75rem; padding: 8px 14px; }
+  .br-nav-actions { gap: 6px; margin-left: 8px; }
+}
+
+/* Hamburger menu — kicks in at 1100px */
+@media (max-width: 1100px) {
+  .br-nav-toggle { display: flex; }
+  .br-nav-menu { position: fixed; right: -100%; width: min(360px, 88vw); ... }
+  .br-nav-menu.open { right: 0; }
+}
 ```
 
 **Breakpoints:**
-- **> 1200px** — Full desktop spacing
+- **> 1200px** — Full desktop, edge-to-edge navbar with comfortable spacing
 - **1100–1200px** — Reduced padding/font-size for nav items
-- **< 1100px** — Hamburger menu (was 768px, raised to accommodate 8+ items)
+- **< 1100px** — Hamburger menu (raised from 768px to accommodate 8+ items)
 - **< 768px** — Layout adjustments (grids go single-column, etc.)
+- **< 480px** — Mobile: tighter container padding
 
-This means as you add more pages to the navigation, the nav items automatically shrink their padding and font size. When items no longer fit, the hamburger menu kicks in at 1100px instead of waiting until 768px.
+**Key:** The nav container uses `max-width: none` to override the global `.br-container { max-width: var(--container-max) }` which is 1200px. This ensures the navbar always uses the full viewport width regardless of screen size.
 
 ---
 
@@ -1172,6 +1555,6 @@ Always bump version numbers when editing shared files:
 
 | File | Current Version | Usage |
 |------|----------------|-------|
-| `overhaul.css` | `?v=7` | All public pages |
+| `overhaul.css` | `?v=10` | All public pages |
 | `content-loader.js` | `?v=15` | All public pages |
 | `supabase-config.js` | `?v=7` | All pages |
