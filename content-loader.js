@@ -570,7 +570,7 @@
         '<form class="br-chat-form" id="br-chat-form">' +
           '<div class="br-chat-fields" id="br-chat-fields">' +
             '<input type="text" id="br-chat-name" placeholder="Your name" required>' +
-            '<input type="email" id="br-chat-email" placeholder="Your email" required>' +
+            '<input type="text" id="br-chat-email" placeholder="Your email" required>' +
           '</div>' +
           '<div class="br-chat-input-row">' +
             '<textarea id="br-chat-message" placeholder="Type your message..." rows="2" required></textarea>' +
@@ -628,7 +628,8 @@
 
       try {
         if (typeof db === 'undefined') throw new Error('Not connected');
-        var result = await db.from('contacts').insert({ name: name, email: email, message: msg, page_source: page || 'chat' });
+        var chatPage = window.location.pathname.split('/').pop() || 'chat';
+        var result = await db.from('contacts').insert({ name: name, email: email, message: msg, page_source: chatPage });
         console.log('[chat] insert result:', result);
         if (result.error) throw result.error;
 
