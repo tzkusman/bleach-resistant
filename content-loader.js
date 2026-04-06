@@ -583,16 +583,8 @@
 
     document.body.appendChild(chatWidget);
 
-    // Restore saved info
-    var savedName = localStorage.getItem('br_chat_name') || '';
-    var savedEmail = localStorage.getItem('br_chat_email') || '';
     var nameInput = document.getElementById('br-chat-name');
     var emailInput = document.getElementById('br-chat-email');
-    if (savedName) nameInput.value = savedName;
-    if (savedEmail) emailInput.value = savedEmail;
-    if (savedName && savedEmail) {
-      document.getElementById('br-chat-fields').style.display = 'none';
-    }
 
     // Toggle
     var toggle = document.getElementById('br-chat-toggle');
@@ -636,22 +628,20 @@
 
       try {
         if (typeof db === 'undefined') throw new Error('Not connected');
-        // Insert just the core fields
-        var result = await db.from('contacts').insert({ name: name, email: email, message: msg });
+        var result = await db.from('contacts').insert({ name: name, email: email, message: msg, page_source: page || 'chat' });
         console.log('[chat] insert result:', result);
         if (result.error) throw result.error;
-
-        // Save info
-        localStorage.setItem('br_chat_name', name);
-        localStorage.setItem('br_chat_email', email);
-        document.getElementById('br-chat-fields').style.display = 'none';
 
         // Show confirmation
         var confirm = document.createElement('div');
         confirm.className = 'br-chat-message br-chat-msg-them';
-        confirm.innerHTML = '<p>Thanks ' + name.replace(/</g, '&lt;') + '! &#9989; Message sent! We\'ll reply to <strong>' + email.replace(/</g, '&lt;') + '</strong> soon.</p>';
+        confirm.innerHTML = '<p>Thanks ' + name.replace(/</g, '&lt;') + '! &#9989; Message sent! We\'ll get back to you soon.</p>';
         body.appendChild(confirm);
         body.scrollTop = body.scrollHeight;
+
+        // Reset form for next message
+        nameInput.value = '';
+        emailInput.value = '';
       } catch (err) {
         console.error('[chat] error:', err);
         var errMsg = document.createElement('div');
