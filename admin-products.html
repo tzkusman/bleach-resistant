@@ -62,14 +62,6 @@
       <div class="topbar-actions">
         <select id="filter-category" onchange="renderProducts()" style="padding:8px 12px;border:1px solid #ddd;border-radius:6px;font-size:13px;">
           <option value="">All Categories</option>
-          <option value="apparel">Apparel</option>
-          <option value="headgear">Head Gear</option>
-          <option value="basicpoly">Basic Poly</option>
-          <option value="stockdesigns">Stock Designs</option>
-          <option value="sublimation">Sublimation</option>
-          <option value="design">Graphic Design</option>
-          <option value="logos">Custom Logos</option>
-          <option value="wraps">Vehicle Wraps</option>
         </select>
         <button class="btn btn-primary" onclick="openAddModal()">+ Add Product</button>
       </div>
@@ -134,15 +126,8 @@
               <label style="display:block;font-weight:600;font-size:12px;margin-bottom:4px;">Category *</label>
               <select id="pf-category" required style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:6px;font-size:13px;">
                 <option value="">Select category</option>
-                <option value="apparel">Apparel</option>
-                <option value="headgear">Head Gear</option>
-                <option value="basicpoly">Basic Poly</option>
-                <option value="stockdesigns">Stock Designs</option>
-                <option value="sublimation">Sublimation</option>
-                <option value="design">Graphic Design</option>
-                <option value="logos">Custom Logos</option>
-                <option value="wraps">Vehicle Wraps</option>
               </select>
+              <input type="text" id="pf-category-custom" placeholder="Or type a new category" style="width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:6px;font-size:12px;margin-top:6px;color:#555">
             </div>
             <div>
               <label style="display:block;font-weight:600;font-size:12px;margin-bottom:4px;">Price From ($)</label>
@@ -406,6 +391,7 @@
     window.openAddModal = function () {
       document.getElementById('modal-title').textContent = 'Add Product';
       document.getElementById('modal-save-btn').textContent = 'Add Product';
+      document.getElementById('pf-category-custom').value = '';
       closeModal();
       openModal();
     };
@@ -420,6 +406,15 @@
       document.getElementById('pf-name').value = p.name || '';
       document.getElementById('pf-slug').value = p.slug || '';
       document.getElementById('pf-category').value = p.category || '';
+      document.getElementById('pf-category-custom').value = '';
+      // If category isn't in the select, add it
+      if (p.category && !document.getElementById('pf-category').value) {
+        var opt = document.createElement('option');
+        opt.value = p.category;
+        opt.textContent = p.category.charAt(0).toUpperCase() + p.category.slice(1);
+        document.getElementById('pf-category').appendChild(opt);
+        document.getElementById('pf-category').value = p.category;
+      }
       document.getElementById('pf-price').value = p.price_from || '';
       document.getElementById('pf-short-desc').value = p.short_description || '';
       document.getElementById('pf-desc').value = p.description || '';
@@ -530,6 +525,7 @@
         showToast(id ? 'Product updated!' : 'Product added!', 'success');
         closeModal();
         await loadProducts();
+        populateCategoryDropdowns();
 
       } catch (err) {
         console.error('Save product error:', err);
@@ -555,11 +551,66 @@
         if (result.error) throw result.error;
         showToast('Product deleted.', 'success');
         await loadProducts();
+        populateCategoryDropdowns();
       } catch (err) {
         console.error('Delete error:', err);
         showToast(err.message || 'Failed to delete product.', 'error');
       }
     };
+
+    /* ── Dynamic Categories ─────────────────────────────── */
+    var DEFAULT_CATS = [
+      {value:'apparel',label:'Apparel'},{value:'headgear',label:'Head Gear'},
+      {value:'basicpoly',label:'Basic Poly'},{value:'stockdesigns',label:'Stock Designs'},
+      {value:'sublimation',label:'Sublimation'},{value:'design',label:'Graphic Design'},
+      {value:'logos',label:'Custom Logos'},{value:'wraps',label:'Vehicle Wraps'}
+    ];
+
+    function populateCategoryDropdowns() {
+      // Merge defaults with any categories found in existing products
+      var cats = DEFAULT_CATS.map(function(c) { return c.value; });
+      var labels = {};
+      DEFAULT_CATS.forEach(function(c) { labels[c.value] = c.label; });
+      allProducts.forEach(function(p) {
+        if (p.category && cats.indexOf(p.category) === -1) {
+          cats.push(p.category);
+          labels[p.category] = p.category.charAt(0).toUpperCase() + p.category.slice(1);
+        }
+      });
+      cats.sort(function(a,b) { return (labels[a]||a).localeCompare(labels[b]||b); });
+
+      // Filter dropdown
+      var filter = document.getElementById('filter-category');
+      var filterVal = filter.value;
+      filter.innerHTML = '<option value="">All Categories</option>' +
+        cats.map(function(c) { return '<option value="'+c+'">'+brEscapeHtml(labels[c]||c)+'</option>'; }).join('');
+      filter.value = filterVal;
+
+      // Modal form dropdown
+      var form = document.getElementById('pf-category');
+      var formVal = form.value;
+      form.innerHTML = '<option value="">Select category</option>' +
+        cats.map(function(c) { return '<option value="'+c+'">'+brEscapeHtml(labels[c]||c)+'</option>'; }).join('');
+      form.value = formVal;
+    }
+
+    // Allow custom category input to override select
+    document.getElementById('pf-category-custom').addEventListener('input', function() {
+      var v = this.value.trim();
+      if (v) {
+        var slug = v.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+        var sel = document.getElementById('pf-category');
+        // Add it as an option if not present
+        var exists = Array.from(sel.options).find(function(o) { return o.value === slug; });
+        if (!exists) {
+          var opt = document.createElement('option');
+          opt.value = slug;
+          opt.textContent = v;
+          sel.appendChild(opt);
+        }
+        sel.value = slug;
+      }
+    });
 
     /* ── Init ─────────────────────────────────────────────── */
     (async function () {
@@ -570,6 +621,7 @@
         document.getElementById('user-email').textContent = user.email;
         document.getElementById('user-avatar').textContent = name.charAt(0).toUpperCase();
         await loadProducts();
+        populateCategoryDropdowns();
       } catch (err) {
         if (err.message !== 'Not authenticated') console.error(err);
       }
