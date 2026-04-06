@@ -28,12 +28,8 @@
 
 <section class="br-section">
     <div class="br-container">
-        <div class="br-tabs">
+        <div class="br-tabs" id="galleryTabs">
             <button class="br-tab active" data-filter="all">All</button>
-            <button class="br-tab" data-filter="apparel">Apparel</button>
-            <button class="br-tab" data-filter="headgear">Headgear</button>
-            <button class="br-tab" data-filter="wraps">Wraps</button>
-            <button class="br-tab" data-filter="logos">Logos</button>
         </div>
 
         <div id="galleryGrid" class="br-gallery-grid">
@@ -43,84 +39,6 @@
                 <p style="margin-top:16px;color:var(--br-text-light);">Loading gallery...</p>
             </div>
         </div>
-
-        <script>
-        (function() {
-            // Tab filtering
-            document.querySelectorAll('.br-tabs .br-tab').forEach(function(tab) {
-                tab.addEventListener('click', function() {
-                    document.querySelectorAll('.br-tabs .br-tab').forEach(function(t) { t.classList.remove('active'); });
-                    tab.classList.add('active');
-                    var filter = tab.getAttribute('data-filter');
-                    document.querySelectorAll('#galleryGrid .br-gallery-item').forEach(function(item) {
-                        item.style.display = (!filter || filter === 'all' || item.getAttribute('data-category') === filter) ? '' : 'none';
-                    });
-                });
-            });
-
-            // Load gallery from Supabase products
-            async function loadGallery() {
-                if (typeof db === 'undefined') return;
-                try {
-                    var result = await db.from('products').select('*').eq('active', true).order('sort_order', { ascending: true });
-                    if (result.error) throw result.error;
-                    var products = result.data || [];
-
-                    if (products.length === 0) {
-                        document.getElementById('galleryGrid').innerHTML =
-                            '<div style="text-align:center;padding:60px 0;grid-column:1/-1;"><p style="color:var(--br-text-light);">No products in gallery yet. Check back soon!</p></div>';
-                        return;
-                    }
-
-                    var esc = typeof brEscapeHtml === 'function' ? brEscapeHtml : function(s) { return s || ''; };
-                    var items = [];
-
-                    products.forEach(function(p) {
-                        // Main image as gallery item
-                        var allImages = [];
-                        if (p.image_url) allImages.push(p.image_url);
-                        var gallery = Array.isArray(p.gallery) ? p.gallery : [];
-                        gallery.forEach(function(url) { if (url && allImages.indexOf(url) === -1) allImages.push(url); });
-
-                        allImages.forEach(function(imgUrl, i) {
-                            items.push(
-                                '<a href="product-detail.html?slug=' + encodeURIComponent(p.slug) + '" class="br-gallery-item" data-category="' + esc(p.category) + '">' +
-                                    '<div style="aspect-ratio:4/3;overflow:hidden;border-radius:var(--radius-md,8px);">' +
-                                        '<img src="' + imgUrl + '" alt="' + esc(p.name) + '" loading="lazy" style="width:100%;height:100%;object-fit:cover;transition:transform 0.4s ease;">' +
-                                    '</div>' +
-                                    '<div class="br-gallery-caption">' +
-                                        '<h4>' + esc(p.name) + '</h4>' +
-                                        '<p>' + esc(p.category).replace(/-/g, ' ') + '</p>' +
-                                    '</div>' +
-                                '</a>'
-                            );
-                        });
-
-                        // If no images, show placeholder
-                        if (allImages.length === 0) {
-                            items.push(
-                                '<a href="product-detail.html?slug=' + encodeURIComponent(p.slug) + '" class="br-gallery-item" data-category="' + esc(p.category) + '">' +
-                                    '<div style="aspect-ratio:4/3;background:linear-gradient(135deg,#1a1a2e,#C7065C);display:flex;align-items:center;justify-content:center;border-radius:var(--radius-md,8px);overflow:hidden;">' +
-                                        '<span style="color:#fff;font-size:1.25rem;font-weight:600;">' + esc(p.name) + '</span>' +
-                                    '</div>' +
-                                    '<div class="br-gallery-caption">' +
-                                        '<h4>' + esc(p.name) + '</h4>' +
-                                        '<p>' + esc(p.category).replace(/-/g, ' ') + '</p>' +
-                                    '</div>' +
-                                '</a>'
-                            );
-                        }
-                    });
-
-                    document.getElementById('galleryGrid').innerHTML = items.join('');
-                } catch (err) {
-                    console.warn('[gallery]', err.message);
-                }
-            }
-
-            loadGallery();
-        })();
-        </script>
     </div>
 </section>
 
@@ -139,5 +57,102 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
 <script src="content-loader.js?v=3"></script>
+<script>
+(function() {
+    var categoryLabels = {
+        apparel: 'Apparel', headgear: 'Head Gear', basicpoly: 'Basic Poly',
+        stockdesigns: 'Stock Designs', sublimation: 'Sublimation',
+        design: 'Graphic Design', logos: 'Custom Logos', wraps: 'Vehicle Wraps'
+    };
+
+    function setupTabs() {
+        document.querySelectorAll('#galleryTabs .br-tab').forEach(function(tab) {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('#galleryTabs .br-tab').forEach(function(t) { t.classList.remove('active'); });
+                tab.classList.add('active');
+                var filter = tab.getAttribute('data-filter');
+                document.querySelectorAll('#galleryGrid .br-gallery-item').forEach(function(item) {
+                    item.style.display = (!filter || filter === 'all' || item.getAttribute('data-category') === filter) ? '' : 'none';
+                });
+            });
+        });
+    }
+
+    async function loadGallery() {
+        if (typeof db === 'undefined') {
+            document.getElementById('galleryGrid').innerHTML =
+                '<div style="text-align:center;padding:60px 0;grid-column:1/-1;"><p style="color:var(--br-text-light);">Unable to connect. Please refresh the page.</p></div>';
+            return;
+        }
+        try {
+            var result = await db.from('products').select('*').eq('active', true).order('sort_order', { ascending: true });
+            if (result.error) throw result.error;
+            var products = result.data || [];
+
+            if (products.length === 0) {
+                document.getElementById('galleryGrid').innerHTML =
+                    '<div style="text-align:center;padding:60px 0;grid-column:1/-1;"><p style="color:var(--br-text-light);">No products in gallery yet. Check back soon!</p></div>';
+                return;
+            }
+
+            var esc = typeof brEscapeHtml === 'function' ? brEscapeHtml : function(s) { return s || ''; };
+            var items = [];
+            var categories = {};
+
+            products.forEach(function(p) {
+                categories[p.category] = true;
+                var allImages = [];
+                if (p.image_url) allImages.push(p.image_url);
+                var gallery = Array.isArray(p.gallery) ? p.gallery : [];
+                gallery.forEach(function(url) { if (url && allImages.indexOf(url) === -1) allImages.push(url); });
+
+                if (allImages.length > 0) {
+                    allImages.forEach(function(imgUrl) {
+                        items.push(
+                            '<a href="product-detail.html?slug=' + encodeURIComponent(p.slug) + '" class="br-gallery-item" data-category="' + esc(p.category) + '">' +
+                                '<div style="aspect-ratio:4/3;overflow:hidden;border-radius:var(--radius-md,8px);">' +
+                                    '<img src="' + esc(imgUrl) + '" alt="' + esc(p.name) + '" loading="lazy" style="width:100%;height:100%;object-fit:cover;transition:transform 0.4s ease;">' +
+                                '</div>' +
+                                '<div class="br-gallery-caption">' +
+                                    '<h4>' + esc(p.name) + '</h4>' +
+                                    '<p>' + (categoryLabels[p.category] || esc(p.category)) + '</p>' +
+                                '</div>' +
+                            '</a>'
+                        );
+                    });
+                } else {
+                    items.push(
+                        '<a href="product-detail.html?slug=' + encodeURIComponent(p.slug) + '" class="br-gallery-item" data-category="' + esc(p.category) + '">' +
+                            '<div style="aspect-ratio:4/3;background:linear-gradient(135deg,#1a1a2e,#C7065C);display:flex;align-items:center;justify-content:center;border-radius:var(--radius-md,8px);overflow:hidden;">' +
+                                '<span style="color:#fff;font-size:1.25rem;font-weight:600;">' + esc(p.name) + '</span>' +
+                            '</div>' +
+                            '<div class="br-gallery-caption">' +
+                                '<h4>' + esc(p.name) + '</h4>' +
+                                '<p>' + (categoryLabels[p.category] || esc(p.category)) + '</p>' +
+                            '</div>' +
+                        '</a>'
+                    );
+                }
+            });
+
+            // Build category tabs dynamically
+            var tabsHtml = '<button class="br-tab active" data-filter="all">All</button>';
+            Object.keys(categories).sort().forEach(function(cat) {
+                tabsHtml += '<button class="br-tab" data-filter="' + esc(cat) + '">' + (categoryLabels[cat] || esc(cat)) + '</button>';
+            });
+            document.getElementById('galleryTabs').innerHTML = tabsHtml;
+            setupTabs();
+
+            document.getElementById('galleryGrid').innerHTML = items.join('');
+        } catch (err) {
+            console.warn('[gallery]', err.message);
+            document.getElementById('galleryGrid').innerHTML =
+                '<div style="text-align:center;padding:60px 0;grid-column:1/-1;"><p style="color:var(--br-text-light);">Unable to load gallery. Please try again later.</p></div>';
+        }
+    }
+
+    loadGallery();
+})();
+</script>
 </body>
 </html>
