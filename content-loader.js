@@ -42,20 +42,22 @@
     });
     overlay.addEventListener('click', closeNav);
 
-    // Mobile dropdown toggles
-    document.querySelectorAll('.br-dropdown > a').forEach(function(link) {
-      link.addEventListener('click', function(e) {
-        if (window.innerWidth <= 768) {
-          e.preventDefault();
-          var parent = link.parentElement;
-          // Close others
-          document.querySelectorAll('.br-dropdown.open').forEach(function(d) {
-            if (d !== parent) d.classList.remove('open');
-          });
-          parent.classList.toggle('open');
-        }
+    // Mobile dropdown toggles — use event delegation so it works even after
+    // brLoadDynamicNav() replaces the nav HTML
+    var navLinksEl = document.querySelector('.br-nav-links');
+    if (navLinksEl) {
+      navLinksEl.addEventListener('click', function(e) {
+        if (window.innerWidth > 768) return;
+        var link = e.target.closest('.br-dropdown > a');
+        if (!link) return;
+        e.preventDefault();
+        var parent = link.parentElement;
+        navLinksEl.querySelectorAll('.br-dropdown.open').forEach(function(d) {
+          if (d !== parent) d.classList.remove('open');
+        });
+        parent.classList.toggle('open');
       });
-    });
+    }
   }
 
   // Active nav link
@@ -701,18 +703,7 @@
       navLinks.querySelectorAll('a').forEach(function(a) {
         if (a.getAttribute('href') === cp) a.classList.add('active');
       });
-
-      // Re-bind mobile dropdown toggles
-      navLinks.querySelectorAll('.br-dropdown > a').forEach(function(link) {
-        link.addEventListener('click', function(e) {
-          if (window.innerWidth <= 768) {
-            e.preventDefault();
-            var parent = link.parentElement;
-            navLinks.querySelectorAll('.br-dropdown.open').forEach(function(d) { if (d !== parent) d.classList.remove('open'); });
-            parent.classList.toggle('open');
-          }
-        });
-      });
+      // Mobile dropdown toggles handled by event delegation (top of file)
     } catch(e) {
       console.warn('[dynamic-nav]', e.message);
     }

@@ -461,9 +461,16 @@ function setViewport(size, btn) {
 }
 
 function renderPagePills() {
-  document.getElementById('page-pills').innerHTML = SITE_PAGES.map(p =>
+  var html = SITE_PAGES.map(p =>
     '<div class="page-pill' + (currentPage === p.file ? ' active' : '') + '" onclick="selectPage(\'' + p.file + '\')">' + p.name + '</div>'
   ).join('');
+  if (window._customPages && window._customPages.length > 0) {
+    html += '<div style="width:100%;border-top:1px solid #eee;margin:8px 0;padding-top:8px;font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.5px">Custom Pages</div>';
+    html += window._customPages.map(p =>
+      '<div class="page-pill' + (currentPage === ('page.html?slug=' + p.slug) ? ' active' : '') + '" onclick="selectPage(\'page.html?slug=' + p.slug + '\')">' + (p.title || p.slug) + '</div>'
+    ).join('');
+  }
+  document.getElementById('page-pills').innerHTML = html;
 }
 
 function selectPage(file) {
@@ -1047,6 +1054,13 @@ function rgbToHex(rgb) {
     document.getElementById('user-name').textContent = name;
     document.getElementById('user-email').textContent = user.email;
     document.getElementById('user-avatar').textContent = name.charAt(0).toUpperCase();
+
+    // Load custom pages from DB
+    try {
+      var cp = await db.from('custom_pages').select('title,slug').order('title');
+      window._customPages = cp.data || [];
+    } catch(e) { window._customPages = []; }
+
     renderPagePills();
     renderGuide();
   } catch(err) {

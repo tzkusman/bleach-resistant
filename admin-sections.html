@@ -488,6 +488,23 @@
       document.getElementById('user-email').textContent = user.email;
       document.getElementById('user-avatar').textContent = (user.email || 'A')[0].toUpperCase();
       loadSections();
+
+      // Load custom pages into the page selector
+      try {
+        var cp = await db.from('custom_pages').select('title,slug').order('title');
+        if (cp.data && cp.data.length > 0) {
+          var sel = document.getElementById('sec-page');
+          var grp = document.createElement('optgroup');
+          grp.label = 'Custom Pages';
+          cp.data.forEach(function(p) {
+            var opt = document.createElement('option');
+            opt.value = 'page.html?slug=' + p.slug;
+            opt.textContent = p.title + ' (/p/' + p.slug + ')';
+            grp.appendChild(opt);
+          });
+          sel.appendChild(grp);
+        }
+      } catch(e) {}
     })();
   </script>
 </body>
