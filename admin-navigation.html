@@ -1168,7 +1168,7 @@ async function uploadBlockImage(input, targetId) {
 // ====================================================================
 async function loadCustomLinks() {
   try {
-    var r = await db.from('site_settings').select('*').eq('key', 'custom_links').single();
+    var r = await db.from('site_settings').select('*').eq('key', 'custom_links').maybeSingle();
     if (r.data) customLinks = JSON.parse(r.data.value || '[]');
   } catch(e) {}
   renderCustomLinks();
@@ -1211,7 +1211,7 @@ function showAddLinkModal() { document.getElementById('add-link-modal').classLis
 // ====================================================================
 async function loadRedirects() {
   try {
-    var r = await db.from('site_settings').select('*').eq('key', 'redirects').single();
+    var r = await db.from('site_settings').select('*').eq('key', 'redirects').maybeSingle();
     if (r.data) customRedirects = JSON.parse(r.data.value || '[]');
   } catch(e) {}
   renderRedirects();
