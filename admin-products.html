@@ -171,6 +171,15 @@
             </div>
           </div>
 
+          <div style="margin-bottom:16px;">
+            <label style="display:block;font-weight:600;font-size:12px;margin-bottom:4px;">Gallery Images</label>
+            <p style="font-size:11px;color:#888;margin-bottom:8px;">Upload additional images for the product detail page gallery.</p>
+            <div id="pf-gallery-preview" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;"></div>
+            <input type="file" id="pf-gallery-files" accept="image/*" multiple style="font-size:13px;">
+            <div id="pf-gallery-urls" style="margin-top:8px;"></div>
+            <button type="button" onclick="addGalleryUrlField()" style="margin-top:4px;font-size:12px;color:#C7065C;cursor:pointer;background:none;border:none;padding:4px 0;">+ Add image URL</button>
+          </div>
+
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
             <div>
               <label style="display:block;font-weight:600;font-size:12px;margin-bottom:4px;">Sizes (comma separated)</label>
@@ -260,6 +269,34 @@
       }
     };
 
+    /* ── Gallery helpers ──────────────────────────────────── */
+    var existingGalleryUrls = [];
+
+    window.addGalleryUrlField = function () {
+      var container = document.getElementById('pf-gallery-urls');
+      var div = document.createElement('div');
+      div.style.cssText = 'display:flex;gap:6px;margin-bottom:4px;';
+      div.innerHTML = '<input type="text" class="gallery-url-input" placeholder="Image URL" style="flex:1;padding:6px 10px;border:1px solid #ddd;border-radius:6px;font-size:12px;">' +
+        '<button type="button" onclick="this.parentElement.remove()" style="color:#c00;cursor:pointer;background:none;border:none;font-size:16px;">&times;</button>';
+      container.appendChild(div);
+    };
+
+    function renderGalleryPreview(urls) {
+      var container = document.getElementById('pf-gallery-preview');
+      if (!urls || urls.length === 0) { container.innerHTML = ''; return; }
+      container.innerHTML = urls.map(function (url, i) {
+        return '<div style="position:relative;width:64px;height:64px;border-radius:6px;overflow:hidden;border:1px solid #ddd;">' +
+          '<img src="' + brEscapeHtml(url) + '" style="width:100%;height:100%;object-fit:cover;">' +
+          '<button type="button" onclick="removeGalleryImage(' + i + ')" style="position:absolute;top:2px;right:2px;background:rgba(0,0,0,0.6);color:#fff;border:none;cursor:pointer;width:18px;height:18px;border-radius:50%;font-size:12px;line-height:1;display:flex;align-items:center;justify-content:center;">&times;</button>' +
+        '</div>';
+      }).join('');
+    }
+
+    window.removeGalleryImage = function (i) {
+      existingGalleryUrls.splice(i, 1);
+      renderGalleryPreview(existingGalleryUrls);
+    };
+
     /* ── Load ─────────────────────────────────────────────── */
     async function loadProducts() {
       try {
@@ -326,6 +363,9 @@
       document.getElementById('pf-id').value = '';
       document.getElementById('pf-active').checked = true;
       document.getElementById('pf-image-preview').innerHTML = '<span style="font-size:11px;color:#999;">No image</span>';
+      existingGalleryUrls = [];
+      renderGalleryPreview([]);
+      document.getElementById('pf-gallery-urls').innerHTML = '';
     };
 
     window.openAddModal = function () {
@@ -360,6 +400,10 @@
         document.getElementById('pf-image-preview').innerHTML =
           '<img src="' + brEscapeHtml(p.image_url) + '" style="width:100%;height:100%;object-fit:cover;">';
       }
+
+      // Load gallery
+      existingGalleryUrls = Array.isArray(p.gallery) ? p.gallery.slice() : [];
+      renderGalleryPreview(existingGalleryUrls);
 
       openModal();
     };
@@ -405,6 +449,19 @@
           imageUrl = await uploadImage(fileInput.files[0]);
         }
 
+        /* Upload gallery images */
+        var galleryUrls = existingGalleryUrls.slice();
+        var galleryFiles = document.getElementById('pf-gallery-files').files;
+        for (var gi = 0; gi < galleryFiles.length; gi++) {
+          var gUrl = await uploadImage(galleryFiles[gi]);
+          galleryUrls.push(gUrl);
+        }
+        // Add manually entered gallery URLs
+        document.querySelectorAll('.gallery-url-input').forEach(function(inp) {
+          var val = inp.value.trim();
+          if (val) galleryUrls.push(val);
+        });
+
         var sizesRaw = document.getElementById('pf-sizes').value.trim();
         var colorsRaw = document.getElementById('pf-colors').value.trim();
         var featuresRaw = document.getElementById('pf-features').value.trim();
@@ -417,6 +474,7 @@
           short_description: document.getElementById('pf-short-desc').value.trim() || null,
           description: document.getElementById('pf-desc').value.trim() || null,
           image_url: imageUrl || null,
+          gallery: galleryUrls,
           sizes: sizesRaw ? sizesRaw.split(',').map(function (s) { return s.trim(); }).filter(Boolean) : [],
           colors: colorsRaw ? colorsRaw.split(',').map(function (s) { return s.trim(); }).filter(Boolean) : [],
           features: featuresRaw ? featuresRaw.split('\n').map(function (s) { return s.trim(); }).filter(Boolean) : [],

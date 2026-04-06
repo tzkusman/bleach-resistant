@@ -231,9 +231,11 @@
         var imgHtml = p.image_url
           ? '<img src="' + p.image_url + '" alt="' + esc(p.name) + '" loading="lazy">'
           : '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:var(--br-bg-alt);color:var(--br-text-muted);font-size:0.85rem">No Image</div>';
+        var detailUrl = 'product-detail.html?slug=' + encodeURIComponent(p.slug || p.id);
         return '<div class="br-product-card" data-category="' + esc(p.category) + '" data-animate="fade-up">' +
+          '<a href="' + detailUrl + '" class="br-product-card-link">' +
           '<div class="br-product-image">' + imgHtml +
-            '<div class="br-product-overlay"><a href="order.html?product=' + encodeURIComponent(p.slug || p.id) + '" class="br-btn br-btn-primary br-btn-sm">Get Quote</a></div>' +
+            '<div class="br-product-overlay"><span class="br-btn br-btn-primary br-btn-sm">View Details</span></div>' +
             (p.featured ? '<span class="br-product-badge">Featured</span>' : '') +
           '</div>' +
           '<div class="br-product-info">' +
@@ -242,9 +244,9 @@
             (p.short_description ? '<p class="br-product-desc">' + esc(p.short_description) + '</p>' : '') +
             '<div class="br-product-footer">' +
               (p.price_from ? '<span class="br-product-price">From $' + parseFloat(p.price_from).toFixed(0) + '</span>' : '<span class="br-product-price">Get Quote</span>') +
-              '<a href="order.html?product=' + encodeURIComponent(p.slug || p.id) + '" class="br-product-link">Order &#8594;</a>' +
+              '<span class="br-product-link">View Details &#8594;</span>' +
             '</div>' +
-          '</div></div>';
+          '</div></a></div>';
       }).join('');
 
       // Re-observe for animations

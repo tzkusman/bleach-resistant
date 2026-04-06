@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product — Bleach Resistant</title>
+  <meta name="description" content="View product details. Custom sublimation printing by Bleach Resistant.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="overhaul.css?v=3">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-BKMJVM1TY0"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-BKMJVM1TY0');</script>
+</head>
+<body>
+
+  <nav class="br-nav" id="navbar"><div class="br-container"><a href="home.html" class="br-logo"><img src="favicon.svg" alt="BR" class="br-logo-icon"><span>Bleach<strong>Resistant</strong></span></a><button class="br-nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button><div class="br-nav-menu" id="navMenu"><ul class="br-nav-links"><li><a href="home.html">Home</a></li><li class="br-dropdown"><a href="product.html">Products <svg width="10" height="6" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></a><ul class="br-dropdown-menu"><li><a href="headgear.html">Head Gear</a></li><li><a href="basicpoly.html">Basic Poly</a></li><li><a href="stockdesigns.html">Stock Designs</a></li><li><a href="fabricdescriptions.html">Fabric Guide</a></li><li><a href="sublimationprinting.html">Sublimation Printing</a></li></ul></li><li class="br-dropdown"><a href="services.html">Services <svg width="10" height="6" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></a><ul class="br-dropdown-menu"><li><a href="grapicdesign.html">Graphic Design</a></li><li><a href="customlogos.html">Custom Logos</a></li><li><a href="wrapdesign.html">Vehicle Wraps</a></li></ul></li><li><a href="copyofwashingsamples.html">Gallery</a></li><li><a href="About.html">About</a></li><li><a href="FAQs.html">FAQs</a></li></ul><div class="br-nav-actions"><a href="order.html" class="br-btn br-btn-primary br-btn-sm">Order Now</a></div></div></div></nav>
+
+  <section class="br-page-header" id="detail-header">
+    <div class="br-container">
+      <nav class="br-breadcrumb">
+        <a href="home.html">Home</a> <span>/</span> <a href="product.html">Products</a> <span>/</span> <span id="breadcrumb-name">Loading...</span>
+      </nav>
+      <h1 id="detail-title">Loading Product...</h1>
+    </div>
+  </section>
+
+  <!-- Product Detail -->
+  <section class="br-section">
+    <div class="br-container">
+      <div id="product-loading" style="text-align:center;padding:80px 0;">
+        <div class="br-spinner"></div>
+        <p style="margin-top:16px;color:var(--br-text-light);">Loading product details...</p>
+      </div>
+
+      <div id="product-not-found" style="display:none;text-align:center;padding:80px 0;">
+        <h2>Product Not Found</h2>
+        <p style="color:var(--br-text-light);margin:16px 0 32px;">The product you're looking for doesn't exist or has been removed.</p>
+        <a href="product.html" class="br-btn br-btn-primary">Browse All Products</a>
+      </div>
+
+      <div id="product-detail" class="br-detail-layout" style="display:none;">
+        <!-- Gallery Side -->
+        <div class="br-detail-gallery">
+          <div class="br-detail-main-image" id="detail-main-image">
+            <img src="" alt="" id="detail-img">
+          </div>
+          <div class="br-detail-thumbs" id="detail-thumbs"></div>
+        </div>
+
+        <!-- Info Side -->
+        <div class="br-detail-info">
+          <span class="br-product-category" id="detail-category"></span>
+          <h2 class="br-detail-name" id="detail-name"></h2>
+          <div class="br-detail-price" id="detail-price"></div>
+          <div class="br-detail-desc" id="detail-desc"></div>
+
+          <div id="detail-features-wrap" style="display:none;">
+            <h4 class="br-detail-section-title">Features</h4>
+            <ul class="br-detail-features" id="detail-features"></ul>
+          </div>
+
+          <div id="detail-sizes-wrap" style="display:none;">
+            <h4 class="br-detail-section-title">Available Sizes</h4>
+            <div class="br-detail-pills" id="detail-sizes"></div>
+          </div>
+
+          <div id="detail-colors-wrap" style="display:none;">
+            <h4 class="br-detail-section-title">Available Colors</h4>
+            <div class="br-detail-pills" id="detail-colors"></div>
+          </div>
+
+          <div class="br-detail-actions">
+            <a href="#" id="detail-order-btn" class="br-btn br-btn-primary br-btn-lg">Order Now</a>
+            <a href="order.html" class="br-btn br-btn-outline br-btn-lg">Get Custom Quote</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Related Products -->
+  <section class="br-section br-section-alt" id="related-section" style="display:none;">
+    <div class="br-container">
+      <div class="br-text-center">
+        <span class="br-section-label">You May Also Like</span>
+        <h2 class="br-section-title">Related Products</h2>
+      </div>
+      <div id="relatedProducts" class="br-products-grid"></div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="br-cta-banner">
+    <div class="br-container">
+      <h2 data-animate="fade-up">Need Something Custom?</h2>
+      <p data-animate="fade-up">We create fully custom products. Tell us your vision and we'll make it happen.</p>
+      <div class="br-btn-group" data-animate="fade-up">
+        <a href="order.html" class="br-btn br-btn-primary br-btn-lg">Request a Custom Quote</a>
+        <a href="product.html" class="br-btn br-btn-outline br-btn-lg" style="border-color:#fff;color:#fff">Browse Products</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="br-footer"><div class="br-container"><div class="br-footer-grid"><div class="br-footer-brand"><a href="home.html" class="br-logo"><img src="favicon.svg" alt="BR" class="br-logo-icon"><span>Bleach<strong>Resistant</strong></span></a><p>Premium custom sublimation printing. Affordable quality apparel for teams, businesses, and individuals.</p></div><div class="br-footer-links"><h4>Products</h4><ul><li><a href="product.html">All Products</a></li><li><a href="headgear.html">Head Gear</a></li><li><a href="basicpoly.html">Basic Poly</a></li><li><a href="stockdesigns.html">Stock Designs</a></li><li><a href="sublimationprinting.html">Sublimation</a></li></ul></div><div class="br-footer-links"><h4>Services</h4><ul><li><a href="services.html">All Services</a></li><li><a href="grapicdesign.html">Graphic Design</a></li><li><a href="customlogos.html">Custom Logos</a></li><li><a href="wrapdesign.html">Vehicle Wraps</a></li><li><a href="sizechart.html">Size Chart</a></li></ul></div><div class="br-footer-links"><h4>Company</h4><ul><li><a href="About.html">About Us</a></li><li><a href="FAQs.html">FAQs</a></li><li><a href="order.html">Get a Quote</a></li><li><a href="privacypolicy.html">Privacy Policy</a></li><li><a href="termsconditions.html">Terms &amp; Conditions</a></li></ul></div></div><div class="br-footer-bottom"><p>&copy; 2026 Bleach Resistant. All rights reserved.</p><div class="br-footer-bottom-links"><a href="privacypolicy.html">Privacy</a><a href="termsconditions.html">Terms</a><a href="sitemap.xml">Sitemap</a></div></div></div></footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="content-loader.js?v=3"></script>
+  <script>
+  (function() {
+    var params = new URLSearchParams(window.location.search);
+    var slug = params.get('slug');
+
+    if (!slug) {
+      document.getElementById('product-loading').style.display = 'none';
+      document.getElementById('product-not-found').style.display = 'block';
+      return;
+    }
+
+    async function loadProduct() {
+      if (typeof db === 'undefined') {
+        document.getElementById('product-loading').style.display = 'none';
+        document.getElementById('product-not-found').style.display = 'block';
+        return;
+      }
+
+      try {
+        var result = await db.from('products').select('*').eq('slug', slug).eq('active', true).single();
+        if (result.error || !result.data) {
+          document.getElementById('product-loading').style.display = 'none';
+          document.getElementById('product-not-found').style.display = 'block';
+          return;
+        }
+
+        var p = result.data;
+        var esc = typeof brEscapeHtml === 'function' ? brEscapeHtml : function(s) { return s || ''; };
+
+        // Update page title & meta
+        document.title = esc(p.name) + ' — Bleach Resistant';
+        var metaDesc = document.querySelector('meta[name="description"]');
+        if (metaDesc) metaDesc.setAttribute('content', p.short_description || p.description || 'Custom sublimation product by Bleach Resistant.');
+
+        // Breadcrumb & header
+        document.getElementById('breadcrumb-name').textContent = p.name;
+        document.getElementById('detail-title').textContent = p.name;
+
+        // Category
+        var categoryLabels = {
+          apparel: 'Apparel', headgear: 'Head Gear', basicpoly: 'Basic Poly',
+          stockdesigns: 'Stock Designs', sublimation: 'Sublimation',
+          design: 'Graphic Design', logos: 'Custom Logos', wraps: 'Vehicle Wraps'
+        };
+        document.getElementById('detail-category').textContent = categoryLabels[p.category] || p.category;
+
+        // Name & price
+        document.getElementById('detail-name').textContent = p.name;
+        document.getElementById('detail-price').innerHTML = p.price_from
+          ? 'From <strong>$' + parseFloat(p.price_from).toFixed(2) + '</strong>'
+          : '<span>Contact for pricing</span>';
+
+        // Description
+        document.getElementById('detail-desc').innerHTML = (p.description || p.short_description || '').replace(/\n/g, '<br>');
+
+        // Main image
+        var mainImg = document.getElementById('detail-img');
+        var gallery = Array.isArray(p.gallery) ? p.gallery : [];
+        var allImages = [];
+        if (p.image_url) allImages.push(p.image_url);
+        gallery.forEach(function(url) { if (url && allImages.indexOf(url) === -1) allImages.push(url); });
+
+        if (allImages.length > 0) {
+          mainImg.src = allImages[0];
+          mainImg.alt = p.name;
+        } else {
+          document.getElementById('detail-main-image').innerHTML =
+            '<div style="width:100%;height:100%;min-height:300px;display:flex;align-items:center;justify-content:center;background:var(--br-bg-alt);color:var(--br-text-muted);border-radius:var(--radius-lg);">No Image Available</div>';
+        }
+
+        // Thumbnails
+        if (allImages.length > 1) {
+          var thumbsHtml = allImages.map(function(url, i) {
+            return '<button class="br-detail-thumb' + (i === 0 ? ' active' : '') + '" onclick="switchImage(this, \'' + url.replace(/'/g, "\\'") + '\')">' +
+              '<img src="' + url + '" alt="' + esc(p.name) + ' view ' + (i + 1) + '" loading="lazy">' +
+            '</button>';
+          }).join('');
+          document.getElementById('detail-thumbs').innerHTML = thumbsHtml;
+        }
+
+        // Features
+        var features = Array.isArray(p.features) ? p.features.filter(Boolean) : [];
+        if (features.length > 0) {
+          document.getElementById('detail-features-wrap').style.display = 'block';
+          document.getElementById('detail-features').innerHTML = features.map(function(f) {
+            return '<li><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M13.3 4.3L6.5 11.1 2.7 7.3" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> ' + esc(f) + '</li>';
+          }).join('');
+        }
+
+        // Sizes
+        var sizes = Array.isArray(p.sizes) ? p.sizes.filter(Boolean) : [];
+        if (sizes.length > 0) {
+          document.getElementById('detail-sizes-wrap').style.display = 'block';
+          document.getElementById('detail-sizes').innerHTML = sizes.map(function(s) {
+            return '<span class="br-pill">' + esc(s) + '</span>';
+          }).join('');
+        }
+
+        // Colors
+        var colors = Array.isArray(p.colors) ? p.colors.filter(Boolean) : [];
+        if (colors.length > 0) {
+          document.getElementById('detail-colors-wrap').style.display = 'block';
+          document.getElementById('detail-colors').innerHTML = colors.map(function(c) {
+            return '<span class="br-pill">' + esc(c) + '</span>';
+          }).join('');
+        }
+
+        // Order button
+        document.getElementById('detail-order-btn').href = 'order.html?product=' + encodeURIComponent(p.slug);
+
+        // Show product, hide loader
+        document.getElementById('product-loading').style.display = 'none';
+        document.getElementById('product-detail').style.display = '';
+
+        // Load related products (same category, exclude current)
+        if (typeof window.brLoadProducts === 'function') {
+          var related = await window.brLoadProducts('relatedProducts', { category: p.category, limit: 4 });
+          if (related && related.length > 1) {
+            // Remove the current product card from related
+            var currentCard = document.querySelector('#relatedProducts .br-product-card a[href*="' + p.slug + '"]');
+            if (currentCard) {
+              var card = currentCard.closest('.br-product-card');
+              if (card) card.remove();
+            }
+            document.getElementById('related-section').style.display = '';
+          }
+        }
+
+      } catch (err) {
+        console.error('Product detail error:', err);
+        document.getElementById('product-loading').style.display = 'none';
+        document.getElementById('product-not-found').style.display = 'block';
+      }
+    }
+
+    // Thumbnail switcher
+    window.switchImage = function(btn, url) {
+      document.getElementById('detail-img').src = url;
+      document.querySelectorAll('.br-detail-thumb').forEach(function(t) { t.classList.remove('active'); });
+      btn.classList.add('active');
+    };
+
+    loadProduct();
+  })();
+  </script>
+</body>
+</html>
