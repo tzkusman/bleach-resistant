@@ -467,13 +467,12 @@
 
       try {
         if (typeof db === 'undefined') throw new Error('Not connected');
-        var result = await db.from('contacts').insert({
-          name: name,
-          email: email,
-          message: msg,
-          page_source: currentPage,
-          status: 'new'
-        });
+        var contactData = { name: name, email: email, message: msg, status: 'new' };
+        // Try with page_source; fall back without it if column doesn't exist yet
+        var result = await db.from('contacts').insert(Object.assign({ page_source: currentPage }, contactData));
+        if (result.error) {
+          result = await db.from('contacts').insert(contactData);
+        }
         if (result.error) throw result.error;
 
         // Save info
