@@ -157,28 +157,25 @@ p { margin-bottom: 1rem; }
 .br-nav-menu {
   display: flex;
   align-items: center;
-  gap: clamp(4px, 0.5vw, 8px);
-  flex: 1 1 auto;
-  min-width: 0;
-  justify-content: flex-end;
+  gap: 6px;
 }
 .br-nav-links {
   display: flex;
   align-items: center;
-  gap: clamp(0px, 0.3vw, 4px);
-  flex-wrap: nowrap;
+  gap: 2px;
+  list-style: none;
 }
 .br-nav-links > li > a {
   font-family: var(--font-heading);
-  font-size: clamp(0.7rem, 0.75vw + 0.15rem, 0.85rem);
+  font-size: 0.82rem;
   font-weight: 600;
-  letter-spacing: 0.2px;
-  padding: 8px clamp(6px, 0.7vw, 14px);
+  letter-spacing: 0.3px;
+  padding: 8px 12px;
   border-radius: var(--radius-sm);
   color: var(--br-text);
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
   transition: all var(--transition);
   white-space: nowrap;
 }
@@ -231,8 +228,8 @@ p { margin-bottom: 1rem; }
 .br-nav-actions {
   display: flex;
   align-items: center;
-  gap: clamp(6px, 0.6vw, 12px);
-  margin-left: clamp(8px, 1vw, 16px);
+  gap: 10px;
+  margin-left: 12px;
   flex-shrink: 0;
 }
 
@@ -1205,8 +1202,9 @@ p { margin-bottom: 1rem; }
 
 /* ── 21. RESPONSIVE ────────────────────────────────────────── */
 @media (max-width: 1200px) {
-  .br-nav-links > li > a { padding: 8px clamp(4px, 0.5vw, 10px); font-size: clamp(0.68rem, 0.7vw + 0.12rem, 0.8rem); }
+  .br-nav-links > li > a { padding: 8px 8px; font-size: 0.78rem; }
   .br-nav-actions .br-btn { font-size: 0.75rem; padding: 8px 14px; }
+  .br-nav-actions { gap: 6px; margin-left: 8px; }
 }
 
 @media (max-width: 1024px) {
