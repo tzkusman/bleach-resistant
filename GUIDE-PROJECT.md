@@ -23,6 +23,7 @@
 14. [Prompt to Recreate This Project](#14-prompt-to-recreate-this-project)
 15. [Navigation System & Custom Pages](#15-navigation-system--custom-pages)
 16. [Cache Version Tracking](#16-cache-version-tracking)
+17. [Hosting on Hostinger (Complete Guide)](#17-hosting-on-hostinger-complete-guide)
 
 ---
 
@@ -1558,3 +1559,458 @@ Always bump version numbers when editing shared files:
 | `overhaul.css` | `?v=10` | All public pages |
 | `content-loader.js` | `?v=15` | All public pages |
 | `supabase-config.js` | `?v=7` | All pages |
+
+---
+
+## 17. Hosting on Hostinger (Complete Guide)
+
+> **How to move this project from Vercel to Hostinger with a custom domain.**
+> This covers buying a domain, setting up hosting, uploading files, SSL, email, and going live.
+
+### 17.1 Why Hostinger?
+
+| Feature | Vercel (Current) | Hostinger |
+|---------|------------------|-----------|
+| **Custom domain** | Requires DNS config | Included — buy & manage in one place |
+| **Email** | Not included | Professional email (name@yourdomain.com) |
+| **File Manager** | Git push only | Web file manager + FTP + Git |
+| **SSL** | Auto (free) | Auto (free Let's Encrypt) |
+| **Price** | Free tier | ~$2.99/month (Premium plan) |
+| **PHP/Backend** | Not supported | Supported (if you ever need it) |
+| **Storage** | No limit (static) | 100GB+ |
+| **Bandwidth** | 100GB/month free | Unlimited |
+
+**Verdict:** Hostinger is better when you want a custom domain, professional email, and one dashboard for everything.
+
+---
+
+### 17.2 Step 1: Buy a Hostinger Plan
+
+1. Go to [hostinger.com](https://www.hostinger.com)
+2. Click **Web Hosting** (not WordPress Hosting, not VPS)
+3. Choose **Premium Web Hosting** plan (recommended):
+   - 100 websites
+   - Free domain (1 year)
+   - Free SSL
+   - Professional email
+   - ~$2.99/month (on 48-month plan)
+4. Create your account and complete payment
+5. You'll get a **Welcome Email** with your hosting credentials
+
+> **Tip:** The 48-month plan gives the best monthly rate. If testing, the 1-month plan works too but costs more per month.
+
+---
+
+### 17.3 Step 2: Register Your Domain
+
+#### Option A: Free Domain with Hosting Plan (Recommended)
+Premium plan includes 1 free domain for 1 year.
+
+1. After purchase, Hostinger dashboard will prompt: **"Claim your free domain"**
+2. Search for your domain: `bleachresistant.com` (or `.ca`, `.store`, etc.)
+3. If available → **Register** it
+4. Fill in WHOIS contact info (name, email, address — Hostinger protects this with WHOIS privacy)
+5. Domain is now registered and auto-connected to your hosting
+
+#### Option B: Buy Domain Separately
+1. In Hostinger dashboard → **Domains** → **Register a New Domain**
+2. Search for your domain name
+3. Select and purchase (`.com` = ~$9.99/year, `.ca` = ~$12.99/year)
+4. It will auto-connect to your hosting account
+
+#### Option C: Use a Domain from Another Registrar (GoDaddy, Namecheap, etc.)
+1. In your Hostinger dashboard → **Hosting** → **Plan Details**
+2. Find your Hostinger **nameservers** (usually):
+   ```
+   ns1.dns-parking.com
+   ns2.dns-parking.com
+   ```
+   Or the actual assigned nameservers (check your hosting welcome email)
+3. Go to your domain registrar (GoDaddy, Namecheap, etc.)
+4. Find **DNS Settings** or **Nameservers**
+5. Change nameservers to the Hostinger ones
+6. Wait 24-48 hours for DNS propagation
+
+---
+
+### 17.4 Step 3: Set Up Your Hosting
+
+After buying hosting + domain, you need to set up the hosting account:
+
+1. Log in to [hpanel.hostinger.com](https://hpanel.hostinger.com) (Hostinger's control panel)
+2. You'll see your hosting plan. Click **Setup** or **Manage**
+3. When asked "What do you want to build?", select **"Upload my own website"** (skip any website builder prompts)
+4. Select your domain from the dropdown
+5. Skip any template/WordPress suggestions — you're uploading your own files
+6. The hosting is now active and tied to your domain
+
+---
+
+### 17.5 Step 4: Upload Your Website Files
+
+There are 3 ways to upload. Choose one:
+
+#### Method A: File Manager (Easiest — No Software Needed)
+
+1. In hPanel → **Files** → **File Manager**
+2. Navigate to `public_html/` (this is your website's root folder — everything in here is publicly accessible)
+3. **Delete** any default files inside `public_html/` (like `index.html` placeholder)
+4. Click **Upload** (top toolbar)
+5. Upload ALL your project files:
+
+```
+Files to upload to public_html/:
+├── overhaul.css
+├── admin.css
+├── supabase-config.js
+├── content-loader.js
+├── home.html
+├── product.html
+├── product-detail.html
+├── order.html
+├── account.html
+├── login.html
+├── signup.html
+├── headgear.html
+├── basicpoly.html
+├── stockdesigns.html
+├── fabricdescriptions.html
+├── sublimationprinting.html
+├── services.html
+├── grapicdesign.html
+├── customlogos.html
+├── wrapdesign.html
+├── copyofwashingsamples.html
+├── About.html
+├── FAQs.html
+├── Pricelist.html
+├── sizechart.html
+├── finprint.html
+├── privacypolicy.html
+├── termsconditions.html
+├── page.html
+├── admin.html
+├── admin-products.html
+├── admin-orders.html
+├── admin-contacts.html
+├── admin-slider.html
+├── admin-sections.html
+├── admin-pages.html
+├── admin-media.html
+├── admin-navigation.html
+├── admin-settings.html
+├── admin-analytics.html
+├── sitemap.xml
+├── favicon.svg
+├── vercel.json              ← Not needed on Hostinger, but harmless to keep
+├── GUIDE-PROJECT.md         ← Optional, for your reference
+├── GUIDE-ADMIN-PANEL.md     ← Optional, for your reference
+├── README.md                ← Optional
+└── supabase-setup.sql       ← Optional, for DB reference
+```
+
+> **Tip:** You can also ZIP all files → upload the ZIP → right-click → **Extract** inside File Manager. Much faster than uploading 40+ files one by one.
+
+#### Method B: FTP Upload (Best for Bulk Files)
+
+1. In hPanel → **Files** → **FTP Accounts**
+2. Note the default FTP credentials (or create a new FTP account):
+   - **Host:** `ftp.yourdomain.com` or the IP shown in hPanel
+   - **Username:** Your FTP username (shown in hPanel)
+   - **Password:** Your hosting password or set a new one
+   - **Port:** `21`
+3. Download [FileZilla](https://filezilla-project.org/) (free FTP client)
+4. Open FileZilla → enter credentials → **Quickconnect**
+5. Left panel = your computer. Navigate to your project folder (`E:\786786\bleach`)
+6. Right panel = server. Navigate to `/public_html/`
+7. Select all files on the left → drag to the right panel
+8. Wait for upload to complete
+
+#### Method C: Git Deploy (Advanced — Auto-Deploy Like Vercel)
+
+Hostinger supports Git deployment:
+
+1. In hPanel → **Advanced** → **Git**
+2. Click **Create a New Repository** or **Manage**
+3. Set the **Repository URL**: `https://github.com/tzkusman/bleach-resistant.git`
+4. Set the **Branch**: `master`
+5. Set the **Deployment Path**: `public_html`
+6. Click **Create**
+7. Click **Deploy** to pull your latest code
+
+To auto-deploy on push (like Vercel), set up a webhook:
+1. In hPanel → Git → copy the **Webhook URL**
+2. In GitHub → your repo → **Settings** → **Webhooks** → **Add webhook**
+3. Paste the Hostinger webhook URL
+4. Content type: `application/json`
+5. Event: `Just the push event`
+6. Now every `git push` auto-deploys to Hostinger
+
+---
+
+### 17.6 Step 5: Set home.html as Homepage
+
+By default, web servers look for `index.html` as the homepage. Your site uses `home.html`. Fix this:
+
+#### Option A: Create an index.html Redirect (Simplest)
+
+Create a new file `index.html` in `public_html/` with:
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="refresh" content="0; url=home.html">
+  <link rel="canonical" href="https://yourdomain.com/home.html">
+</head>
+<body>
+  <p>Redirecting to <a href="home.html">Home</a>...</p>
+</body>
+</html>
+```
+
+#### Option B: Use .htaccess (Better for SEO)
+
+Create a file called `.htaccess` in `public_html/` with:
+
+```apache
+# Redirect root to home.html
+DirectoryIndex home.html index.html
+
+# Custom page URL rewrites (replaces vercel.json rewrites)
+RewriteEngine On
+RewriteRule ^p/([a-zA-Z0-9_-]+)$ /page.html?slug=$1 [L,QSA]
+
+# Force HTTPS
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
+
+# Security headers (replaces vercel.json headers)
+Header set X-Frame-Options "DENY"
+Header set X-Content-Type-Options "nosniff"
+Header set X-XSS-Protection "1; mode=block"
+Header set Referrer-Policy "strict-origin-when-cross-origin"
+
+# Block access to sensitive files
+<FilesMatch "\.(sql|md)$">
+  Order allow,deny
+  Deny from all
+</FilesMatch>
+
+# Cache static assets (CSS, JS, images) for 1 year
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/css "access plus 1 year"
+  ExpiresByType application/javascript "access plus 1 year"
+  ExpiresByType image/svg+xml "access plus 1 year"
+  ExpiresByType image/jpeg "access plus 1 year"
+  ExpiresByType image/png "access plus 1 year"
+  ExpiresByType image/webp "access plus 1 year"
+</IfModule>
+
+# Gzip compression
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json image/svg+xml
+</IfModule>
+
+# Custom 404 page (optional)
+ErrorDocument 404 /home.html
+```
+
+> **Important:** The `.htaccess` file replaces `vercel.json` functionality. It handles:
+> - URL rewrites for custom pages (`/p/blog` → `page.html?slug=blog`)
+> - Security headers
+> - HTTPS redirect
+> - Cache control
+> - Gzip compression
+
+---
+
+### 17.7 Step 6: Enable SSL (HTTPS)
+
+1. In hPanel → **Security** → **SSL**
+2. Your domain should be listed. Click **Setup** or **Install**
+3. Choose **Free SSL** (Let's Encrypt) — auto-renews every 90 days
+4. Click **Install**
+5. Wait 5-10 minutes for SSL to activate
+6. Test: visit `https://yourdomain.com` — padlock icon should appear
+
+> If SSL doesn't appear immediately, try **Force HTTPS** toggle in hPanel → Security → SSL.
+
+---
+
+### 17.8 Step 7: Set Up Professional Email
+
+1. In hPanel → **Emails** → **Email Accounts**
+2. Click **Create Email Account**
+3. Enter: `info@yourdomain.com` (or `orders@`, `support@`, etc.)
+4. Set a password
+5. Click **Create**
+
+**Access your email:**
+- **Webmail:** Go to `https://mail.yourdomain.com` or hPanel → Emails → Webmail
+- **Mobile/Desktop:** Use the IMAP/SMTP settings shown in hPanel:
+  ```
+  Incoming (IMAP): imap.hostinger.com, Port 993, SSL
+  Outgoing (SMTP): smtp.hostinger.com, Port 465, SSL
+  Username: info@yourdomain.com
+  Password: (the one you set)
+  ```
+
+**Create multiple emails:**
+- `info@yourdomain.com` — General inquiries
+- `orders@yourdomain.com` — Order-related
+- `support@yourdomain.com` — Customer support
+
+---
+
+### 17.9 Step 8: Update Supabase Config for New Domain
+
+After moving to Hostinger, update the allowed redirect URLs in Supabase:
+
+1. Go to [supabase.com](https://supabase.com) → your project → **Authentication** → **URL Configuration**
+2. Set **Site URL**: `https://yourdomain.com`
+3. Under **Redirect URLs**, add:
+   ```
+   https://yourdomain.com/**
+   https://www.yourdomain.com/**
+   ```
+4. (Optional) Remove the old Vercel URL if you're fully migrating
+
+Also update your `supabase-config.js` if it contains any hardcoded redirect URLs:
+```javascript
+// No changes needed to SUPABASE_URL or SUPABASE_ANON_KEY
+// These stay the same — only the domain serving the HTML changed
+// Supabase doesn't care where the request comes from (CORS is open for anon key)
+```
+
+> **Key Point:** Supabase URL (`dbppxzkkgdtnmikkviyt.supabase.co`) and anon key do NOT change. The database is separate from your hosting. You're just moving where the HTML files live.
+
+---
+
+### 17.10 Step 9: Update Google Analytics
+
+1. Go to [analytics.google.com](https://analytics.google.com)
+2. Navigate to **Admin** → **Data Streams**
+3. Click your existing stream
+4. Under **Website URL**, update to `https://yourdomain.com`
+5. (Optional) Add the `www.yourdomain.com` variant too
+
+The GA tracking code (`G-BKMJVM1TY0`) in your HTML files stays the same.
+
+---
+
+### 17.11 Step 10: DNS Records Reference
+
+If you need to manually configure DNS (e.g., using a domain from another registrar):
+
+| Record Type | Name | Value | TTL | Purpose |
+|------------|------|-------|-----|---------|
+| **A** | `@` | `(Hostinger IP from hPanel)` | 14400 | Points domain to server |
+| **A** | `www` | `(Hostinger IP from hPanel)` | 14400 | Points www subdomain |
+| **CNAME** | `www` | `yourdomain.com` | 14400 | Alternative to A record for www |
+| **MX** | `@` | `mx1.hostinger.com` (priority 5) | 14400 | Email routing |
+| **MX** | `@` | `mx2.hostinger.com` (priority 10) | 14400 | Email routing backup |
+| **TXT** | `@` | `v=spf1 include:_spf.hostinger.com ~all` | 14400 | Email SPF (prevents spam) |
+
+Find your Hostinger server IP:
+- hPanel → **Hosting** → **Plan Details** → **Server IP Address**
+
+---
+
+### 17.12 Step 11: Test Everything
+
+After uploading and configuring, verify all features work:
+
+**Checklist:**
+- [ ] `https://yourdomain.com` loads home page (SSL padlock visible)
+- [ ] `https://yourdomain.com/home.html` works
+- [ ] `https://yourdomain.com/product.html` loads products from Supabase
+- [ ] Hero slider loads dynamic slides
+- [ ] Navigation loads from database (dynamic nav)
+- [ ] Chat widget appears on public pages
+- [ ] Order form works (submit → saved to Supabase)
+- [ ] Login/signup works (Supabase Auth)
+- [ ] Client account page loads order history
+- [ ] `https://yourdomain.com/admin.html` works (admin login)
+- [ ] Admin product CRUD works (create/edit/delete/upload images)
+- [ ] Custom pages work: `https://yourdomain.com/p/your-slug`
+- [ ] `.htaccess` rewrites work (no 404 on `/p/slug` URLs)
+- [ ] Professional email sends/receives
+- [ ] Google Analytics tracking active (check real-time view)
+
+---
+
+### 17.13 Vercel vs Hostinger — Decision Guide
+
+| Scenario | Use Vercel | Use Hostinger |
+|----------|-----------|---------------|
+| Just need free hosting | ✅ | |
+| Want custom domain + email | | ✅ |
+| Auto-deploy from GitHub | ✅ (built-in) | ✅ (webhook setup) |
+| Need PHP backend later | | ✅ |
+| Need cron jobs | | ✅ |
+| Global CDN speed | ✅ (better) | ⚠️ (single server) |
+| Budget = $0 | ✅ | |
+| Professional business | | ✅ |
+| Multiple websites | | ✅ (100 sites on Premium) |
+
+**You can run both:** Keep Vercel as staging (`bleach-resistant.vercel.app`) and Hostinger as production (`yourdomain.com`). Push to GitHub deploys to both.
+
+---
+
+### 17.14 Migration Checklist (Vercel → Hostinger)
+
+```
+1. □ Buy Hostinger Premium plan ($2.99/mo)
+2. □ Register domain (or use free domain with plan)
+3. □ Wait for domain DNS propagation (up to 48 hours)
+4. □ Upload all files to public_html/
+5. □ Create .htaccess (URL rewrites, HTTPS, security headers, caching)
+6. □ Create index.html redirect (or set DirectoryIndex in .htaccess)
+7. □ Enable SSL in hPanel
+8. □ Set up professional email(s)
+9. □ Update Supabase Auth redirect URLs to new domain
+10. □ Update Google Analytics site URL
+11. □ Update sitemap.xml URLs to new domain
+12. □ Test all pages, forms, admin, auth
+13. □ (Optional) Set up Git auto-deploy webhook
+14. □ (Optional) Keep Vercel as staging environment
+```
+
+---
+
+### 17.15 Troubleshooting Common Issues
+
+**"Site shows Hostinger parking page"**
+- Files not uploaded to `public_html/` yet, or `index.html`/`home.html` missing
+- Solution: Upload files and create the index redirect
+
+**"SSL not working / browser shows 'Not Secure'"**
+- SSL takes 5-30 minutes to activate after installation
+- Solution: Wait, then force HTTPS in hPanel → Security → SSL → Force HTTPS
+
+**"Custom page URLs like /p/blog give 404"**
+- `.htaccess` rewrite rules not set up
+- Solution: Create `.htaccess` with the `RewriteRule` shown in Step 6
+
+**"Supabase queries fail / CORS error"**
+- Very rare — Supabase anon key allows requests from any origin
+- If it happens: Go to Supabase → Settings → API → add your domain to "Additional Redirect URLs"
+
+**"Email going to spam"**
+- SPF record not set up
+- Solution: Add the TXT SPF record shown in the DNS section
+- Also set up DKIM: hPanel → Emails → Email DNS Records → copy DKIM record to DNS
+
+**"Changes not showing after upload"**
+- Browser cache — do a hard refresh: `Ctrl + Shift + R`
+- Or bump the `?v=N` version number on CSS/JS files
+
+**"Git deploy shows wrong files"**
+- Deployment path not set to `public_html`
+- Solution: hPanel → Git → edit repository → set path to `public_html`
+
+**".htaccess not working / 500 error"**
+- Syntax error in `.htaccess` file
+- Solution: Check for typos, ensure `RewriteEngine On` is present, test with a minimal file first
