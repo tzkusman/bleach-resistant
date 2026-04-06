@@ -74,6 +74,8 @@ async function brRequireAdmin() {
     window.location.href = 'home.html';
     throw new Error('Admin access required');
   }
+  // Reveal admin page content (hidden by default via .admin-hidden)
+  document.body.classList.remove('admin-hidden');
   return user;
 }
 
