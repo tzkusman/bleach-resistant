@@ -412,13 +412,8 @@
           active: document.getElementById('slide-active').checked
         };
 
-      if (!data.title) { showToast('Title is required', 'error'); return; }
+        if (!data.title) { showToast('Title is required', 'error'); btn.disabled = false; btn.textContent = 'Save Slide'; return; }
 
-      const btn = document.getElementById('save-slide-btn');
-      btn.disabled = true;
-      btn.textContent = 'Saving...';
-
-      try {
         let result;
         if (id) {
           result = await db.from('hero_slides').update(data).eq('id', id);
