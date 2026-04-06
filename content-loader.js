@@ -340,67 +340,88 @@
 
   /* ── DYNAMIC CATEGORY SECTION LOADER ──────────────────────── */
   window.brLoadCategorySection = async function() {
-    var hero = document.querySelector('.br-category-hero');
-    if (!hero || typeof db === 'undefined') return;
+    if (typeof db === 'undefined') return;
 
     try {
       var page = window.location.pathname.split('/').pop() || '';
       var result = await db.from('category_sections').select('*')
-        .eq('page_name', page).eq('active', true).limit(1).maybeSingle();
+        .eq('page_name', page).eq('active', true).order('sort_order', { ascending: true });
       if (result.error) throw result.error;
-      var s = result.data;
-      if (!s) return; // keep static content as fallback
+      var sections = result.data || [];
+      if (sections.length === 0) return; // keep static content as fallback
 
       var esc = function(str) { var d = document.createElement('div'); d.textContent = str || ''; return d.innerHTML; };
 
-      // Update section label
-      var labelEl = hero.querySelector('.br-section-label');
-      if (labelEl && s.section_label) labelEl.textContent = s.section_label;
+      // Process each section from DB
+      sections.forEach(function(s, idx) {
+        var hero = idx === 0 ? document.querySelector('.br-category-hero') : null;
 
-      // Update heading
-      var h2 = hero.querySelector('h2');
-      if (h2 && s.heading) h2.textContent = s.heading;
+        // If no .br-category-hero exists OR this is an extra section, create one
+        if (!hero) {
+          var wrapper = document.createElement('section');
+          wrapper.className = idx % 2 === 0 ? 'br-section' : 'br-section-alt';
+          wrapper.innerHTML = '<div class="br-container"><div class="br-category-hero" data-animate="fade-up">' +
+            '<div><span class="br-section-label"></span><h2></h2><p></p><ul class="br-checklist"></ul>' +
+            '<div class="br-btn-group" style="margin-top:24px"></div></div>' +
+            '<div class="br-category-image" style="background:linear-gradient(135deg,#1a1a2e,#0f3460);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.3);font-size:1.2rem"></div>' +
+            '</div></div>';
+          // Insert before the first .br-section-alt or .br-cta-banner after the page header
+          var pageHeader = document.querySelector('.br-page-header');
+          var insertTarget = pageHeader ? pageHeader.nextElementSibling : document.querySelector('.br-section, .br-section-alt');
+          if (insertTarget) {
+            insertTarget.parentNode.insertBefore(wrapper, insertTarget);
+          } else {
+            document.querySelector('.br-container')?.parentNode?.appendChild(wrapper);
+          }
+          hero = wrapper.querySelector('.br-category-hero');
+        }
 
-      // Update description
-      var desc = hero.querySelector('h2 ~ p');
-      if (desc && s.description) desc.textContent = s.description;
+        // Update section label
+        var labelEl = hero.querySelector('.br-section-label');
+        if (labelEl && s.section_label) labelEl.textContent = s.section_label;
 
-      // Update checklist
-      if (s.checklist) {
-        var items = typeof s.checklist === 'string' ? JSON.parse(s.checklist) : (s.checklist || []);
+        // Update heading
+        var h2 = hero.querySelector('h2');
+        if (h2 && s.heading) h2.textContent = s.heading;
+
+        // Update description
+        var desc = hero.querySelector('h2 ~ p');
+        if (desc && s.description) desc.textContent = s.description;
+
+        // Update checklist
+        var items = [];
+        try { items = typeof s.checklist === 'string' ? JSON.parse(s.checklist) : (s.checklist || []); } catch(e) {}
         var ul = hero.querySelector('.br-checklist');
-        if (ul && items.length) {
-          ul.innerHTML = items.map(function(item) { return '<li>' + esc(item) + '</li>'; }).join('');
+        if (ul) {
+          if (items.length) {
+            ul.innerHTML = items.map(function(item) { return '<li>' + esc(item) + '</li>'; }).join('');
+          } else {
+            ul.style.display = 'none';
+          }
         }
-      }
 
-      // Update image
-      var imgDiv = hero.querySelector('.br-category-image');
-      if (imgDiv && s.image_url) {
-        imgDiv.style.cssText = '';
-        imgDiv.innerHTML = '<img src="' + esc(s.image_url) + '" alt="' + esc(s.section_label || '') + '" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">';
-      }
+        // Update image
+        var imgDiv = hero.querySelector('.br-category-image');
+        if (imgDiv && s.image_url) {
+          imgDiv.style.cssText = '';
+          imgDiv.innerHTML = '<img src="' + esc(s.image_url) + '" alt="' + esc(s.section_label || '') + '" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;">';
+        } else if (imgDiv && !s.image_url) {
+          imgDiv.style.display = 'none';
+        }
 
-      // Update buttons
-      var btnGroup = hero.querySelector('.br-btn-group');
-      if (btnGroup) {
-        var btns = btnGroup.querySelectorAll('a');
-        if (s.btn1_text && btns[0]) {
-          btns[0].textContent = s.btn1_text;
-          if (s.btn1_link) btns[0].href = s.btn1_link;
+        // Update buttons
+        var btnGroup = hero.querySelector('.br-btn-group');
+        if (btnGroup) {
+          var html = '';
+          if (s.btn1_text) html += '<a href="' + esc(s.btn1_link || '#') + '" class="br-btn br-btn-primary">' + esc(s.btn1_text) + '</a>';
+          if (s.btn2_text) html += '<a href="' + esc(s.btn2_link || '#') + '" class="br-btn br-btn-outline br-btn-sm">' + esc(s.btn2_text) + '</a>';
+          if (html) btnGroup.innerHTML = html;
+          else btnGroup.style.display = 'none';
         }
-        if (s.btn2_text && btns[1]) {
-          btns[1].textContent = s.btn2_text;
-          if (s.btn2_link) btns[1].href = s.btn2_link;
-        } else if (s.btn2_text && !btns[1] && btnGroup) {
-          // Create second button if doesn't exist
-          var newBtn = document.createElement('a');
-          newBtn.href = s.btn2_link || '#';
-          newBtn.className = 'br-btn br-btn-outline br-btn-sm';
-          newBtn.textContent = s.btn2_text;
-          btnGroup.appendChild(newBtn);
-        }
-      }
+
+        // Animate
+        hero.querySelectorAll('[data-animate]').forEach(function(el) { if (typeof animObserver !== 'undefined') animObserver.observe(el); });
+      });
     } catch (err) {
       console.warn('[category-section]', err.message);
     }
