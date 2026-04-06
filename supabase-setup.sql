@@ -307,16 +307,16 @@ CREATE POLICY "products_auth_read" ON products
 -- Admin (email = usman@gmail.com) can do everything
 CREATE POLICY "products_admin_insert" ON products
   FOR INSERT TO authenticated
-  WITH CHECK (auth.jwt() ->> 'email' = 'usman@gmail.com');
+  WITH CHECK (auth.email() = 'usman@gmail.com');
 
 CREATE POLICY "products_admin_update" ON products
   FOR UPDATE TO authenticated
-  USING (auth.jwt() ->> 'email' = 'usman@gmail.com')
-  WITH CHECK (auth.jwt() ->> 'email' = 'usman@gmail.com');
+  USING (auth.email() = 'usman@gmail.com')
+  WITH CHECK (auth.email() = 'usman@gmail.com');
 
 CREATE POLICY "products_admin_delete" ON products
   FOR DELETE TO authenticated
-  USING (auth.jwt() ->> 'email' = 'usman@gmail.com');
+  USING (auth.email() = 'usman@gmail.com');
 
 
 -- ============================================================
