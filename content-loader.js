@@ -1,328 +1,286 @@
 /* ============================================================
- *  content-loader.js — Dynamic Content Loader
- *  Bleach Resistant / FinPrint Inc.
- *  ============================================================
- *  Loaded on ALL 20 public pages (after supabase-config.js).
- *  Fetches page_content overrides from Supabase and applies
- *  them to the DOM — images, text, HTML, backgrounds, styles.
- *  ============================================================ */
-
-/* ============================================================
- *  MOBILE RESPONSIVENESS — Viewport Scaling + Hamburger Nav
- *  ============================================================
- *  Wix Thunderbolt exports use a fixed 980px pixel layout with
- *  absolute/relative positions.  Standard media-query CSS
- *  cannot reflow these pages.  Instead we:
- *    1. Scale #SITE_CONTAINER via CSS transform so the 980px
- *       design fits any viewport width (no horizontal scroll).
- *    2. Inject a fixed hamburger navigation overlay that gives
- *       proper touch-friendly navigation on mobile.
- *  All Wix links, forms, and functionality remain intact.
- *  ============================================================ */
-(function () {
-  'use strict';
-
-  var DESIGN_WIDTH = 980;  // Wix desktop canvas width (px)
-  var ADMIN_RE = /admin/i;  // skip scaling on admin pages
-  var isAdmin = ADMIN_RE.test(window.location.pathname);
-
-  /* ─── 1. VIEWPORT SCALING ───────────────────────────────── */
-  function getScale() {
-    return Math.min(1, window.innerWidth / DESIGN_WIDTH);
-  }
-
-  function applyScale() {
-    if (isAdmin) return;
-    var sc = document.getElementById('SITE_CONTAINER') ||
-             document.getElementById('masterPage');
-    if (!sc) return;
-
-    var scale = getScale();
-    if (scale < 1) {
-      // Reset transform to measure true height
-      sc.style.transform    = '';
-      sc.style.marginBottom = '';
-      var originH = sc.offsetHeight || sc.scrollHeight;
-
-      sc.style.transformOrigin = 'top left';
-      sc.style.transform       = 'scale(' + scale + ')';
-      sc.style.width           = DESIGN_WIDTH + 'px';
-      sc.style.minWidth        = DESIGN_WIDTH + 'px';
-
-      // Collapse the extra space below the scaled element so the page
-      // doesn't scroll past the visual content.
-      // Without this, a 3000px tall container scaled to 0.4 still
-      // occupies 3000px in the document flow instead of 1200px.
-      var visualH = Math.ceil(originH * scale);
-      sc.style.marginBottom = '-' + Math.ceil(originH - visualH) + 'px';
-
-      document.body.style.overflowX = 'hidden';
-    } else {
-      sc.style.transform       = '';
-      sc.style.transformOrigin = '';
-      sc.style.width           = '';
-      sc.style.minWidth        = '';
-      sc.style.marginBottom    = '';
-      document.body.style.overflowX = '';
-    }
-  }
-
-  /* ─── 2. HAMBURGER NAVIGATION OVERLAY ───────────────────── */
-  var NAV_LINKS = [
-    { href: 'home.html',                   label: 'HOME' },
-    { href: 'product.html',                label: 'PRODUCTS',  children: [
-        { href: 'Pricelist.html',          label: 'Pricelist' },
-        { href: 'headgear.html',           label: 'Head Gear' },
-        { href: 'basicpoly.html',          label: 'Basics' },
-        { href: 'stockdesigns.html',       label: 'Stock Designs' },
-        { href: 'fabricdescriptions.html', label: 'Fabric Descriptions' },
-        { href: 'sublimationprinting.html',label: 'Sublimation Printing' }
-    ]},
-    { href: 'services.html',               label: 'SERVICES',  children: [
-        { href: 'grapicdesign.html',       label: 'Logos & Graphic Design' },
-        { href: 'customlogos.html',        label: 'Logo Showcase' }
-    ]},
-    { href: 'copyofwashingsamples.html',   label: 'SHOWCASE' },
-    { href: 'order.html',                  label: 'ORDER' },
-    { href: 'sizechart.html',              label: 'SIZE CHART' },
-    { href: 'About.html',                  label: 'ABOUT' },
-    { href: 'FAQs.html',                   label: 'FAQs' },
-    { href: 'login.html',                  label: 'LOGIN' },
-    { href: 'signup.html',                 label: 'SIGN UP' }
-  ];
-
-  function buildHamburgerNav() {
-    if (document.getElementById('br-mnav')) return;
-    if (isAdmin) return;
-
-    // Build menu HTML
-    var linksHtml = NAV_LINKS.map(function (item) {
-      var sub = '';
-      if (item.children && item.children.length) {
-        sub = '<ul class="br-msubnav">' +
-          item.children.map(function (c) {
-            return '<li><a href="' + c.href + '">' + c.label + '</a></li>';
-          }).join('') +
-          '</ul>';
-      }
-      return '<li class="' + (item.children ? 'br-has-sub' : '') + '">' +
-             '<a href="' + item.href + '">' + item.label + '</a>' +
-             sub + '</li>';
-    }).join('');
-
-    var nav = document.createElement('div');
-    nav.id = 'br-mnav';
-    nav.setAttribute('role', 'navigation');
-    nav.setAttribute('aria-label', 'Mobile navigation');
-    nav.innerHTML =
-      '<button id="br-mtoggle" aria-label="Open menu" aria-expanded="false">' +
-        '<span></span><span></span><span></span>' +
-      '</button>' +
-      '<div id="br-moverlay" aria-hidden="true">' +
-        '<button id="br-mclose" aria-label="Close menu">&times;</button>' +
-        '<ul>' + linksHtml + '</ul>' +
-      '</div>';
-    document.body.appendChild(nav);
-
-    var toggle  = document.getElementById('br-mtoggle');
-    var overlay = document.getElementById('br-moverlay');
-    var close   = document.getElementById('br-mclose');
-
-    function openMenu() {
-      overlay.setAttribute('aria-hidden', 'false');
-      overlay.classList.add('br-open');
-      toggle.setAttribute('aria-expanded', 'true');
-      document.body.style.overflow = 'hidden';
-    }
-    function closeMenu() {
-      overlay.setAttribute('aria-hidden', 'true');
-      overlay.classList.remove('br-open');
-      toggle.setAttribute('aria-expanded', 'false');
-      document.body.style.overflow = '';
-    }
-
-    toggle.addEventListener('click', openMenu);
-    close.addEventListener('click', closeMenu);
-
-    // Accordion for sub-menus
-    overlay.querySelectorAll('.br-has-sub > a').forEach(function (a) {
-      a.addEventListener('click', function (e) {
-        e.preventDefault();
-        var li = a.parentNode;
-        li.classList.toggle('br-sub-open');
-      });
-    });
-
-    // Swipe-to-close
-    var touchStartX = 0;
-    overlay.addEventListener('touchstart', function (e) {
-      touchStartX = e.touches[0].clientX;
-    }, { passive: true });
-    overlay.addEventListener('touchend', function (e) {
-      if (e.changedTouches[0].clientX - touchStartX > 60) closeMenu();
-    }, { passive: true });
-
-    // Show only on mobile
-    updateNavVisibility();
-  }
-
-  function updateNavVisibility() {
-    var nav = document.getElementById('br-mnav');
-    if (!nav) return;
-    var scale = getScale();
-    nav.style.display = scale < 1 ? 'block' : 'none';
-  }
-
-  /* ─── 3. INIT & EVENT LISTENERS ─────────────────────────── */
-  function init() {
-    applyScale();
-    buildHamburgerNav();
-    // Re-apply after Wix JS has had time to paint additional content
-    setTimeout(function () { applyScale(); updateNavVisibility(); }, 600);
-    setTimeout(function () { applyScale(); }, 1500);
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
-
-  // Re-apply on window load (all images/fonts loaded — final heights)
-  window.addEventListener('load', function () {
-    applyScale();
-    updateNavVisibility();
-  });
-
-  window.addEventListener('resize', function () {
-    applyScale();
-    updateNavVisibility();
-  });
-
-  window.addEventListener('orientationchange', function () {
-    setTimeout(function () { applyScale(); updateNavVisibility(); }, 300);
-  });
-})();
-
+   content-loader.js — Bleach Resistant
+   Dynamic functionality: nav, slider, animations, products
+   Complete rebuild April 2026
+   ============================================================ */
 (function() {
   'use strict';
 
-  // Determine current page filename
-  var path = window.location.pathname;
-  var pageName = path.substring(path.lastIndexOf('/') + 1) || 'home.html';
-
-  // Wait for DOM
-  function onReady(fn) {
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', fn);
-    } else {
-      fn();
-    }
+  /* ── NAVBAR SCROLL EFFECT ────────────────────────────────── */
+  var navbar = document.getElementById('navbar');
+  function updateNav() {
+    if (navbar) navbar.classList.toggle('scrolled', window.scrollY > 50);
   }
+  window.addEventListener('scroll', updateNav, { passive: true });
+  updateNav();
 
-  onReady(function() {
-    // Only load if Supabase client exists
-    if (typeof db === 'undefined') return;
+  /* ── MOBILE NAV TOGGLE ───────────────────────────────────── */
+  var navToggle = document.getElementById('navToggle');
+  var navMenu = document.getElementById('navMenu');
 
-    loadPageOverrides(pageName);
-  });
+  if (navToggle && navMenu) {
+    var overlay = document.createElement('div');
+    overlay.className = 'br-nav-overlay';
+    document.body.appendChild(overlay);
 
-  async function loadPageOverrides(page) {
-    try {
-      var result = await db
-        .from('page_content')
-        .select('element_selector, content_type, content_value')
-        .eq('page_name', page);
-
-      if (result.error) {
-        console.warn('[content-loader] Error fetching overrides:', result.error.message);
-        return;
-      }
-
-      var items = result.data || [];
-      if (items.length === 0) return;
-
-      items.forEach(function(item) {
-        applyOverride(item.element_selector, item.content_type, item.content_value);
-      });
-
-    } catch (err) {
-      console.warn('[content-loader] Failed to load overrides:', err.message);
+    function openNav() {
+      navMenu.classList.add('open');
+      overlay.classList.add('active');
+      navToggle.classList.add('active');
+      navToggle.setAttribute('aria-expanded', 'true');
+      document.body.style.overflow = 'hidden';
     }
-  }
+    function closeNav() {
+      navMenu.classList.remove('open');
+      overlay.classList.remove('active');
+      navToggle.classList.remove('active');
+      navToggle.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+    }
+    navToggle.addEventListener('click', function() {
+      navMenu.classList.contains('open') ? closeNav() : openNav();
+    });
+    overlay.addEventListener('click', closeNav);
 
-  function applyOverride(selector, type, value) {
-    try {
-      var elements = document.querySelectorAll(selector);
-      if (elements.length === 0) {
-        console.warn('[content-loader] No elements found for selector:', selector);
-        return;
-      }
-
-      elements.forEach(function(el) {
-        switch (type) {
-          case 'image':
-            // If it's an <img>, set src. If it's a <wix-image>, find the img inside.
-            if (el.tagName === 'IMG') {
-              el.src = value;
-              el.srcset = '';
-              el.removeAttribute('fetchpriority');
-            } else {
-              var img = el.querySelector('img');
-              if (img) {
-                img.src = value;
-                img.srcset = '';
-              } else {
-                el.style.backgroundImage = 'url(' + value + ')';
-              }
-            }
-            break;
-
-          case 'text':
-            el.textContent = value;
-            break;
-
-          case 'html':
-            el.innerHTML = value;
-            break;
-
-          case 'background':
-            el.style.backgroundImage = 'url(' + value + ')';
-            el.style.backgroundSize = 'cover';
-            el.style.backgroundPosition = 'center';
-            break;
-
-          case 'style':
-            el.style.cssText += ';' + value;
-            break;
-
-          case 'attribute':
-            // value format: "attrName=attrValue"
-            var eq = value.indexOf('=');
-            if (eq > 0) {
-              el.setAttribute(value.substring(0, eq), value.substring(eq + 1));
-            }
-            break;
-
-          case 'href':
-            el.href = value;
-            break;
-
-          case 'hide':
-            el.style.display = 'none';
-            break;
-
-          case 'show':
-            el.style.display = value || 'block';
-            break;
-
-          default:
-            el.textContent = value;
+    // Mobile dropdown toggles
+    document.querySelectorAll('.br-dropdown > a').forEach(function(link) {
+      link.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768) {
+          e.preventDefault();
+          var parent = link.parentElement;
+          // Close others
+          document.querySelectorAll('.br-dropdown.open').forEach(function(d) {
+            if (d !== parent) d.classList.remove('open');
+          });
+          parent.classList.toggle('open');
         }
       });
-    } catch (e) {
-      console.warn('[content-loader] Error applying override:', selector, e.message);
+    });
+  }
+
+  // Active nav link
+  var currentPage = window.location.pathname.split('/').pop() || 'home.html';
+  document.querySelectorAll('.br-nav-links a').forEach(function(a) {
+    var href = a.getAttribute('href');
+    if (href === currentPage) a.classList.add('active');
+  });
+
+  /* ── SCROLL ANIMATIONS (Intersection Observer) ───────────── */
+  var animObserver = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('animated');
+        animObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('[data-animate]').forEach(function(el) {
+    animObserver.observe(el);
+  });
+
+  // Stagger children index
+  document.querySelectorAll('[data-stagger]').forEach(function(parent) {
+    Array.from(parent.children).forEach(function(child, i) {
+      child.style.setProperty('--i', i);
+    });
+  });
+
+  /* ── HERO SLIDER ─────────────────────────────────────────── */
+  var heroSlides = document.querySelectorAll('.br-hero-slide');
+  var heroDots = document.querySelectorAll('.br-hero-dot');
+  var currentSlide = 0;
+  var slideTimer;
+
+  function goToSlide(index) {
+    heroSlides.forEach(function(s) { s.classList.remove('active'); });
+    heroDots.forEach(function(d) { d.classList.remove('active'); });
+    currentSlide = ((index % heroSlides.length) + heroSlides.length) % heroSlides.length;
+    if (heroSlides[currentSlide]) heroSlides[currentSlide].classList.add('active');
+    if (heroDots[currentSlide]) heroDots[currentSlide].classList.add('active');
+  }
+
+  if (heroSlides.length > 1) {
+    slideTimer = setInterval(function() { goToSlide(currentSlide + 1); }, 6000);
+
+    heroDots.forEach(function(dot, i) {
+      dot.addEventListener('click', function() {
+        goToSlide(i);
+        clearInterval(slideTimer);
+        slideTimer = setInterval(function() { goToSlide(currentSlide + 1); }, 6000);
+      });
+    });
+
+    var prevArrow = document.querySelector('.br-hero-prev');
+    var nextArrow = document.querySelector('.br-hero-next');
+    function resetTimer() {
+      clearInterval(slideTimer);
+      slideTimer = setInterval(function() { goToSlide(currentSlide + 1); }, 6000);
     }
+    if (prevArrow) prevArrow.addEventListener('click', function() { goToSlide(currentSlide - 1); resetTimer(); });
+    if (nextArrow) nextArrow.addEventListener('click', function() { goToSlide(currentSlide + 1); resetTimer(); });
+
+    // Swipe
+    var touchX = 0;
+    var heroEl = document.querySelector('.br-hero');
+    if (heroEl) {
+      heroEl.addEventListener('touchstart', function(e) { touchX = e.touches[0].clientX; }, { passive: true });
+      heroEl.addEventListener('touchend', function(e) {
+        var diff = e.changedTouches[0].clientX - touchX;
+        if (Math.abs(diff) > 50) { diff > 0 ? goToSlide(currentSlide - 1) : goToSlide(currentSlide + 1); resetTimer(); }
+      }, { passive: true });
+    }
+  }
+
+  /* ── FAQ ACCORDION ───────────────────────────────────────── */
+  document.querySelectorAll('.br-faq-question').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var item = btn.closest('.br-faq-item');
+      var wasOpen = item.classList.contains('active');
+      document.querySelectorAll('.br-faq-item.active').forEach(function(i) { i.classList.remove('active'); });
+      if (!wasOpen) item.classList.add('active');
+    });
+  });
+
+  /* ── GALLERY LIGHTBOX ────────────────────────────────────── */
+  var lightbox = document.getElementById('lightbox');
+  var lbImg = lightbox ? lightbox.querySelector('img') : null;
+  var galleryImages = [];
+  var lbIndex = 0;
+
+  document.querySelectorAll('.br-gallery-item[data-src]').forEach(function(item, i) {
+    galleryImages.push(item.getAttribute('data-src') || item.querySelector('img').src);
+    item.addEventListener('click', function() {
+      lbIndex = i;
+      if (lbImg) lbImg.src = galleryImages[lbIndex];
+      if (lightbox) { lightbox.classList.add('active'); document.body.style.overflow = 'hidden'; }
+    });
+  });
+
+  if (lightbox) {
+    var lbClose = lightbox.querySelector('.br-lightbox-close');
+    var lbPrev = lightbox.querySelector('.br-lightbox-prev');
+    var lbNext = lightbox.querySelector('.br-lightbox-next');
+
+    function closeLB() { lightbox.classList.remove('active'); document.body.style.overflow = ''; }
+    if (lbClose) lbClose.addEventListener('click', closeLB);
+    lightbox.addEventListener('click', function(e) { if (e.target === lightbox) closeLB(); });
+
+    function showLB(i) {
+      lbIndex = ((i % galleryImages.length) + galleryImages.length) % galleryImages.length;
+      if (lbImg) lbImg.src = galleryImages[lbIndex];
+    }
+    if (lbPrev) lbPrev.addEventListener('click', function(e) { e.stopPropagation(); showLB(lbIndex - 1); });
+    if (lbNext) lbNext.addEventListener('click', function(e) { e.stopPropagation(); showLB(lbIndex + 1); });
+
+    document.addEventListener('keydown', function(e) {
+      if (!lightbox.classList.contains('active')) return;
+      if (e.key === 'Escape') closeLB();
+      if (e.key === 'ArrowLeft') showLB(lbIndex - 1);
+      if (e.key === 'ArrowRight') showLB(lbIndex + 1);
+    });
+  }
+
+  /* ── PRODUCT TABS / FILTER ───────────────────────────────── */
+  document.querySelectorAll('.br-tabs').forEach(function(tabContainer) {
+    tabContainer.querySelectorAll('.br-tab').forEach(function(tab) {
+      tab.addEventListener('click', function() {
+        tabContainer.querySelectorAll('.br-tab').forEach(function(t) { t.classList.remove('active'); });
+        tab.classList.add('active');
+        var filter = tab.getAttribute('data-filter');
+        var targetId = tabContainer.getAttribute('data-target');
+        var grid = document.getElementById(targetId);
+        if (!grid) return;
+        grid.querySelectorAll('.br-product-card').forEach(function(card) {
+          if (!filter || filter === 'all') {
+            card.style.display = '';
+          } else {
+            card.style.display = card.getAttribute('data-category') === filter ? '' : 'none';
+          }
+        });
+      });
+    });
+  });
+
+  /* ── PRODUCT LOADING FROM SUPABASE ───────────────────────── */
+  window.brLoadProducts = async function(containerId, options) {
+    options = options || {};
+    var container = document.getElementById(containerId);
+    if (!container || typeof db === 'undefined') return;
+
+    container.innerHTML = '<div class="br-loading"><div class="br-spinner"></div><p>Loading products...</p></div>';
+
+    try {
+      var query = db.from('products').select('*').eq('active', true);
+      if (options.category) query = query.eq('category', options.category);
+      if (options.featured) query = query.eq('featured', true);
+      if (options.limit) query = query.limit(options.limit);
+      query = query.order('sort_order', { ascending: true });
+
+      var result = await query;
+      if (result.error) throw result.error;
+      var data = result.data || [];
+
+      if (data.length === 0) {
+        container.innerHTML = '<div class="br-empty"><p>No products available yet. Check back soon!</p></div>';
+        return data;
+      }
+
+      container.innerHTML = data.map(function(p) {
+        var esc = typeof brEscapeHtml === 'function' ? brEscapeHtml : function(s) { return s || ''; };
+        var imgHtml = p.image_url
+          ? '<img src="' + p.image_url + '" alt="' + esc(p.name) + '" loading="lazy">'
+          : '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:var(--br-bg-alt);color:var(--br-text-muted);font-size:0.85rem">No Image</div>';
+        return '<div class="br-product-card" data-category="' + esc(p.category) + '" data-animate="fade-up">' +
+          '<div class="br-product-image">' + imgHtml +
+            '<div class="br-product-overlay"><a href="order.html?product=' + encodeURIComponent(p.slug || p.id) + '" class="br-btn br-btn-primary br-btn-sm">Get Quote</a></div>' +
+            (p.featured ? '<span class="br-product-badge">Featured</span>' : '') +
+          '</div>' +
+          '<div class="br-product-info">' +
+            '<span class="br-product-category">' + esc(p.category).replace(/-/g, ' ') + '</span>' +
+            '<h3 class="br-product-title">' + esc(p.name) + '</h3>' +
+            (p.short_description ? '<p class="br-product-desc">' + esc(p.short_description) + '</p>' : '') +
+            '<div class="br-product-footer">' +
+              (p.price_from ? '<span class="br-product-price">From $' + parseFloat(p.price_from).toFixed(0) + '</span>' : '<span class="br-product-price">Get Quote</span>') +
+              '<a href="order.html?product=' + encodeURIComponent(p.slug || p.id) + '" class="br-product-link">Order &#8594;</a>' +
+            '</div>' +
+          '</div></div>';
+      }).join('');
+
+      // Re-observe for animations
+      container.querySelectorAll('[data-animate]').forEach(function(el) { animObserver.observe(el); });
+      return data;
+    } catch (err) {
+      console.warn('[products]', err.message);
+      container.innerHTML = '<div class="br-empty"><p>Unable to load products at this time.</p></div>';
+      return [];
+    }
+  };
+
+  /* ── SUPABASE CONTENT OVERRIDES ──────────────────────────── */
+  if (typeof db !== 'undefined') {
+    (async function() {
+      try {
+        var r = await db.from('page_content')
+          .select('element_selector, content_type, content_value')
+          .eq('page_name', currentPage);
+        if (r.error || !r.data) return;
+        r.data.forEach(function(item) {
+          document.querySelectorAll(item.element_selector).forEach(function(el) {
+            switch (item.content_type) {
+              case 'text': el.textContent = item.content_value; break;
+              case 'html': el.innerHTML = item.content_value; break;
+              case 'image': if (el.tagName === 'IMG') el.src = item.content_value; else { var img = el.querySelector('img'); if (img) img.src = item.content_value; } break;
+              case 'background': el.style.backgroundImage = 'url(' + item.content_value + ')'; break;
+              case 'style': el.style.cssText += ';' + item.content_value; break;
+              case 'href': el.href = item.content_value; break;
+              case 'hide': el.style.display = 'none'; break;
+              case 'show': el.style.display = ''; break;
+            }
+          });
+        });
+      } catch(e) { console.warn('[content-loader]', e.message); }
+    })();
   }
 
 })();

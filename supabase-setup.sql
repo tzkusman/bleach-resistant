@@ -257,19 +257,84 @@ CREATE POLICY "Admin can manage media"
 
 
 -- ============================================================
--- SECTION 5: ROLE GRANTS
+-- SECTION 5: PRODUCTS TABLE (product catalog)
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS products (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  created_at        TIMESTAMPTZ DEFAULT NOW(),
+  updated_at        TIMESTAMPTZ DEFAULT NOW(),
+  name              TEXT NOT NULL,
+  slug              TEXT UNIQUE NOT NULL,
+  description       TEXT,
+  short_description TEXT,
+  price_from        DECIMAL(10,2),
+  category          TEXT NOT NULL,          -- apparel, headgear, basicpoly, stockdesigns, sublimation, design, logos, wraps
+  image_url         TEXT,
+  gallery           JSONB DEFAULT '[]'::jsonb,
+  sizes             JSONB DEFAULT '[]'::jsonb,
+  colors            JSONB DEFAULT '[]'::jsonb,
+  features          JSONB DEFAULT '[]'::jsonb,
+  featured          BOOLEAN DEFAULT false,
+  active            BOOLEAN DEFAULT true,
+  sort_order        INTEGER DEFAULT 0
+);
+
+-- Auto-update updated_at
+CREATE OR REPLACE FUNCTION update_products_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN NEW.updated_at = NOW(); RETURN NEW; END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_products_updated ON products;
+CREATE TRIGGER trg_products_updated
+  BEFORE UPDATE ON products
+  FOR EACH ROW EXECUTE FUNCTION update_products_updated_at();
+
+-- RLS for products
+ALTER TABLE products ENABLE ROW LEVEL SECURITY;
+
+-- Public can read active products
+CREATE POLICY "products_public_read" ON products
+  FOR SELECT TO anon
+  USING (active = true);
+
+-- Authenticated users can read all products
+CREATE POLICY "products_auth_read" ON products
+  FOR SELECT TO authenticated
+  USING (true);
+
+-- Admin (email = usman@gmail.com) can do everything
+CREATE POLICY "products_admin_insert" ON products
+  FOR INSERT TO authenticated
+  WITH CHECK (auth.jwt() ->> 'email' = 'usman@gmail.com');
+
+CREATE POLICY "products_admin_update" ON products
+  FOR UPDATE TO authenticated
+  USING (auth.jwt() ->> 'email' = 'usman@gmail.com')
+  WITH CHECK (auth.jwt() ->> 'email' = 'usman@gmail.com');
+
+CREATE POLICY "products_admin_delete" ON products
+  FOR DELETE TO authenticated
+  USING (auth.jwt() ->> 'email' = 'usman@gmail.com');
+
+
+-- ============================================================
+-- SECTION 6: ROLE GRANTS
 -- ============================================================
 
 GRANT INSERT                        ON TABLE orders       TO anon;
 GRANT INSERT                        ON TABLE contacts     TO anon;
 GRANT SELECT                        ON TABLE page_content TO anon;
 GRANT SELECT                        ON TABLE site_settings TO anon;
+GRANT SELECT                        ON TABLE products     TO anon;
 
 GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE orders        TO authenticated;
 GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE contacts      TO authenticated;
 GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE page_content  TO authenticated;
 GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE media         TO authenticated;
 GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE site_settings TO authenticated;
+GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE products      TO authenticated;
 
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO anon;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO authenticated;

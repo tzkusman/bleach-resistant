@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Products &#x2014; Bleach Resistant Admin</title>
+  <link rel="icon" href="favicon.svg" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+</head>
+<body>
+
+  <!-- ===== SIDEBAR ===== -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <h2>Bleach Resistant</h2>
+      <small>Admin Panel</small>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-section">Main</div>
+      <a href="admin.html"><span class="icon">&#x1F4CA;</span> Dashboard</a>
+      <a href="admin-orders.html"><span class="icon">&#x1F4E6;</span> Orders</a>
+      <a href="admin-contacts.html"><span class="icon">&#x1F4AC;</span> Contacts</a>
+
+      <div class="nav-section">Content</div>
+      <a href="admin-products.html" class="active"><span class="icon">&#x1F6CD;&#xFE0F;</span> Products</a>
+      <a href="admin-pages.html"><span class="icon">&#x1F4C4;</span> Pages</a>
+      <a href="admin-media.html"><span class="icon">&#x1F5BC;&#xFE0F;</span> Media Library</a>
+      <a href="admin-navigation.html"><span class="icon">&#x1F517;</span> Navigation</a>
+
+      <div class="nav-section">Settings</div>
+      <a href="admin-settings.html"><span class="icon">&#x2699;&#xFE0F;</span> Site Settings</a>
+      <a href="admin-analytics.html"><span class="icon">&#x1F4C8;</span> Analytics</a>
+
+      <div class="nav-section">Website</div>
+      <a href="home.html" target="_blank"><span class="icon">&#x1F310;</span> View Site</a>
+      <a href="order.html" target="_blank"><span class="icon">&#x1F6D2;</span> Order Page</a>
+    </div>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" id="user-avatar">A</div>
+        <div>
+          <div style="font-size:12px;font-weight:600;" id="user-name">Admin</div>
+          <div class="user-email" id="user-email">loading&#x2026;</div>
+        </div>
+      </div>
+      <button class="btn btn-secondary btn-sm btn-block" onclick="brSignOut()">Sign Out</button>
+    </div>
+  </nav>
+
+  <!-- ===== MAIN ===== -->
+  <div class="main-content">
+    <div class="topbar">
+      <div>
+        <h1>Products</h1>
+        <div class="breadcrumb">Manage your product catalog</div>
+      </div>
+      <div class="topbar-actions">
+        <select id="filter-category" onchange="renderProducts()" style="padding:8px 12px;border:1px solid #ddd;border-radius:6px;font-size:13px;">
+          <option value="">All Categories</option>
+          <option value="apparel">Apparel</option>
+          <option value="headgear">Head Gear</option>
+          <option value="basicpoly">Basic Poly</option>
+          <option value="stockdesigns">Stock Designs</option>
+          <option value="sublimation">Sublimation</option>
+          <option value="design">Graphic Design</option>
+          <option value="logos">Custom Logos</option>
+          <option value="wraps">Vehicle Wraps</option>
+        </select>
+        <button class="btn btn-primary" onclick="openAddModal()">+ Add Product</button>
+      </div>
+    </div>
+
+    <div class="content-area">
+      <div class="table-card">
+        <div class="table-header">
+          <div>
+            <h3>Product Catalog</h3>
+            <span class="badge" id="product-count">0</span>
+          </div>
+          <input type="text" placeholder="Search products..." id="search-input" oninput="renderProducts()" style="padding:8px 14px;border:1px solid #ddd;border-radius:6px;font-size:13px;width:220px;">
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Image</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Price From</th>
+                <th>Featured</th>
+                <th>Active</th>
+                <th>Order</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="products-body">
+              <tr><td colspan="8" style="text-align:center;padding:40px;color:#888;">Loading products...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL ===== -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal" style="max-width:700px;">
+      <div class="modal-header">
+        <h3 id="modal-title">Add Product</h3>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="modal-body">
+        <form id="product-form" onsubmit="return false;">
+          <input type="hidden" id="pf-id">
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+            <div>
+              <label style="display:block;font-weight:600;font-size:12px;margin-bottom:4px;">Name *</label>
+              <input type="text" id="pf-name" required style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:6px;font-size:13px;">
+            </div>
+            <div>
+              <label style="display:block;font-weight:600;font-size:12px;margin-bottom:4px;">Slug *</label>
+              <input type="text" id="pf-slug" required placeholder="auto-generated" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:6px;font-size:13px;">
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+            <div>
+              <label style="display:block;font-weight:600;font-size:12px;margin-bottom:4px;">Category *</label>
+              <select id="pf-category" required style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:6px;font-size:13px;">
+                <option value="">Select category</option>
+                <option value="apparel">Apparel</option>
+                <option value="headgear">Head Gear</option>
+                <option value="basicpoly">Basic Poly</option>
+                <option value="stockdesigns">Stock Designs</option>
+                <option value="sublimation">Sublimation</option>
+                <option value="design">Graphic Design</option>
+                <option value="logos">Custom Logos</option>
+                <option value="wraps">Vehicle Wraps</option>
+              </select>
+            </div>
+            <div>
+              <label style="display:block;font-weight:600;font-size:12px;margin-bottom:4px;">Price From ($)</label>
+              <input type="number" id="pf-price" step="0.01" min="0" placeholder="0.00" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:6px;font-size:13px;">
+            </div>
+          </div>
+
+          <div style="margin-bottom:16px;">
+            <label style="display:block;font-weight:600;font-size:12px;margin-bottom:4px;">Short Description</label>
+            <input type="text" id="pf-short-desc" maxlength="160" placeholder="Brief summary for product cards" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:6px;font-size:13px;">
+          </div>
+
+          <div style="margin-bottom:16px;">
+            <label style="display:block;font-weight:600;font-size:12px;margin-bottom:4px;">Full Description</label>
+            <textarea id="pf-desc" rows="3" placeholder="Detailed product description" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:6px;font-size:13px;resize:vertical;"></textarea>
+          </div>
+
+          <div style="margin-bottom:16px;">
+            <label style="display:block;font-weight:600;font-size:12px;margin-bottom:4px;">Image</label>
+            <div style="display:flex;gap:12px;align-items:flex-start;">
+              <div id="pf-image-preview" style="width:100px;height:100px;border-radius:8px;background:#f4f4f6;border:1px solid #ddd;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;">
+                <span style="font-size:11px;color:#999;">No image</span>
+              </div>
+              <div style="flex:1;">
+                <input type="file" id="pf-image-file" accept="image/*" onchange="previewImage(this)" style="font-size:13px;margin-bottom:8px;">
+                <input type="text" id="pf-image-url" placeholder="Or paste image URL" style="width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:6px;font-size:12px;">
+              </div>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+            <div>
+              <label style="display:block;font-weight:600;font-size:12px;margin-bottom:4px;">Sizes (comma separated)</label>
+              <input type="text" id="pf-sizes" placeholder="XS, S, M, L, XL, 2XL, 3XL" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:6px;font-size:13px;">
+            </div>
+            <div>
+              <label style="display:block;font-weight:600;font-size:12px;margin-bottom:4px;">Colors (comma separated)</label>
+              <input type="text" id="pf-colors" placeholder="Black, White, Red, Blue" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:6px;font-size:13px;">
+            </div>
+          </div>
+
+          <div style="margin-bottom:16px;">
+            <label style="display:block;font-weight:600;font-size:12px;margin-bottom:4px;">Features (one per line)</label>
+            <textarea id="pf-features" rows="3" placeholder="Full dye sublimation&#10;Bleach resistant fabric&#10;Machine washable" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:6px;font-size:13px;resize:vertical;"></textarea>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px;">
+            <div>
+              <label style="display:block;font-weight:600;font-size:12px;margin-bottom:4px;">Sort Order</label>
+              <input type="number" id="pf-sort" value="0" min="0" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:6px;font-size:13px;">
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;padding-top:22px;">
+              <input type="checkbox" id="pf-featured" style="width:18px;height:18px;">
+              <label for="pf-featured" style="font-weight:600;font-size:13px;cursor:pointer;">Featured</label>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;padding-top:22px;">
+              <input type="checkbox" id="pf-active" checked style="width:18px;height:18px;">
+              <label for="pf-active" style="font-weight:600;font-size:13px;cursor:pointer;">Active</label>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-primary" id="modal-save-btn" onclick="saveProduct()">Save Product</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+  (function () {
+
+    var allProducts = [];
+    var currentPage = 1;
+    var perPage = 20;
+
+    /* ── Helpers ──────────────────────────────────────────── */
+    function slugify(text) {
+      return text.toString().toLowerCase().trim()
+        .replace(/\s+/g, '-').replace(/[^\w\-]+/g, '').replace(/\-\-+/g, '-');
+    }
+
+    var categoryLabels = {
+      apparel: 'Apparel', headgear: 'Head Gear', basicpoly: 'Basic Poly',
+      stockdesigns: 'Stock Designs', sublimation: 'Sublimation',
+      design: 'Graphic Design', logos: 'Custom Logos', wraps: 'Vehicle Wraps'
+    };
+
+    function catLabel(c) { return categoryLabels[c] || c; }
+
+    function showToast(msg, type) {
+      var t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = 'toast ' + (type || 'info') + ' show';
+      setTimeout(function () { t.classList.remove('show'); }, 3000);
+    }
+
+    /* ── Auto-slug ────────────────────────────────────────── */
+    document.getElementById('pf-name').addEventListener('input', function () {
+      var slugEl = document.getElementById('pf-slug');
+      if (!document.getElementById('pf-id').value) {
+        slugEl.value = slugify(this.value);
+      }
+    });
+
+    /* ── Image preview ────────────────────────────────────── */
+    window.previewImage = function (input) {
+      var preview = document.getElementById('pf-image-preview');
+      if (input.files && input.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          preview.innerHTML = '<img src="' + e.target.result + '" style="width:100%;height:100%;object-fit:cover;">';
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    };
+
+    /* ── Load ─────────────────────────────────────────────── */
+    async function loadProducts() {
+      try {
+        var result = await db.from('products').select('*').order('sort_order', { ascending: true });
+        if (result.error) throw result.error;
+        allProducts = result.data || [];
+        renderProducts();
+      } catch (err) {
+        console.error('Load products error:', err);
+        document.getElementById('products-body').innerHTML =
+          '<tr><td colspan="8" style="text-align:center;padding:40px;color:#c00;">Error loading products: ' + brEscapeHtml(err.message) + '</td></tr>';
+      }
+    }
+
+    /* ── Filter + Render ──────────────────────────────────── */
+    function getFiltered() {
+      var search = (document.getElementById('search-input').value || '').toLowerCase();
+      var cat = document.getElementById('filter-category').value;
+      return allProducts.filter(function (p) {
+        if (cat && p.category !== cat) return false;
+        if (search && !(p.name || '').toLowerCase().includes(search) && !(p.slug || '').toLowerCase().includes(search) && !(p.category || '').toLowerCase().includes(search)) return false;
+        return true;
+      });
+    }
+
+    window.renderProducts = function () {
+      var filtered = getFiltered();
+      document.getElementById('product-count').textContent = filtered.length;
+
+      if (filtered.length === 0) {
+        document.getElementById('products-body').innerHTML =
+          '<tr><td colspan="8" style="text-align:center;padding:40px;color:#888;">No products found. Click "Add Product" to create one.</td></tr>';
+        return;
+      }
+
+      document.getElementById('products-body').innerHTML = filtered.map(function (p) {
+        var img = p.image_url
+          ? '<img src="' + brEscapeHtml(p.image_url) + '" style="width:48px;height:48px;object-fit:cover;border-radius:6px;">'
+          : '<div style="width:48px;height:48px;border-radius:6px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:10px;color:#999;">N/A</div>';
+        return '<tr>' +
+          '<td>' + img + '</td>' +
+          '<td><strong>' + brEscapeHtml(p.name) + '</strong><br><span style="font-size:11px;color:#999;">' + brEscapeHtml(p.slug) + '</span></td>' +
+          '<td><span class="badge">' + brEscapeHtml(catLabel(p.category)) + '</span></td>' +
+          '<td>' + (p.price_from ? '$' + parseFloat(p.price_from).toFixed(2) : '—') + '</td>' +
+          '<td>' + (p.featured ? '<span style="color:#10b981;font-weight:700;">&#x2713;</span>' : '—') + '</td>' +
+          '<td>' + (p.active ? '<span style="color:#10b981;font-weight:700;">Active</span>' : '<span style="color:#ef4444;">Inactive</span>') + '</td>' +
+          '<td>' + (p.sort_order || 0) + '</td>' +
+          '<td>' +
+            '<button class="btn btn-sm" onclick="openEditModal(\'' + p.id + '\')" title="Edit">&#x270F;&#xFE0F;</button> ' +
+            '<button class="btn btn-sm btn-danger" onclick="deleteProduct(\'' + p.id + '\')" title="Delete" style="background:#fee;color:#c00;border:1px solid #fcc;">&times;</button>' +
+          '</td>' +
+          '</tr>';
+      }).join('');
+    };
+
+    /* ── Modal Open/Close ─────────────────────────────────── */
+    function openModal() {
+      document.getElementById('modal-overlay').classList.add('active');
+    }
+
+    window.closeModal = function () {
+      document.getElementById('modal-overlay').classList.remove('active');
+      document.getElementById('product-form').reset();
+      document.getElementById('pf-id').value = '';
+      document.getElementById('pf-active').checked = true;
+      document.getElementById('pf-image-preview').innerHTML = '<span style="font-size:11px;color:#999;">No image</span>';
+    };
+
+    window.openAddModal = function () {
+      document.getElementById('modal-title').textContent = 'Add Product';
+      document.getElementById('modal-save-btn').textContent = 'Add Product';
+      closeModal();
+      openModal();
+    };
+
+    window.openEditModal = function (id) {
+      var p = allProducts.find(function (x) { return x.id === id; });
+      if (!p) return;
+
+      document.getElementById('modal-title').textContent = 'Edit Product';
+      document.getElementById('modal-save-btn').textContent = 'Save Changes';
+      document.getElementById('pf-id').value = p.id;
+      document.getElementById('pf-name').value = p.name || '';
+      document.getElementById('pf-slug').value = p.slug || '';
+      document.getElementById('pf-category').value = p.category || '';
+      document.getElementById('pf-price').value = p.price_from || '';
+      document.getElementById('pf-short-desc').value = p.short_description || '';
+      document.getElementById('pf-desc').value = p.description || '';
+      document.getElementById('pf-image-url').value = p.image_url || '';
+      document.getElementById('pf-sizes').value = Array.isArray(p.sizes) ? p.sizes.join(', ') : '';
+      document.getElementById('pf-colors').value = Array.isArray(p.colors) ? p.colors.join(', ') : '';
+      document.getElementById('pf-features').value = Array.isArray(p.features) ? p.features.join('\n') : '';
+      document.getElementById('pf-sort').value = p.sort_order || 0;
+      document.getElementById('pf-featured').checked = !!p.featured;
+      document.getElementById('pf-active').checked = p.active !== false;
+
+      if (p.image_url) {
+        document.getElementById('pf-image-preview').innerHTML =
+          '<img src="' + brEscapeHtml(p.image_url) + '" style="width:100%;height:100%;object-fit:cover;">';
+      }
+
+      openModal();
+    };
+
+    /* ── Upload Image ─────────────────────────────────────── */
+    async function uploadImage(file) {
+      var ext = file.name.split('.').pop().toLowerCase();
+      var allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'];
+      if (allowed.indexOf(ext) === -1) throw new Error('Invalid file type');
+
+      var fileName = 'products/' + Date.now() + '-' + file.name.replace(/[^a-zA-Z0-9._-]/g, '');
+      var result = await db.storage.from('media').upload(fileName, file, {
+        cacheControl: '3600',
+        upsert: false
+      });
+      if (result.error) throw result.error;
+
+      var urlResult = db.storage.from('media').getPublicUrl(fileName);
+      return urlResult.data.publicUrl;
+    }
+
+    /* ── Save Product ─────────────────────────────────────── */
+    window.saveProduct = async function () {
+      var id = document.getElementById('pf-id').value;
+      var name = document.getElementById('pf-name').value.trim();
+      var slug = document.getElementById('pf-slug').value.trim() || slugify(name);
+      var category = document.getElementById('pf-category').value;
+
+      if (!name || !slug || !category) {
+        showToast('Name, slug and category are required.', 'error');
+        return;
+      }
+
+      var saveBtn = document.getElementById('modal-save-btn');
+      saveBtn.disabled = true;
+      saveBtn.textContent = 'Saving...';
+
+      try {
+        /* Upload image if file selected */
+        var imageUrl = document.getElementById('pf-image-url').value.trim();
+        var fileInput = document.getElementById('pf-image-file');
+        if (fileInput.files && fileInput.files[0]) {
+          imageUrl = await uploadImage(fileInput.files[0]);
+        }
+
+        var sizesRaw = document.getElementById('pf-sizes').value.trim();
+        var colorsRaw = document.getElementById('pf-colors').value.trim();
+        var featuresRaw = document.getElementById('pf-features').value.trim();
+
+        var data = {
+          name: name,
+          slug: slug,
+          category: category,
+          price_from: document.getElementById('pf-price').value ? parseFloat(document.getElementById('pf-price').value) : null,
+          short_description: document.getElementById('pf-short-desc').value.trim() || null,
+          description: document.getElementById('pf-desc').value.trim() || null,
+          image_url: imageUrl || null,
+          sizes: sizesRaw ? sizesRaw.split(',').map(function (s) { return s.trim(); }).filter(Boolean) : [],
+          colors: colorsRaw ? colorsRaw.split(',').map(function (s) { return s.trim(); }).filter(Boolean) : [],
+          features: featuresRaw ? featuresRaw.split('\n').map(function (s) { return s.trim(); }).filter(Boolean) : [],
+          sort_order: parseInt(document.getElementById('pf-sort').value) || 0,
+          featured: document.getElementById('pf-featured').checked,
+          active: document.getElementById('pf-active').checked
+        };
+
+        var result;
+        if (id) {
+          result = await db.from('products').update(data).eq('id', id);
+        } else {
+          result = await db.from('products').insert([data]);
+        }
+
+        if (result.error) throw result.error;
+
+        showToast(id ? 'Product updated!' : 'Product added!', 'success');
+        closeModal();
+        await loadProducts();
+
+      } catch (err) {
+        console.error('Save product error:', err);
+        var msg = err.message || 'Failed to save product.';
+        if (msg.includes('duplicate key') && msg.includes('slug')) {
+          msg = 'A product with this slug already exists. Choose a different slug.';
+        }
+        showToast(msg, 'error');
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = id ? 'Save Changes' : 'Add Product';
+      }
+    };
+
+    /* ── Delete Product ───────────────────────────────────── */
+    window.deleteProduct = async function (id) {
+      var p = allProducts.find(function (x) { return x.id === id; });
+      if (!p) return;
+      if (!confirm('Delete "' + p.name + '"? This cannot be undone.')) return;
+
+      try {
+        var result = await db.from('products').delete().eq('id', id);
+        if (result.error) throw result.error;
+        showToast('Product deleted.', 'success');
+        await loadProducts();
+      } catch (err) {
+        console.error('Delete error:', err);
+        showToast(err.message || 'Failed to delete product.', 'error');
+      }
+    };
+
+    /* ── Init ─────────────────────────────────────────────── */
+    (async function () {
+      try {
+        var user = await brRequireAdmin();
+        var name = (user.user_metadata && user.user_metadata.full_name) || (user.email ? user.email.split('@')[0] : 'Admin');
+        document.getElementById('user-name').textContent = name;
+        document.getElementById('user-email').textContent = user.email;
+        document.getElementById('user-avatar').textContent = name.charAt(0).toUpperCase();
+        await loadProducts();
+      } catch (err) {
+        if (err.message !== 'Not authenticated') console.error(err);
+      }
+    })();
+
+  })();
+  </script>
+
+</body>
+</html>

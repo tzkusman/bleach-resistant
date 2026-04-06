@@ -20,7 +20,12 @@
   <meta name="twitter:title" content="Order &amp; Inquiry &#x2014; Bleach Resistant">
 
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="overhaul.css">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-BKMJVM1TY0"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-BKMJVM1TY0');</script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
 
@@ -33,7 +38,9 @@
       background: #f4f4f6;
       color: #1a1a1a;
       min-height: 100vh;
+      padding-top: 80px;
     }
+    .br-nav + .order-hero { margin-top: 0; }
 
     /* ===== TOPBAR (back to site) ===== */
     .site-topbar {
@@ -554,23 +561,48 @@
 </head>
 <body>
 
-  <!-- ===== TOP NAV ===== -->
-  <div class="site-topbar">
-    <a href="home.html" class="logo-link">
-      <img src="favicon.svg" alt="BR">
-      BLEACH RESISTANT
-      <span class="br-badge">ORDER</span>
-    </a>
-    <nav>
-      <span class="nav-links" style="display:contents;">
-        <a href="home.html">Home</a>
-        <a href="Pricelist.html">Products</a>
-        <a href="services.html">Services</a>
-        <a href="FAQs.html">FAQs</a>
-      </span>
-      <a href="login.html" class="btn-login" id="auth-nav-link">Sign In</a>
-    </nav>
-  </div>
+  <!-- ===== NAVBAR ===== -->
+  <nav class="br-nav" id="navbar">
+    <div class="br-container">
+      <a href="home.html" class="br-logo">
+        <img src="favicon.svg" alt="BR" class="br-logo-icon">
+        <span>Bleach<strong>Resistant</strong></span>
+      </a>
+      <button class="br-nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="br-nav-menu" id="navMenu">
+        <ul class="br-nav-links">
+          <li><a href="home.html">Home</a></li>
+          <li class="br-dropdown">
+            <a href="product.html">Products <svg width="10" height="6" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></a>
+            <ul class="br-dropdown-menu">
+              <li><a href="headgear.html">Head Gear</a></li>
+              <li><a href="basicpoly.html">Basic Poly</a></li>
+              <li><a href="stockdesigns.html">Stock Designs</a></li>
+              <li><a href="fabricdescriptions.html">Fabric Guide</a></li>
+              <li><a href="sublimationprinting.html">Sublimation Printing</a></li>
+            </ul>
+          </li>
+          <li class="br-dropdown">
+            <a href="services.html">Services <svg width="10" height="6" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></a>
+            <ul class="br-dropdown-menu">
+              <li><a href="grapicdesign.html">Graphic Design</a></li>
+              <li><a href="customlogos.html">Custom Logos</a></li>
+              <li><a href="wrapdesign.html">Vehicle Wraps</a></li>
+            </ul>
+          </li>
+          <li><a href="copyofwashingsamples.html">Gallery</a></li>
+          <li><a href="About.html">About</a></li>
+          <li><a href="FAQs.html">FAQs</a></li>
+        </ul>
+        <div class="br-nav-actions">
+          <a href="login.html" class="br-btn br-btn-outline br-btn-sm" id="auth-nav-link">Sign In</a>
+          <a href="order.html" class="br-btn br-btn-primary br-btn-sm">Order Now</a>
+        </div>
+      </div>
+    </div>
+  </nav>
 
   <!-- ===== HERO ===== -->
   <div class="order-hero">
@@ -1015,17 +1047,52 @@
   </div>
   <!-- end .order-wrap -->
 
-  <footer class="order-footer">
-    <div class="footer-links">
-      <a href="home.html">Home</a>
-      <a href="Pricelist.html">Products</a>
-      <a href="services.html">Services</a>
-      <a href="sizechart.html">Size Chart</a>
-      <a href="FAQs.html">FAQs</a>
-      <a href="privacypolicy.html">Privacy</a>
-      <a href="termsconditions.html">Terms</a>
+  <!-- Footer -->
+  <footer class="br-footer">
+    <div class="br-container">
+      <div class="br-footer-grid">
+        <div class="br-footer-brand">
+          <a href="home.html" class="br-logo"><img src="favicon.svg" alt="BR" class="br-logo-icon"><span>Bleach<strong>Resistant</strong></span></a>
+          <p>Premium custom sublimation printing. Affordable quality apparel for teams, businesses, and individuals.</p>
+        </div>
+        <div class="br-footer-links">
+          <h4>Products</h4>
+          <ul>
+            <li><a href="product.html">All Products</a></li>
+            <li><a href="headgear.html">Head Gear</a></li>
+            <li><a href="basicpoly.html">Basic Poly</a></li>
+            <li><a href="stockdesigns.html">Stock Designs</a></li>
+          </ul>
+        </div>
+        <div class="br-footer-links">
+          <h4>Services</h4>
+          <ul>
+            <li><a href="services.html">All Services</a></li>
+            <li><a href="grapicdesign.html">Graphic Design</a></li>
+            <li><a href="customlogos.html">Custom Logos</a></li>
+            <li><a href="wrapdesign.html">Vehicle Wraps</a></li>
+          </ul>
+        </div>
+        <div class="br-footer-links">
+          <h4>Company</h4>
+          <ul>
+            <li><a href="About.html">About Us</a></li>
+            <li><a href="FAQs.html">FAQs</a></li>
+            <li><a href="sizechart.html">Size Chart</a></li>
+            <li><a href="privacypolicy.html">Privacy Policy</a></li>
+            <li><a href="termsconditions.html">Terms</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="br-footer-bottom">
+        <p>&copy; 2026 Bleach Resistant. All rights reserved.</p>
+        <div class="br-footer-bottom-links">
+          <a href="mailto:bleachresistant@gmail.com">bleachresistant@gmail.com</a>
+          <a href="privacypolicy.html">Privacy</a>
+          <a href="termsconditions.html">Terms</a>
+        </div>
+      </div>
     </div>
-    <p>&#xa9; 2026 Bleach Resistant Inc. &nbsp;&mdash;&nbsp; Guelph, Ontario, Canada &nbsp;&mdash;&nbsp; <a href="mailto:bleachresistant@gmail.com">bleachresistant@gmail.com</a></p>
   </footer>
 
   <div id="toast"></div>
@@ -1294,6 +1361,7 @@
 
   })();
   </script>
+  <script src="content-loader.js"></script>
 
 </body>
 </html>
