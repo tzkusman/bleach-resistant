@@ -332,6 +332,9 @@ p { margin-bottom: 1rem; }
   opacity: 0;
   transition: opacity 1s var(--ease);
   z-index: 0;
+  display: flex;
+  align-items: center;
+  padding-top: var(--nav-height);
 }
 .br-hero-slide.active { opacity: 1; z-index: 1; }
 .br-hero-slide-bg {
