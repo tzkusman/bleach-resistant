@@ -1268,6 +1268,165 @@ p { margin-bottom: 1rem; }
   .br-section-dark { background: #eee; color: #000; }
 }
 
+/* ── 24. CLIENT ACCOUNT PAGE ────────────────────────────────── */
+.br-account-grid {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 32px;
+  align-items: start;
+}
+.br-account-sidebar {
+  background: #fff;
+  border-radius: 16px;
+  padding: 32px 24px;
+  text-align: center;
+  border: 1px solid var(--br-border);
+  position: sticky;
+  top: 100px;
+}
+.br-account-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--br-primary);
+  color: #fff;
+  font-size: 1.8rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 12px;
+}
+.br-account-sidebar h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+.br-account-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 20px;
+  text-align: left;
+}
+.br-account-tab {
+  background: none;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s;
+  color: var(--br-text);
+}
+.br-account-tab:hover { background: var(--br-bg-alt); }
+.br-account-tab.active {
+  background: var(--br-primary);
+  color: #fff;
+}
+.br-account-main {
+  background: #fff;
+  border-radius: 16px;
+  padding: 32px;
+  border: 1px solid var(--br-border);
+  min-height: 400px;
+}
+.br-account-panel { display: none; }
+.br-account-panel.active { display: block; }
+.br-form-group {
+  margin-bottom: 16px;
+}
+.br-form-group label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--br-text-muted);
+  margin-bottom: 6px;
+}
+.br-input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--br-border);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  transition: border-color 0.2s;
+  background: var(--br-bg);
+}
+.br-input:focus {
+  border-color: var(--br-primary);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(199,6,92,0.08);
+}
+
+/* Order Cards */
+.br-order-card {
+  border: 1px solid var(--br-border);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 12px;
+  transition: box-shadow 0.2s;
+}
+.br-order-card:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+}
+.br-order-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.br-order-id {
+  font-family: 'Montserrat', monospace;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+.br-order-date {
+  font-size: 0.8rem;
+  color: var(--br-text-muted);
+  margin-top: 2px;
+}
+.br-order-status {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+.br-order-card-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 20px;
+}
+.br-order-detail {
+  font-size: 0.85rem;
+  color: var(--br-text-muted);
+}
+.br-order-detail strong {
+  color: var(--br-text);
+}
+
+@media (max-width: 768px) {
+  .br-account-grid {
+    grid-template-columns: 1fr;
+  }
+  .br-account-sidebar {
+    position: static;
+  }
+  .br-account-nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .br-order-card-body {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* ── 23. CHAT WIDGET ───────────────────────────────────────── */
 #br-chat-widget {
   position: fixed;

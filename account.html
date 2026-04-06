@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Account &#x2014; Bleach Resistant</title>
+  <meta name="description" content="Manage your Bleach Resistant account, track orders, and update your profile.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="overhaul.css?v=5">
+</head>
+<body>
+  <nav class="br-nav" id="navbar"><div class="br-container"><a href="home.html" class="br-logo"><img src="favicon.svg" alt="BR" class="br-logo-icon"><span>Bleach<strong>Resistant</strong></span></a><button class="br-nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button><div class="br-nav-menu" id="navMenu"><ul class="br-nav-links"><li><a href="home.html">Home</a></li><li class="br-dropdown"><a href="product.html">Products <svg width="10" height="6" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></a><ul class="br-dropdown-menu"><li><a href="headgear.html">Head Gear</a></li><li><a href="basicpoly.html">Basic Poly</a></li><li><a href="stockdesigns.html">Stock Designs</a></li><li><a href="fabricdescriptions.html">Fabric Guide</a></li><li><a href="sublimationprinting.html">Sublimation Printing</a></li></ul></li><li class="br-dropdown"><a href="services.html">Services <svg width="10" height="6" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></a><ul class="br-dropdown-menu"><li><a href="grapicdesign.html">Graphic Design</a></li><li><a href="customlogos.html">Custom Logos</a></li><li><a href="wrapdesign.html">Vehicle Wraps</a></li></ul></li><li><a href="copyofwashingsamples.html">Gallery</a></li><li><a href="About.html">About</a></li><li><a href="FAQs.html">FAQs</a></li></ul><div class="br-nav-actions"><a href="order.html" class="br-btn br-btn-primary br-btn-sm">Order Now</a></div></div></div></nav>
+
+  <section class="br-page-header">
+    <div class="br-container">
+      <nav class="br-breadcrumb"><a href="home.html">Home</a><span>/</span><span>My Account</span></nav>
+      <h1>My Account</h1>
+      <p>Track your orders, update your profile, and manage your account.</p>
+    </div>
+  </section>
+
+  <!-- Account Content (hidden until auth check) -->
+  <div id="account-content" style="display:none;">
+
+    <!-- Profile Card -->
+    <section class="br-section">
+      <div class="br-container">
+        <div class="br-account-grid">
+
+          <!-- Sidebar -->
+          <div class="br-account-sidebar">
+            <div class="br-account-avatar" id="acc-avatar">U</div>
+            <h3 id="acc-name">Loading...</h3>
+            <p id="acc-email" style="color:var(--br-text-muted);font-size:0.85rem;margin-bottom:20px;">loading...</p>
+            <nav class="br-account-nav">
+              <button class="br-account-tab active" data-tab="orders">&#x1F4E6; My Orders</button>
+              <button class="br-account-tab" data-tab="profile">&#x1F464; Profile</button>
+              <button class="br-account-tab" data-tab="password">&#x1F512; Change Password</button>
+            </nav>
+            <button class="br-btn br-btn-outline br-btn-sm" style="width:100%;margin-top:20px;" onclick="handleSignOut()">Sign Out</button>
+            <a href="admin.html" class="br-btn br-btn-primary br-btn-sm" id="admin-link" style="width:100%;margin-top:10px;display:none;text-align:center;">Admin Panel</a>
+          </div>
+
+          <!-- Tab Panels -->
+          <div class="br-account-main">
+
+            <!-- Orders Tab -->
+            <div class="br-account-panel active" id="tab-orders">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+                <h2 style="font-size:1.4rem;">My Orders</h2>
+                <a href="order.html" class="br-btn br-btn-primary br-btn-sm">&#x2795; New Order</a>
+              </div>
+              <div id="orders-list">
+                <div class="br-loading"><div class="br-spinner"></div><p>Loading orders...</p></div>
+              </div>
+            </div>
+
+            <!-- Profile Tab -->
+            <div class="br-account-panel" id="tab-profile">
+              <h2 style="font-size:1.4rem;margin-bottom:24px;">Profile Information</h2>
+              <form id="profile-form">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                  <div class="br-form-group">
+                    <label>First Name</label>
+                    <input type="text" id="prof-first" class="br-input" placeholder="First name">
+                  </div>
+                  <div class="br-form-group">
+                    <label>Last Name</label>
+                    <input type="text" id="prof-last" class="br-input" placeholder="Last name">
+                  </div>
+                </div>
+                <div class="br-form-group">
+                  <label>Email</label>
+                  <input type="email" id="prof-email" class="br-input" disabled style="opacity:0.6;">
+                </div>
+                <div class="br-form-group">
+                  <label>Phone</label>
+                  <input type="tel" id="prof-phone" class="br-input" placeholder="Phone number">
+                </div>
+                <div class="br-form-group">
+                  <label>Company (optional)</label>
+                  <input type="text" id="prof-company" class="br-input" placeholder="Company name">
+                </div>
+                <button type="submit" class="br-btn br-btn-primary">Save Profile</button>
+              </form>
+              <div id="profile-toast" style="display:none;margin-top:12px;padding:10px 16px;border-radius:8px;font-size:0.85rem;"></div>
+            </div>
+
+            <!-- Password Tab -->
+            <div class="br-account-panel" id="tab-password">
+              <h2 style="font-size:1.4rem;margin-bottom:24px;">Change Password</h2>
+              <form id="password-form">
+                <div class="br-form-group">
+                  <label>New Password</label>
+                  <input type="password" id="new-password" class="br-input" placeholder="Minimum 6 characters" minlength="6" required>
+                </div>
+                <div class="br-form-group">
+                  <label>Confirm New Password</label>
+                  <input type="password" id="confirm-password" class="br-input" placeholder="Re-enter new password" minlength="6" required>
+                </div>
+                <button type="submit" class="br-btn br-btn-primary">Update Password</button>
+              </form>
+              <div id="password-toast" style="display:none;margin-top:12px;padding:10px 16px;border-radius:8px;font-size:0.85rem;"></div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Not logged in message -->
+  <div id="account-guest" style="display:none;">
+    <section class="br-section">
+      <div class="br-container">
+        <div style="text-align:center;padding:60px 20px;">
+          <div style="font-size:3rem;margin-bottom:16px;">&#x1F512;</div>
+          <h2 style="margin-bottom:12px;">Sign In Required</h2>
+          <p style="color:var(--br-text-muted);margin-bottom:24px;">Please sign in to access your account and track your orders.</p>
+          <div class="br-btn-group" style="justify-content:center;">
+            <a href="login.html" class="br-btn br-btn-primary">Sign In</a>
+            <a href="signup.html" class="br-btn br-btn-outline">Create Account</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <footer class="br-footer"><div class="br-container"><div class="br-footer-grid"><div class="br-footer-brand"><a href="home.html" class="br-logo"><img src="favicon.svg" alt="BR" class="br-logo-icon"><span>Bleach<strong>Resistant</strong></span></a><p>Premium custom sublimation printing. Affordable quality apparel for teams, businesses, and individuals.</p></div><div class="br-footer-links"><h4>Products</h4><ul><li><a href="product.html">All Products</a></li><li><a href="headgear.html">Head Gear</a></li><li><a href="basicpoly.html">Basic Poly</a></li><li><a href="stockdesigns.html">Stock Designs</a></li><li><a href="sublimationprinting.html">Sublimation</a></li></ul></div><div class="br-footer-links"><h4>Services</h4><ul><li><a href="services.html">All Services</a></li><li><a href="grapicdesign.html">Graphic Design</a></li><li><a href="customlogos.html">Custom Logos</a></li><li><a href="wrapdesign.html">Vehicle Wraps</a></li><li><a href="sizechart.html">Size Chart</a></li></ul></div><div class="br-footer-links"><h4>Company</h4><ul><li><a href="About.html">About Us</a></li><li><a href="FAQs.html">FAQs</a></li><li><a href="order.html">Get a Quote</a></li><li><a href="privacypolicy.html">Privacy Policy</a></li><li><a href="termsconditions.html">Terms &amp; Conditions</a></li></ul></div></div><div class="br-footer-bottom"><p>&copy; 2026 Bleach Resistant. All rights reserved.</p><div class="br-footer-bottom-links"><a href="privacypolicy.html">Privacy</a><a href="termsconditions.html">Terms</a><a href="sitemap.xml">Sitemap</a></div></div></div></footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="content-loader.js?v=6"></script>
+  <script>
+    var currentUser = null;
+
+    function esc(s) {
+      var d = document.createElement('div');
+      d.textContent = s || '';
+      return d.innerHTML;
+    }
+
+    /* ── AUTH CHECK ──────────────────────────────────────────── */
+    (async function() {
+      try {
+        currentUser = await brGetUser();
+      } catch(e) {}
+
+      if (!currentUser) {
+        document.getElementById('account-guest').style.display = '';
+        return;
+      }
+
+      // Show account content
+      document.getElementById('account-content').style.display = '';
+
+      // Populate profile
+      var meta = currentUser.user_metadata || {};
+      var fullName = meta.full_name || meta.name || '';
+      var parts = fullName.split(' ');
+      document.getElementById('acc-avatar').textContent = (currentUser.email || 'U')[0].toUpperCase();
+      document.getElementById('acc-name').textContent = fullName || 'User';
+      document.getElementById('acc-email').textContent = currentUser.email;
+      document.getElementById('prof-first').value = parts[0] || '';
+      document.getElementById('prof-last').value = parts.slice(1).join(' ') || '';
+      document.getElementById('prof-email').value = currentUser.email || '';
+      document.getElementById('prof-phone').value = meta.phone || '';
+      document.getElementById('prof-company').value = meta.company || '';
+
+      // Show admin link for admin user
+      if (brIsAdmin(currentUser)) {
+        document.getElementById('admin-link').style.display = '';
+      }
+
+      // Load orders
+      loadOrders();
+    })();
+
+    /* ── TAB SWITCHING ──────────────────────────────────────── */
+    document.querySelectorAll('.br-account-tab').forEach(function(tab) {
+      tab.addEventListener('click', function() {
+        document.querySelectorAll('.br-account-tab').forEach(function(t) { t.classList.remove('active'); });
+        document.querySelectorAll('.br-account-panel').forEach(function(p) { p.classList.remove('active'); });
+        tab.classList.add('active');
+        var panel = document.getElementById('tab-' + tab.getAttribute('data-tab'));
+        if (panel) panel.classList.add('active');
+      });
+    });
+
+    /* ── LOAD ORDERS ────────────────────────────────────────── */
+    async function loadOrders() {
+      var container = document.getElementById('orders-list');
+      try {
+        var result = await db.from('orders').select('*')
+          .eq('user_id', currentUser.id)
+          .order('created_at', { ascending: false });
+
+        // Also try matching by email if user_id not set
+        var result2 = await db.from('orders').select('*')
+          .eq('email', currentUser.email)
+          .order('created_at', { ascending: false });
+
+        // Merge and deduplicate
+        var orders = result.data || [];
+        var ids = new Set(orders.map(function(o) { return o.id; }));
+        (result2.data || []).forEach(function(o) {
+          if (!ids.has(o.id)) orders.push(o);
+        });
+
+        // Sort by date desc
+        orders.sort(function(a, b) { return new Date(b.created_at) - new Date(a.created_at); });
+
+        if (orders.length === 0) {
+          container.innerHTML =
+            '<div style="text-align:center;padding:40px 20px;">' +
+              '<div style="font-size:2.5rem;margin-bottom:12px;">&#x1F4E6;</div>' +
+              '<h3 style="margin-bottom:8px;">No Orders Yet</h3>' +
+              '<p style="color:var(--br-text-muted);margin-bottom:20px;">You haven\'t placed any orders. Start your first custom order today!</p>' +
+              '<a href="order.html" class="br-btn br-btn-primary br-btn-sm">Place an Order</a>' +
+            '</div>';
+          return;
+        }
+
+        container.innerHTML = orders.map(function(o) {
+          var date = new Date(o.created_at);
+          var dateStr = date.toLocaleDateString('en-US', { year:'numeric', month:'short', day:'numeric' });
+          var status = (o.status || 'new').toLowerCase();
+          var statusColors = {
+            new: '#3498db', processing: '#f39c12', in_progress: '#f39c12',
+            completed: '#22c55e', shipped: '#8b5cf6', delivered: '#22c55e',
+            cancelled: '#e74c3c'
+          };
+          var color = statusColors[status] || '#888';
+          var statusLabel = status.replace(/_/g, ' ').replace(/\b\w/g, function(c) { return c.toUpperCase(); });
+          var service = o.service_type || o.item_type || 'Custom Order';
+
+          return '<div class="br-order-card">' +
+            '<div class="br-order-card-header">' +
+              '<div>' +
+                '<div class="br-order-id">#' + esc(o.id.substring(0, 8).toUpperCase()) + '</div>' +
+                '<div class="br-order-date">' + dateStr + '</div>' +
+              '</div>' +
+              '<span class="br-order-status" style="background:' + color + '15;color:' + color + ';border:1px solid ' + color + '30;">' + statusLabel + '</span>' +
+            '</div>' +
+            '<div class="br-order-card-body">' +
+              '<div class="br-order-detail"><strong>Service:</strong> ' + esc(service) + '</div>' +
+              (o.quantity ? '<div class="br-order-detail"><strong>Quantity:</strong> ' + esc(o.quantity) + '</div>' : '') +
+              (o.urgency ? '<div class="br-order-detail"><strong>Urgency:</strong> ' + esc(o.urgency) + '</div>' : '') +
+              (o.design_notes ? '<div class="br-order-detail"><strong>Notes:</strong> ' + esc(o.design_notes).substring(0, 100) + ((o.design_notes||'').length > 100 ? '...' : '') + '</div>' : '') +
+            '</div>' +
+          '</div>';
+        }).join('');
+      } catch (err) {
+        console.warn('[orders]', err.message);
+        container.innerHTML =
+          '<div style="text-align:center;padding:40px 20px;color:var(--br-text-muted);">' +
+            '<p>Unable to load orders. Please try again later.</p>' +
+          '</div>';
+      }
+    }
+
+    /* ── PROFILE UPDATE ─────────────────────────────────────── */
+    document.getElementById('profile-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      var toast = document.getElementById('profile-toast');
+      var first = document.getElementById('prof-first').value.trim();
+      var last = document.getElementById('prof-last').value.trim();
+      var phone = document.getElementById('prof-phone').value.trim();
+      var company = document.getElementById('prof-company').value.trim();
+      var fullName = (first + ' ' + last).trim();
+
+      try {
+        var { error } = await db.auth.updateUser({
+          data: { full_name: fullName, name: fullName, phone: phone, company: company }
+        });
+        if (error) throw error;
+        document.getElementById('acc-name').textContent = fullName || 'User';
+        document.getElementById('acc-avatar').textContent = (first || currentUser.email || 'U')[0].toUpperCase();
+        toast.style.display = '';
+        toast.style.background = '#dcfce7';
+        toast.style.color = '#166534';
+        toast.textContent = '\u2705 Profile updated successfully!';
+        setTimeout(function() { toast.style.display = 'none'; }, 3000);
+      } catch (err) {
+        toast.style.display = '';
+        toast.style.background = '#fef2f2';
+        toast.style.color = '#991b1b';
+        toast.textContent = 'Error: ' + err.message;
+        setTimeout(function() { toast.style.display = 'none'; }, 4000);
+      }
+    });
+
+    /* ── PASSWORD CHANGE ────────────────────────────────────── */
+    document.getElementById('password-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      var toast = document.getElementById('password-toast');
+      var newPw = document.getElementById('new-password').value;
+      var confirmPw = document.getElementById('confirm-password').value;
+
+      if (newPw !== confirmPw) {
+        toast.style.display = '';
+        toast.style.background = '#fef2f2';
+        toast.style.color = '#991b1b';
+        toast.textContent = 'Passwords do not match.';
+        setTimeout(function() { toast.style.display = 'none'; }, 3000);
+        return;
+      }
+
+      try {
+        var { error } = await db.auth.updateUser({ password: newPw });
+        if (error) throw error;
+        toast.style.display = '';
+        toast.style.background = '#dcfce7';
+        toast.style.color = '#166534';
+        toast.textContent = '\u2705 Password updated successfully!';
+        document.getElementById('new-password').value = '';
+        document.getElementById('confirm-password').value = '';
+        setTimeout(function() { toast.style.display = 'none'; }, 3000);
+      } catch (err) {
+        toast.style.display = '';
+        toast.style.background = '#fef2f2';
+        toast.style.color = '#991b1b';
+        toast.textContent = 'Error: ' + err.message;
+        setTimeout(function() { toast.style.display = 'none'; }, 4000);
+      }
+    });
+
+    /* ── SIGN OUT ───────────────────────────────────────────── */
+    async function handleSignOut() {
+      await brSignOut();
+    }
+  </script>
+</body>
+</html>

@@ -65,6 +65,28 @@
     if (href === currentPage) a.classList.add('active');
   });
 
+  /* ── AUTH-AWARE NAVBAR ───────────────────────────────────── */
+  // Show "My Account" button for logged-in users on public pages
+  if (typeof db !== 'undefined' && currentPage.indexOf('admin') !== 0 && currentPage !== 'login.html' && currentPage !== 'signup.html') {
+    (async function() {
+      try {
+        var navActions = document.querySelector('.br-nav-actions');
+        if (!navActions) return;
+        var user = await brGetUser();
+        if (!user) return;
+
+        // Check if a My Account link already exists
+        if (navActions.querySelector('.br-nav-account')) return;
+
+        var accountBtn = document.createElement('a');
+        accountBtn.href = brIsAdmin(user) ? 'admin.html' : 'account.html';
+        accountBtn.className = 'br-btn br-btn-outline br-btn-sm br-nav-account';
+        accountBtn.textContent = 'My Account';
+        navActions.insertBefore(accountBtn, navActions.firstChild);
+      } catch(e) {}
+    })();
+  }
+
   /* ── SCROLL ANIMATIONS (Intersection Observer) ───────────── */
   var animObserver = new IntersectionObserver(function(entries) {
     entries.forEach(function(entry) {

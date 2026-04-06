@@ -50,7 +50,7 @@
     (async () => {
       const user = await brGetUser();
       if (user) {
-        window.location.href = brIsAdmin(user) ? 'admin.html' : 'home.html';
+        window.location.href = brIsAdmin(user) ? 'admin.html' : 'account.html';
       }
     })();
 
@@ -76,7 +76,7 @@
         const { data, error } = await db.auth.signInWithPassword({ email, password });
         if (error) throw error;
         // Admin goes to dashboard, regular users go to home
-        window.location.href = brIsAdmin(data.user) ? 'admin.html' : 'home.html';
+        window.location.href = brIsAdmin(data.user) ? 'admin.html' : 'account.html';
       } catch (err) {
         alert.textContent = err.message || 'Login failed. Check your credentials.';
         alert.style.display = 'block';

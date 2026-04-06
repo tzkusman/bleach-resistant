@@ -23,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="overhaul.css?v=4">
+  <link rel="stylesheet" href="overhaul.css?v=5">
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-BKMJVM1TY0"></script>
   <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-BKMJVM1TY0');</script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1195,7 +1195,7 @@
           nudge.innerHTML = '<p><strong>&#x2705; Signed in as ' + escapeHtml(user.email) + '</strong> &mdash; Your order will be linked to your account for easy tracking.</p>';
           /* Update nav button */
           var navLink = document.getElementById('auth-nav-link');
-          if (navLink) { navLink.textContent = 'My Account'; navLink.href = 'admin.html'; }
+          if (navLink) { navLink.textContent = 'My Account'; navLink.href = brIsAdmin(user) ? 'admin.html' : 'account.html'; }
         }
       } catch (e) { /* guest - that's fine */ }
     })();
@@ -1361,7 +1361,7 @@
 
   })();
   </script>
-  <script src="content-loader.js?v=5"></script>
+  <script src="content-loader.js?v=6"></script>
 
 </body>
 </html>

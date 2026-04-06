@@ -426,7 +426,8 @@ DO $$ DECLARE pol RECORD; BEGIN
 END $$;
 
 CREATE POLICY "orders_public_insert"  ON orders FOR INSERT TO anon, authenticated WITH CHECK (true);
-CREATE POLICY "orders_admin_select"   ON orders FOR SELECT TO authenticated USING (auth.email() = 'usman@gmail.com');
+CREATE POLICY "orders_user_select"    ON orders FOR SELECT TO authenticated
+  USING (auth.email() = 'usman@gmail.com' OR email = auth.email() OR user_id = auth.uid());
 CREATE POLICY "orders_admin_update"   ON orders FOR UPDATE TO authenticated USING (auth.email() = 'usman@gmail.com');
 CREATE POLICY "orders_admin_delete"   ON orders FOR DELETE TO authenticated USING (auth.email() = 'usman@gmail.com');
 
