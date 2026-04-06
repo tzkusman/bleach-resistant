@@ -76,7 +76,7 @@ async function brRequireAdmin() {
   }
   // Reveal admin page content (hidden by default via .admin-hidden)
   document.body.classList.remove('admin-hidden');
-  document.body.style.display = '';
+  document.body.style.display = 'flex';
   return user;
 }
 
