@@ -1722,7 +1722,14 @@ p { margin-bottom: 1rem; }
 
 /* Nested dropdown (submenu) */
 .br-dropdown-nested { position: relative; }
-.br-dropdown-nested > a { display: flex; align-items: center; justify-content: space-between; }
+.br-dropdown-nested > a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #00c8d4 !important;
+  font-weight: 600 !important;
+}
+.br-dropdown-nested > a svg { color: #00c8d4; }
 .br-dropdown-submenu {
   position: absolute;
   left: 100%;

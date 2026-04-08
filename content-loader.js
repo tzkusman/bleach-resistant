@@ -895,7 +895,9 @@
   };
 
   /* ── SUBLIMATION SERVICES SUBMENU ──────────────────────────── */
-  // Builds nested submenu under Sublimation Printing nav item from sublimation_services table
+  // Finds the "Sublimation Printing" link inside any dropdown menu and
+  // converts it into a nested flyout submenu with all sublimation services.
+  // Works with both static HTML navs and dynamic nav loaded by brLoadDynamicNav().
   window.brLoadSubServicesMenu = async function() {
     if (typeof db === 'undefined') return;
     try {
@@ -907,39 +909,7 @@
       var services = result.data || [];
       if (services.length === 0) return;
 
-      // Find the Sublimation Printing nav link (match by href or text)
-      var navLinks = document.querySelectorAll('.br-nav-links > li');
-      var subNavItem = null;
-      navLinks.forEach(function(li) {
-        var a = li.querySelector('a');
-        if (!a) return;
-        var text = (a.textContent || '').toLowerCase().trim();
-        var href = (a.getAttribute('href') || '').toLowerCase();
-        if (text.indexOf('sublimation') !== -1 || href.indexOf('sublimation') !== -1) {
-          subNavItem = li;
-        }
-      });
-
-      if (!subNavItem) return;
-
-      // Ensure the parent has dropdown class
-      if (!subNavItem.classList.contains('br-dropdown')) {
-        subNavItem.classList.add('br-dropdown');
-        var mainLink = subNavItem.querySelector('a');
-        if (mainLink && mainLink.innerHTML.indexOf('svg') === -1) {
-          mainLink.innerHTML += ' <svg width="10" height="6" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>';
-        }
-      }
-
-      // Check if dropdown menu already exists
-      var dropMenu = subNavItem.querySelector('.br-dropdown-menu');
-      if (!dropMenu) {
-        dropMenu = document.createElement('ul');
-        dropMenu.className = 'br-dropdown-menu';
-        subNavItem.appendChild(dropMenu);
-      }
-
-      // Build submenu items
+      // Build submenu HTML
       var subHtml = '';
       services.forEach(function(svc) {
         var title = (svc.title || '').replace(/</g, '&lt;');
@@ -947,19 +917,61 @@
         subHtml += '<li><a href="sublimation-service.html?slug=' + slug + '">' + title + '</a></li>';
       });
 
-      // Insert as a nested dropdown within the existing dropdown, or append items
-      // If there are existing items in the dropdown, wrap sublimation services in nested submenu
-      var existingItems = dropMenu.querySelectorAll(':scope > li');
-      if (existingItems.length > 0) {
-        // There are already dropdown items; add a "Services" nested group
-        var nestedLi = document.createElement('li');
-        nestedLi.className = 'br-dropdown-nested';
-        nestedLi.innerHTML = '<a href="sublimationprinting.html">Our Services <svg width="8" height="5" viewBox="0 0 10 6" style="margin-left:8px;transform:rotate(-90deg)"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></a>'
-          + '<ul class="br-dropdown-submenu">' + subHtml + '</ul>';
-        dropMenu.appendChild(nestedLi);
+      var arrowSvg = ' <svg width="8" height="5" viewBox="0 0 10 6" style="margin-left:6px;transform:rotate(-90deg)"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>';
+
+      // Search ALL links inside dropdown menus for one that points to sublimation
+      var allDropdownLinks = document.querySelectorAll('.br-dropdown-menu li a');
+      var subLink = null;
+      allDropdownLinks.forEach(function(a) {
+        var href = (a.getAttribute('href') || '').toLowerCase();
+        var text = (a.textContent || '').toLowerCase().trim();
+        if (href.indexOf('sublimationprinting') !== -1 || href.indexOf('sublimation-service') !== -1 || text.indexOf('sublimation') !== -1) {
+          subLink = a;
+        }
+      });
+
+      if (subLink) {
+        // Convert the existing <li> into a nested dropdown
+        var parentLi = subLink.parentElement;
+        parentLi.classList.add('br-dropdown-nested');
+        // Add arrow indicator to the link text
+        if (subLink.innerHTML.indexOf('svg') === -1) {
+          subLink.innerHTML = subLink.textContent.trim() + arrowSvg;
+        }
+        // Create the submenu
+        var submenu = document.createElement('ul');
+        submenu.className = 'br-dropdown-submenu';
+        submenu.innerHTML = subHtml;
+        parentLi.appendChild(submenu);
       } else {
-        // No existing items — just add services directly
-        dropMenu.innerHTML = subHtml;
+        // Fallback: look for a top-level "Sublimation Printing" nav item
+        var topLinks = document.querySelectorAll('.br-nav-links > li');
+        var topItem = null;
+        topLinks.forEach(function(li) {
+          var a = li.querySelector(':scope > a');
+          if (!a) return;
+          var text = (a.textContent || '').toLowerCase().trim();
+          var href = (a.getAttribute('href') || '').toLowerCase();
+          if (text.indexOf('sublimation') !== -1 || href.indexOf('sublimation') !== -1) {
+            topItem = li;
+          }
+        });
+        if (topItem) {
+          if (!topItem.classList.contains('br-dropdown')) {
+            topItem.classList.add('br-dropdown');
+            var link = topItem.querySelector('a');
+            if (link && link.innerHTML.indexOf('svg') === -1) {
+              link.innerHTML += ' <svg width="10" height="6" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>';
+            }
+          }
+          var menu = topItem.querySelector('.br-dropdown-menu');
+          if (!menu) {
+            menu = document.createElement('ul');
+            menu.className = 'br-dropdown-menu';
+            topItem.appendChild(menu);
+          }
+          menu.innerHTML = subHtml;
+        }
       }
 
       // Handle mobile nested dropdown toggle
