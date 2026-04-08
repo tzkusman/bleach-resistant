@@ -3,31 +3,21 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Blog Manager &#x2014; Bleach Resistant Admin</title>
+  <title>Cotton Manager &#x2014; Bleach Resistant Admin</title>
   <link rel="icon" href="favicon.svg" type="image/png">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="admin.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js?v=7"></script>
   <style>
-    /* ── Blog Admin Specific Styles ── */
     .blog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
     .blog-admin-card {
-      background: #fff;
-      border-radius: 10px;
-      overflow: hidden;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-      transition: box-shadow 0.2s, transform 0.2s;
-      display: flex;
-      flex-direction: column;
+      background: #fff; border-radius: 10px; overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06); transition: box-shadow 0.2s, transform 0.2s;
+      display: flex; flex-direction: column;
     }
     .blog-admin-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.12); transform: translateY(-2px); }
-    .blog-admin-card .card-image {
-      height: 180px;
-      background: #f0f0f0;
-      overflow: hidden;
-      position: relative;
-    }
+    .blog-admin-card .card-image { height: 180px; background: #f0f0f0; overflow: hidden; position: relative; }
     .blog-admin-card .card-image img { width: 100%; height: 100%; object-fit: cover; }
     .blog-admin-card .card-image .placeholder {
       display: flex; align-items: center; justify-content: center;
@@ -43,47 +33,36 @@
     .blog-admin-card .card-body { padding: 16px; flex: 1; display: flex; flex-direction: column; }
     .blog-admin-card .card-body h4 { font-size: 14px; font-weight: 700; margin-bottom: 6px; line-height: 1.3; }
     .blog-admin-card .card-body .card-meta {
-      font-size: 11px; color: #888; margin-bottom: 8px;
-      display: flex; gap: 12px; flex-wrap: wrap;
+      font-size: 11px; color: #888; margin-bottom: 8px; display: flex; gap: 12px; flex-wrap: wrap;
     }
     .blog-admin-card .card-body .card-excerpt {
-      font-size: 12px; color: #666; line-height: 1.5;
-      flex: 1; margin-bottom: 12px;
+      font-size: 12px; color: #666; line-height: 1.5; flex: 1; margin-bottom: 12px;
       overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
     }
-    .blog-admin-card .card-actions {
-      display: flex; gap: 6px; padding: 12px 16px; border-top: 1px solid #f0f0f0;
-    }
+    .blog-admin-card .card-actions { display: flex; gap: 6px; padding: 12px 16px; border-top: 1px solid #f0f0f0; }
     .blog-admin-card .card-actions .btn { font-size: 11px; padding: 6px 12px; }
 
-    /* Rich text editor area */
     .editor-toolbar { display: flex; flex-wrap: wrap; gap: 4px; padding: 8px; background: #f8f8f8; border: 1px solid #ddd; border-bottom: none; border-radius: 6px 6px 0 0; }
     .editor-toolbar button {
       width: 32px; height: 32px; border: 1px solid #ddd; border-radius: 4px;
       background: #fff; cursor: pointer; font-size: 13px; font-weight: 700;
-      display: flex; align-items: center; justify-content: center;
-      transition: all 0.15s;
+      display: flex; align-items: center; justify-content: center; transition: all 0.15s;
     }
     .editor-toolbar button:hover { background: #C7065C; color: #fff; border-color: #C7065C; }
     .editor-toolbar .sep { width: 1px; background: #ddd; margin: 4px 4px; }
     .editor-content {
       min-height: 350px; max-height: 600px; overflow-y: auto;
       padding: 20px; border: 1px solid #ddd; border-radius: 0 0 6px 6px;
-      font-family: 'Poppins', sans-serif; font-size: 14px; line-height: 1.7;
-      outline: none;
+      font-family: 'Poppins', sans-serif; font-size: 14px; line-height: 1.7; outline: none;
     }
     .editor-content:focus { border-color: #C7065C; }
     .editor-content img { max-width: 100%; height: auto; border-radius: 6px; margin: 12px 0; }
     .editor-content h2 { font-size: 1.4rem; margin: 24px 0 8px; }
     .editor-content h3 { font-size: 1.2rem; margin: 20px 0 8px; }
-    .editor-content blockquote {
-      border-left: 4px solid #C7065C; padding: 12px 20px; margin: 16px 0;
-      background: #fef2f6; font-style: italic; color: #555;
-    }
+    .editor-content blockquote { border-left: 4px solid #C7065C; padding: 12px 20px; margin: 16px 0; background: #fef2f6; font-style: italic; color: #555; }
     .editor-content ul, .editor-content ol { padding-left: 24px; margin: 12px 0; }
     .editor-content a { color: #C7065C; text-decoration: underline; }
 
-    /* Tags input */
     .tags-input-wrap {
       display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 12px;
       border: 1px solid #ddd; border-radius: 6px; min-height: 42px; align-items: center;
@@ -95,16 +74,10 @@
       background: #C7065C; color: #fff; padding: 3px 10px; border-radius: 20px;
       font-size: 11px; font-weight: 600;
     }
-    .tags-input-wrap .tag-pill .tag-remove {
-      cursor: pointer; font-size: 14px; opacity: 0.8; margin-left: 2px;
-    }
+    .tags-input-wrap .tag-pill .tag-remove { cursor: pointer; font-size: 14px; opacity: 0.8; margin-left: 2px; }
     .tags-input-wrap .tag-pill .tag-remove:hover { opacity: 1; }
-    .tags-input-wrap input {
-      border: none; outline: none; flex: 1; min-width: 100px;
-      font-size: 13px; padding: 4px 0;
-    }
+    .tags-input-wrap input { border: none; outline: none; flex: 1; min-width: 100px; font-size: 13px; padding: 4px 0; }
 
-    /* Image upload area */
     .image-upload-area {
       border: 2px dashed #ddd; border-radius: 8px; padding: 24px;
       text-align: center; cursor: pointer; transition: all 0.2s;
@@ -120,11 +93,9 @@
       position: absolute; top: 8px; right: 8px;
       width: 28px; height: 28px; border-radius: 50%;
       background: rgba(0,0,0,0.6); color: #fff; border: none;
-      font-size: 16px; cursor: pointer; display: flex;
-      align-items: center; justify-content: center;
+      font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center;
     }
 
-    /* Stats row for blog */
     .blog-stats { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
     .blog-stat {
       background: #fff; border-radius: 8px; padding: 12px 20px;
@@ -134,7 +105,6 @@
     .blog-stat .stat-num { font-size: 20px; font-weight: 800; color: #2c2c2c; }
     .blog-stat .stat-label { font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
 
-    /* View toggle */
     .view-toggle { display: flex; border: 1px solid #ddd; border-radius: 6px; overflow: hidden; }
     .view-toggle button {
       padding: 6px 14px; border: none; background: #fff; cursor: pointer;
@@ -143,7 +113,6 @@
     .view-toggle button.active { background: #C7065C; color: #fff; }
     .view-toggle button:not(:last-child) { border-right: 1px solid #ddd; }
 
-    /* Category manager mini */
     .cat-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
     .cat-item {
       display: flex; align-items: center; gap: 6px;
@@ -173,8 +142,8 @@
       <a href="admin-slider.html"><span class="icon">&#x1F3A0;</span> Hero Slider</a>
       <a href="admin-sections.html"><span class="icon">&#x1F4D0;</span> Page Sections</a>
       <a href="admin-pages.html"><span class="icon">&#x1F4C4;</span> Pages</a>
-      <a href="admin-blog.html" class="active"><span class="icon">&#x1F4DD;</span> Blog</a>
-      <a href="admin-cotton.html"><span class="icon">&#x1F9F5;</span> Cotton</a>
+      <a href="admin-blog.html"><span class="icon">&#x1F4DD;</span> Blog</a>
+      <a href="admin-cotton.html" class="active"><span class="icon">&#x1F9F5;</span> Cotton</a>
       <a href="admin-services.html"><span class="icon">&#x1F6E0;&#xFE0F;</span> Service Pages</a>
       <a href="admin-media.html"><span class="icon">&#x1F5BC;&#xFE0F;</span> Media Library</a>
       <a href="admin-navigation.html"><span class="icon">&#x1F517;</span> Navigation</a>
@@ -185,7 +154,7 @@
 
       <div class="nav-section">Website</div>
       <a href="home.html" target="_blank"><span class="icon">&#x1F310;</span> View Site</a>
-      <a href="blog.html" target="_blank"><span class="icon">&#x1F4DD;</span> View Blog</a>
+      <a href="cotton.html" target="_blank"><span class="icon">&#x1F9F5;</span> View Cotton</a>
     </div>
     <div class="sidebar-footer">
       <div class="user-info">
@@ -203,8 +172,8 @@
   <div class="main-content">
     <div class="topbar">
       <div>
-        <h1>Blog Manager</h1>
-        <div class="breadcrumb">Create and manage blog posts</div>
+        <h1>Cotton Manager</h1>
+        <div class="breadcrumb">Create and manage cotton articles &amp; product guides</div>
       </div>
       <div class="topbar-actions">
         <select id="filter-status" onchange="renderPosts()" style="padding:8px 12px;border:1px solid #ddd;border-radius:6px;font-size:13px;">
@@ -221,10 +190,8 @@
     </div>
 
     <div class="content-area">
-      <!-- Stats -->
       <div class="blog-stats" id="blog-stats"></div>
 
-      <!-- Search & View Toggle -->
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
         <input type="text" placeholder="Search posts..." id="search-input" oninput="renderPosts()" style="padding:8px 14px;border:1px solid #ddd;border-radius:6px;font-size:13px;width:280px;">
         <div class="view-toggle">
@@ -233,18 +200,17 @@
         </div>
       </div>
 
-      <!-- Posts Grid/List -->
       <div id="posts-container" class="blog-grid">
         <div style="text-align:center;padding:60px;color:#888;grid-column:1/-1;">Loading posts...</div>
       </div>
     </div>
   </div>
 
-  <!-- ===== POST EDITOR MODAL (Full Screen) ===== -->
+  <!-- ===== POST EDITOR MODAL ===== -->
   <div class="modal-overlay" id="editor-overlay">
     <div class="modal" style="max-width:900px;max-height:92vh;">
       <div class="modal-header">
-        <h3 id="editor-title">New Blog Post</h3>
+        <h3 id="editor-title">New Cotton Post</h3>
         <button class="modal-close" onclick="closeEditor()">&times;</button>
       </div>
       <div class="modal-body" style="padding:0;max-height:calc(92vh - 130px);overflow-y:auto;">
@@ -261,7 +227,7 @@
             </div>
             <div class="form-group">
               <label>Excerpt / Summary</label>
-              <textarea id="post-excerpt" rows="3" placeholder="A brief summary that appears on the blog listing page..."></textarea>
+              <textarea id="post-excerpt" rows="3" placeholder="A brief summary shown on the cotton listing page..."></textarea>
             </div>
             <div class="form-group">
               <label>Content *</label>
@@ -354,7 +320,7 @@
   <div class="modal-overlay" id="cat-overlay">
     <div class="modal" style="max-width:480px;">
       <div class="modal-header">
-        <h3>Blog Categories</h3>
+        <h3>Cotton Categories</h3>
         <button class="modal-close" onclick="closeCategoryManager()">&times;</button>
       </div>
       <div class="modal-body">
@@ -420,7 +386,7 @@
     /* ── Load Posts ── */
     async function loadPosts() {
       try {
-        var r = await db.from('blog_posts').select('*').order('created_at', { ascending: false });
+        var r = await db.from('cotton_posts').select('*').order('created_at', { ascending: false });
         if (r.error) throw r.error;
         allPosts = r.data || [];
         renderStats();
@@ -434,24 +400,22 @@
     /* ── Load Categories ── */
     async function loadCategories() {
       try {
-        var r = await db.from('blog_categories').select('*').order('sort_order');
+        var r = await db.from('cotton_categories').select('*').order('sort_order');
         if (r.error) throw r.error;
         allCategories = r.data || [];
         populateCategoryDropdowns();
-      } catch(e) { console.warn('[blog-cats]', e.message); }
+      } catch(e) { console.warn('[cotton-cats]', e.message); }
     }
 
     function populateCategoryDropdowns() {
       var filterSelect = document.getElementById('filter-category');
       var postSelect = document.getElementById('post-category');
       
-      // Filter dropdown
       filterSelect.innerHTML = '<option value="">All Categories</option>';
       allCategories.forEach(function(cat) {
         filterSelect.innerHTML += '<option value="' + esc(cat.slug) + '">' + esc(cat.name) + '</option>';
       });
 
-      // Post editor dropdown
       postSelect.innerHTML = '';
       allCategories.forEach(function(cat) {
         postSelect.innerHTML += '<option value="' + esc(cat.slug) + '">' + esc(cat.name) + '</option>';
@@ -466,7 +430,7 @@
       var totalViews = allPosts.reduce(function(sum, p) { return sum + (p.views || 0); }, 0);
 
       document.getElementById('blog-stats').innerHTML =
-        '<div class="blog-stat"><span class="stat-icon">&#x1F4DD;</span><div><div class="stat-num">' + total + '</div><div class="stat-label">Total Posts</div></div></div>' +
+        '<div class="blog-stat"><span class="stat-icon">&#x1F9F5;</span><div><div class="stat-num">' + total + '</div><div class="stat-label">Total Posts</div></div></div>' +
         '<div class="blog-stat"><span class="stat-icon">&#x2705;</span><div><div class="stat-num">' + published + '</div><div class="stat-label">Published</div></div></div>' +
         '<div class="blog-stat"><span class="stat-icon">&#x1F4CB;</span><div><div class="stat-num">' + drafts + '</div><div class="stat-label">Drafts</div></div></div>' +
         '<div class="blog-stat"><span class="stat-icon">&#x1F441;</span><div><div class="stat-num">' + totalViews.toLocaleString() + '</div><div class="stat-label">Total Views</div></div></div>';
@@ -511,7 +475,7 @@
       var date = post.published_at ? new Date(post.published_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Not published';
       return '<div class="blog-admin-card">' +
         '<div class="card-image">' +
-          (post.featured_image ? '<img src="' + esc(post.featured_image) + '" alt="">' : '<div class="placeholder">&#x1F4DD;</div>') +
+          (post.featured_image ? '<img src="' + esc(post.featured_image) + '" alt="">' : '<div class="placeholder">&#x1F9F5;</div>') +
           '<span class="card-status ' + post.status + '">' + post.status + '</span>' +
         '</div>' +
         '<div class="card-body">' +
@@ -552,10 +516,9 @@
     window.openEditor = function(id) {
       editingId = id || null;
       currentTags = [];
-      document.getElementById('editor-title').textContent = id ? 'Edit Post' : 'New Blog Post';
+      document.getElementById('editor-title').textContent = id ? 'Edit Post' : 'New Cotton Post';
       document.getElementById('save-btn').textContent = id ? 'Update Post' : 'Save Post';
 
-      // Reset fields
       document.getElementById('post-title').value = '';
       document.getElementById('post-slug').value = '';
       document.getElementById('post-excerpt').value = '';
@@ -593,7 +556,6 @@
         }
       }
 
-      // Show source or contenteditable
       document.getElementById('editor-content').style.display = '';
       document.getElementById('editor-source').style.display = 'none';
       document.getElementById('btn-source').style.background = '';
@@ -635,9 +597,9 @@
       try {
         var r;
         if (editingId) {
-          r = await db.from('blog_posts').update(postData).eq('id', editingId);
+          r = await db.from('cotton_posts').update(postData).eq('id', editingId);
         } else {
-          r = await db.from('blog_posts').insert(postData);
+          r = await db.from('cotton_posts').insert(postData);
         }
         if (r.error) throw r.error;
         showToast(editingId ? 'Post updated!' : 'Post created!', 'success');
@@ -652,7 +614,7 @@
     window.deletePost = async function(id) {
       if (!confirm('Delete this post? This cannot be undone.')) return;
       try {
-        var r = await db.from('blog_posts').delete().eq('id', id);
+        var r = await db.from('cotton_posts').delete().eq('id', id);
         if (r.error) throw r.error;
         showToast('Post deleted', 'success');
         await loadPosts();
@@ -669,7 +631,7 @@
         update.published_at = new Date().toISOString();
       }
       try {
-        var r = await db.from('blog_posts').update(update).eq('id', id);
+        var r = await db.from('cotton_posts').update(update).eq('id', id);
         if (r.error) throw r.error;
         showToast(newStatus === 'published' ? 'Post published!' : 'Post unpublished', 'success');
         await loadPosts();
@@ -694,7 +656,7 @@
         featured: false
       };
       try {
-        var r = await db.from('blog_posts').insert(newPost);
+        var r = await db.from('cotton_posts').insert(newPost);
         if (r.error) throw r.error;
         showToast('Post duplicated as draft', 'success');
         await loadPosts();
@@ -710,7 +672,6 @@
     window.insertLink = function() {
       var url = prompt('Enter URL:');
       if (url) {
-        // Basic URL validation
         if (!/^https?:\/\//.test(url) && !url.startsWith('/') && !url.endsWith('.html')) {
           url = 'https://' + url;
         }
@@ -750,7 +711,7 @@
     window.previewPost = function() {
       var slug = document.getElementById('post-slug').value.trim() || slugify(document.getElementById('post-title').value.trim());
       if (slug) {
-        window.open('blog-post.html?slug=' + encodeURIComponent(slug), '_blank');
+        window.open('cotton-detail.html?slug=' + encodeURIComponent(slug), '_blank');
       } else {
         showToast('Save the post first to preview', 'error');
       }
@@ -795,7 +756,7 @@
       if (!file) return;
       try {
         var ext = file.name.split('.').pop();
-        var path = 'blog/' + Date.now() + '.' + ext;
+        var path = 'cotton/' + Date.now() + '.' + ext;
         var r = await db.storage.from('media').upload(path, file, { upsert: true });
         if (r.error) throw r.error;
         var url = SUPABASE_URL + '/storage/v1/object/public/media/' + path;
@@ -856,7 +817,7 @@
       var name = document.getElementById('new-cat-name').value.trim();
       if (!name) return;
       try {
-        var r = await db.from('blog_categories').insert({
+        var r = await db.from('cotton_categories').insert({
           name: name,
           slug: slugify(name),
           sort_order: allCategories.length + 1
@@ -872,7 +833,7 @@
     window.deleteCategory = async function(id) {
       if (!confirm('Delete this category?')) return;
       try {
-        var r = await db.from('blog_categories').delete().eq('id', id);
+        var r = await db.from('cotton_categories').delete().eq('id', id);
         if (r.error) throw r.error;
         showToast('Category deleted', 'success');
         await loadCategories();

@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Blog &#x2014; Bleach Resistant | Sublimation Printing Tips &amp; News</title>
-  <meta name="description" content="Read the latest tips, design ideas, and industry news about custom sublimation printing from Bleach Resistant.">
+  <title>Cotton &#x2014; Bleach Resistant | Cotton Fabric Guide &amp; Products</title>
+  <meta name="description" content="Explore cotton fabric types, printing methods, care guides, and product spotlights from Bleach Resistant.">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -19,21 +19,21 @@
   <!-- ===== PAGE HEADER ===== -->
   <section class="br-page-header">
     <div class="br-container">
-      <nav class="br-breadcrumb"><a href="home.html">Home</a><span>/</span><span>Blog</span></nav>
-      <h1>Blog</h1>
-      <p>Tips, design ideas, industry news, and customer stories from the Bleach Resistant team.</p>
+      <nav class="br-breadcrumb"><a href="home.html">Home</a><span>/</span><a href="product.html">Products</a><span>/</span><span>Cotton</span></nav>
+      <h1>Cotton</h1>
+      <p>Everything about cotton fabrics, printing methods, care guides, and product spotlights.</p>
     </div>
   </section>
 
-  <!-- ===== BLOG FILTER BAR ===== -->
+  <!-- ===== FILTER BAR ===== -->
   <section class="br-section" style="padding-bottom:0">
     <div class="br-container">
       <div class="br-blog-toolbar" data-animate="fade-up">
-        <div class="br-blog-categories" id="blogCategories">
+        <div class="br-blog-categories" id="cottonCategories">
           <button class="br-tab active" data-cat="all">All Posts</button>
         </div>
         <div class="br-blog-search">
-          <input type="text" id="blogSearch" placeholder="Search articles..." class="br-blog-search-input">
+          <input type="text" id="cottonSearch" placeholder="Search cotton articles..." class="br-blog-search-input">
         </div>
       </div>
     </div>
@@ -46,10 +46,10 @@
     </div>
   </section>
 
-  <!-- ===== BLOG GRID ===== -->
+  <!-- ===== COTTON GRID ===== -->
   <section class="br-section">
     <div class="br-container">
-      <div class="br-blog-grid" id="blogGrid" data-animate="fade-up">
+      <div class="br-blog-grid" id="cottonGrid" data-animate="fade-up">
         <div class="br-loading"><div class="br-spinner"></div><p>Loading articles...</p></div>
       </div>
       <div class="br-blog-load-more" id="loadMoreWrap" style="display:none">
@@ -58,8 +58,8 @@
     </div>
   </section>
 
-  <!-- ===== NEWSLETTER CTA ===== -->
-  <section class="br-cta-banner"><div class="br-container"><h2 data-animate="fade-up">Stay Updated</h2><p data-animate="fade-up">Get the latest sublimation printing tips, design ideas, and exclusive offers delivered to your inbox.</p><div class="br-btn-group" data-animate="fade-up"><a href="order.html" class="br-btn br-btn-primary br-btn-lg">Contact Us</a><a href="sublimationprinting.html" class="br-btn br-btn-outline br-btn-lg" style="border-color:#fff;color:#fff">Our Services</a></div></div></section>
+  <!-- ===== CTA BANNER ===== -->
+  <section class="br-cta-banner"><div class="br-container"><h2 data-animate="fade-up">Need Custom Cotton Apparel?</h2><p data-animate="fade-up">We offer screen printing, DTG, and more on premium cotton blanks. Get a free quote today.</p><div class="br-btn-group" data-animate="fade-up"><a href="order.html" class="br-btn br-btn-primary br-btn-lg">Get Free Quote</a><a href="product.html" class="br-btn br-btn-outline br-btn-lg" style="border-color:#fff;color:#fff">All Products</a></div></div></section>
 
   <!-- ===== FOOTER ===== -->
   <footer class="br-footer"><div class="br-container"><div class="br-footer-grid"><div class="br-footer-brand"><a href="home.html" class="br-logo"><img src="favicon.svg" alt="BR" class="br-logo-icon"><span>Bleach<strong>Resistant</strong></span></a><p>Premium custom sublimation printing. Affordable quality apparel for teams, businesses, and individuals.</p></div><div class="br-footer-links"><h4>Products</h4><ul><li><a href="product.html">All Products</a></li><li><a href="headgear.html">Head Gear</a></li><li><a href="basicpoly.html">Basic Poly</a></li><li><a href="stockdesigns.html">Stock Designs</a></li><li><a href="sublimationprinting.html">Sublimation</a></li></ul></div><div class="br-footer-links"><h4>Services</h4><ul><li><a href="services.html">All Services</a></li><li><a href="grapicdesign.html">Graphic Design</a></li><li><a href="customlogos.html">Custom Logos</a></li><li><a href="wrapdesign.html">Vehicle Wraps</a></li><li><a href="sizechart.html">Size Chart</a></li></ul></div><div class="br-footer-links"><h4>Company</h4><ul><li><a href="About.html">About Us</a></li><li><a href="FAQs.html">FAQs</a></li><li><a href="order.html">Get a Quote</a></li><li><a href="privacypolicy.html">Privacy Policy</a></li><li><a href="termsconditions.html">Terms &amp; Conditions</a></li></ul></div></div><div class="br-footer-bottom"><p>&copy; 2026 Bleach Resistant. All rights reserved.</p><div class="br-footer-bottom-links"><a href="privacypolicy.html">Privacy</a><a href="termsconditions.html">Terms</a><a href="sitemap.xml">Sitemap</a></div></div></div></footer>
@@ -86,10 +86,10 @@
 
     async function loadCategories() {
       try {
-        var r = await db.from('blog_categories').select('*').order('sort_order');
+        var r = await db.from('cotton_categories').select('*').order('sort_order');
         if (r.error) throw r.error;
         var cats = r.data || [];
-        var container = document.getElementById('blogCategories');
+        var container = document.getElementById('cottonCategories');
         cats.forEach(function(cat) {
           var btn = document.createElement('button');
           btn.className = 'br-tab';
@@ -97,12 +97,12 @@
           btn.textContent = cat.name;
           container.appendChild(btn);
         });
-      } catch(e) { console.warn('[blog-categories]', e.message); }
+      } catch(e) { console.warn('[cotton-categories]', e.message); }
     }
 
     async function loadPosts() {
       try {
-        var query = db.from('blog_posts')
+        var query = db.from('cotton_posts')
           .select('*')
           .eq('status', 'published')
           .order('published_at', { ascending: false });
@@ -112,8 +112,8 @@
         allPosts = r.data || [];
         renderPosts();
       } catch(e) {
-        console.warn('[blog-posts]', e.message);
-        document.getElementById('blogGrid').innerHTML = '<div class="br-empty"><p>No articles available yet. Check back soon!</p></div>';
+        console.warn('[cotton-posts]', e.message);
+        document.getElementById('cottonGrid').innerHTML = '<div class="br-empty"><p>No articles available yet. Check back soon!</p></div>';
       }
     }
 
@@ -131,10 +131,9 @@
     function renderPosts() {
       var filtered = getFilteredPosts();
       var featuredContainer = document.getElementById('featuredPost');
-      var gridContainer = document.getElementById('blogGrid');
+      var gridContainer = document.getElementById('cottonGrid');
       var loadMoreWrap = document.getElementById('loadMoreWrap');
 
-      // Featured post (first featured post or first post)
       var featuredPost = filtered.find(function(p) { return p.featured; }) || filtered[0];
       var regularPosts = filtered.filter(function(p) { return p !== featuredPost; });
 
@@ -162,7 +161,6 @@
 
       loadMoreWrap.style.display = visibleCount < regularPosts.length ? '' : 'none';
 
-      // Re-animate
       gridContainer.querySelectorAll('[data-animate]').forEach(function(el) {
         var obs = new IntersectionObserver(function(entries) {
           entries.forEach(function(entry) {
@@ -175,10 +173,10 @@
 
     function renderFeaturedCard(post) {
       var date = post.published_at ? new Date(post.published_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '';
-      return '<a href="blog-post.html?slug=' + encodeURIComponent(post.slug) + '" class="br-blog-featured">' +
+      return '<a href="cotton-detail.html?slug=' + encodeURIComponent(post.slug) + '" class="br-blog-featured">' +
         '<div class="br-blog-featured-image">' +
           (post.featured_image ? '<img src="' + esc(post.featured_image) + '" alt="' + esc(post.title) + '" loading="lazy">' :
-          '<div class="br-blog-placeholder">&#x1F4DD;</div>') +
+          '<div class="br-blog-placeholder">&#x1F9F5;</div>') +
         '</div>' +
         '<div class="br-blog-featured-content">' +
           '<div class="br-blog-meta">' +
@@ -195,10 +193,10 @@
     function renderPostCard(post) {
       var date = post.published_at ? new Date(post.published_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : '';
       var readTime = estimateReadTime(post.content || '');
-      return '<a href="blog-post.html?slug=' + encodeURIComponent(post.slug) + '" class="br-blog-card" data-animate="fade-up">' +
+      return '<a href="cotton-detail.html?slug=' + encodeURIComponent(post.slug) + '" class="br-blog-card" data-animate="fade-up">' +
         '<div class="br-blog-card-image">' +
           (post.featured_image ? '<img src="' + esc(post.featured_image) + '" alt="' + esc(post.title) + '" loading="lazy">' :
-          '<div class="br-blog-placeholder">&#x1F4DD;</div>') +
+          '<div class="br-blog-placeholder">&#x1F9F5;</div>') +
         '</div>' +
         '<div class="br-blog-card-body">' +
           '<div class="br-blog-meta">' +
@@ -222,30 +220,27 @@
     }
 
     function bindEvents() {
-      // Category filter
-      document.getElementById('blogCategories').addEventListener('click', function(e) {
+      document.getElementById('cottonCategories').addEventListener('click', function(e) {
         var tab = e.target.closest('.br-tab');
         if (!tab) return;
-        document.querySelectorAll('#blogCategories .br-tab').forEach(function(t) { t.classList.remove('active'); });
+        document.querySelectorAll('#cottonCategories .br-tab').forEach(function(t) { t.classList.remove('active'); });
         tab.classList.add('active');
-        currentCategory = tab.getAttribute('data-cat') || 'all';
+        currentCategory = tab.getAttribute('data-cat');
         currentPage = 0;
         renderPosts();
       });
 
-      // Search
-      var searchTimeout;
-      document.getElementById('blogSearch').addEventListener('input', function() {
-        clearTimeout(searchTimeout);
-        var input = this;
-        searchTimeout = setTimeout(function() {
-          searchQuery = input.value.trim().toLowerCase();
+      var searchTimer;
+      document.getElementById('cottonSearch').addEventListener('input', function() {
+        var val = this.value.toLowerCase().trim();
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(function() {
+          searchQuery = val;
           currentPage = 0;
           renderPosts();
         }, 300);
       });
 
-      // Load more
       document.getElementById('loadMoreBtn').addEventListener('click', function() {
         currentPage++;
         renderPosts();

@@ -57,7 +57,7 @@
 │                                                   │
 │  ┌─────────┐  ┌──────────┐  ┌─────────────────┐  │
 │  │  Auth   │  │ Postgres │  │    Storage       │  │
-│  │(email/  │  │(11 tables│  │  (media,         │  │
+│  │(email/  │  │(15+table)│  │  (media,         │  │
 │  │password)│  │  + RLS)  │  │   attachments)   │  │
 │  └─────────┘  └──────────┘  └─────────────────┘  │
 └───────────────────────────────────────────────────┘
@@ -117,9 +117,16 @@ project/
 ├── ... (more category pages)
 │
 ├── services.html             ← Services overview
+├── sublimation-service.html  ← Sublimation service page (DB-driven)
+├── web-design-service.html   ← Web design service page (DB-driven)
 ├── About.html                ← About page
 ├── FAQs.html                 ← FAQ with accordion
 ├── Pricelist.html            ← Pricing page
+│
+├── blog.html                 ← Blog listing page (from blog_posts table)
+├── blog-post.html            ← Blog detail page (slug-based)
+├── cotton.html               ← Cotton articles listing (from cotton_posts table)
+├── cotton-detail.html        ← Cotton article detail (slug-based)
 │
 ├── admin.html                ← Admin dashboard
 ├── admin-products.html       ← Product CRUD
@@ -128,11 +135,18 @@ project/
 ├── admin-slider.html         ← Hero slider CRUD
 ├── admin-sections.html       ← Page section editor
 ├── admin-pages.html          ← Visual page editor
+├── admin-blog.html           ← Blog CMS (full CRUD + categories)
+├── admin-cotton.html         ← Cotton CMS (full CRUD + categories)
+├── admin-services.html       ← Service pages editor
 ├── admin-media.html          ← Media library
 ├── admin-navigation.html     ← Nav menu editor + Page Creator + Page Builder
 ├── admin-settings.html       ← Site settings (branding, SEO, etc.)
 ├── admin-analytics.html      ← Analytics dashboard
 │
+├── supabase-setup.sql        ← Core database schema
+├── supabase-migration-blog.sql    ← Blog tables migration
+├── supabase-migration-cotton.sql  ← Cotton tables migration
+├── supabase-migration-webdesign.sql ← Web design service migration
 ├── page.html                 ← Dynamic page renderer (for custom pages)
 ├── sitemap.xml               ← SEO sitemap
 └── favicon.svg               ← Site icon
@@ -1557,22 +1571,18 @@ Always bump version numbers when editing shared files:
 | File | Current Version | Usage |
 |------|----------------|-------|
 | `overhaul.css` | `?v=10` | All public pages |
-| `content-loader.js` | `?v=15` | All public pages |
+| `content-loader.js` | `?v=19` | All public pages |
 | `supabase-config.js` | `?v=7` | All pages |
 
 ---
 
 ## 17. Hosting on Hostinger
 
-See **[GUIDE-HOSTINGER.md](GUIDE-HOSTINGER.md)** for the complete Hostinger hosting guide covering:
+See **[GUIDE-HOSTINGER.md](GUIDE-HOSTINGER.md)** for the simple 4-step Hostinger hosting guide:
 
-- Buying a plan & registering a domain
-- 3 upload methods (File Manager, FTP, Git auto-deploy)
-- `.htaccess` configuration (replaces `vercel.json`)
-- SSL setup & HTTPS enforcement
-- Professional email setup (webmail, Gmail, phone, Outlook)
-- Email anti-spam (SPF, DKIM, DMARC)
-- Supabase & Google Analytics domain updates
-- DNS records reference
-- Full migration checklist (29 steps)
-- Troubleshooting guide (10 common issues)
+1. Buy Hostinger hosting + domain
+2. Connect GitHub repo for auto-deploy (webhook)
+3. Create `.htaccess` (homepage + HTTPS)
+4. Update Supabase redirect URLs
+
+Your Supabase stays separate — Hostinger only hosts the static HTML/CSS/JS files.

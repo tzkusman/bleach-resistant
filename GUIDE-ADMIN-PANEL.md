@@ -22,7 +22,9 @@
 13. [Site Settings](#13-site-settings)
 14. [Reusable Components](#14-reusable-components)
 15. [Adapting for Desktop & Mobile](#15-adapting-for-desktop--mobile)
-16. [Complete Prompt for AI Recreation](#16-complete-prompt-for-ai-recreation)
+16. [Blog CMS](#16-blog-cms)
+17. [Cotton CMS](#17-cotton-cms)
+18. [Complete Prompt for AI Recreation](#18-complete-prompt-for-ai-recreation)
 
 ---
 
@@ -1078,7 +1080,42 @@ The Supabase calls, auth pattern, and CRUD logic stay exactly the same.
 
 ---
 
-## 16. Complete Prompt for AI Recreation
+## 16. Blog CMS
+
+**File:** `admin-blog.html`
+**Tables:** `blog_posts`, `blog_categories`
+**Migration:** `supabase-migration-blog.sql`
+
+Full CRUD for blog articles with:
+- Rich text editor (bold, italic, headings, lists, blockquote, links, images, HTML source)
+- Featured image upload to `media/blog/` in Supabase Storage
+- Tags (JSONB array), category selection, status (published/draft)
+- Auto-slug generation from title
+- SEO meta description with character count
+- Grid/list view toggle, search, stats bar
+- Category manager modal (add/edit/delete categories)
+
+**Public pages:** `blog.html` (listing with category filters, search, pagination) and `blog-post.html` (detail with related posts, share buttons, view counter)
+
+---
+
+## 17. Cotton CMS
+
+**File:** `admin-cotton.html`
+**Tables:** `cotton_posts`, `cotton_categories`
+**Migration:** `supabase-migration-cotton.sql`
+
+Identical pattern to Blog CMS — full CRUD for cotton articles. Same feature set:
+- Rich text editor, image upload to `media/cotton/`, tags, categories, status
+- Auto-slug, SEO meta, grid/list view, search, stats, category manager
+
+**Public pages:** `cotton.html` (listing page in Products dropdown) and `cotton-detail.html` (detail page with related posts, share buttons, view counter)
+
+**Key difference from Blog:** Cotton appears under **Products** dropdown in navigation, while Blog is a top-level nav item.
+
+---
+
+## 18. Complete Prompt for AI Recreation
 
 Use this prompt to build a similar admin panel from scratch:
 

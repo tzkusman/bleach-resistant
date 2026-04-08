@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Loading... &#x2014; Bleach Resistant Blog</title>
+  <title>Loading... &#x2014; Bleach Resistant Cotton</title>
   <meta name="description" content="">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,7 +17,7 @@
   <nav class="br-nav" id="navbar"><div class="br-container"><a href="home.html" class="br-logo"><img src="favicon.svg" alt="BR" class="br-logo-icon"><span>Bleach<strong>Resistant</strong></span></a><button class="br-nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button><div class="br-nav-menu" id="navMenu"><ul class="br-nav-links"><li><a href="home.html">Home</a></li><li class="br-dropdown"><a href="product.html">Products <svg width="10" height="6" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></a><ul class="br-dropdown-menu"><li><a href="headgear.html">Head Gear</a></li><li><a href="basicpoly.html">Basic Poly</a></li><li><a href="stockdesigns.html">Stock Designs</a></li><li><a href="fabricdescriptions.html">Fabric Guide</a></li><li><a href="sublimationprinting.html">Sublimation Printing</a></li><li><a href="cotton.html">Cotton</a></li></ul></li><li class="br-dropdown"><a href="services.html">Services <svg width="10" height="6" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></a><ul class="br-dropdown-menu"><li><a href="grapicdesign.html">Graphic Design</a></li><li><a href="customlogos.html">Custom Logos</a></li><li><a href="wrapdesign.html">Vehicle Wraps</a></li></ul></li><li><a href="copyofwashingsamples.html">Gallery</a></li><li><a href="About.html">About</a></li><li><a href="FAQs.html">FAQs</a></li></ul><div class="br-nav-actions"><a href="order.html" class="br-btn br-btn-primary br-btn-sm">Order Now</a></div></div></div></nav>
 
   <!-- ===== ARTICLE ===== -->
-  <article id="blog-article">
+  <article id="cotton-article">
     <div class="br-loading" style="padding:200px 20px"><div class="br-spinner"></div><p>Loading article...</p></div>
   </article>
 
@@ -31,11 +31,11 @@
   (async function() {
     'use strict';
     var slug = new URLSearchParams(window.location.search).get('slug');
-    if (!slug) { window.location.href = 'blog.html'; return; }
+    if (!slug) { window.location.href = 'cotton.html'; return; }
 
     try {
-      var r = await db.from('blog_posts').select('*').eq('slug', slug).single();
-      if (r.error || !r.data) { window.location.href = 'blog.html'; return; }
+      var r = await db.from('cotton_posts').select('*').eq('slug', slug).single();
+      if (r.error || !r.data) { window.location.href = 'cotton.html'; return; }
       var post = r.data;
 
       // Don't show drafts to non-admin
@@ -43,13 +43,13 @@
         try {
           var u = await db.auth.getUser();
           if (!u.data.user || u.data.user.email !== 'usman@gmail.com') {
-            window.location.href = 'blog.html'; return;
+            window.location.href = 'cotton.html'; return;
           }
-        } catch(e) { window.location.href = 'blog.html'; return; }
+        } catch(e) { window.location.href = 'cotton.html'; return; }
       }
 
       // Update page meta
-      document.title = post.title + ' \u2014 Bleach Resistant Blog';
+      document.title = post.title + ' \u2014 Bleach Resistant Cotton';
       var metaDesc = document.querySelector('meta[name="description"]');
       if (metaDesc && post.meta_description) metaDesc.setAttribute('content', post.meta_description);
 
@@ -67,7 +67,7 @@
       }
       html += '<div class="br-container">';
       html += '<div class="br-post-header-content">';
-      html += '<nav class="br-breadcrumb"><a href="home.html">Home</a><span>/</span><a href="blog.html">Blog</a><span>/</span><span>' + esc(post.title).substring(0, 50) + '</span></nav>';
+      html += '<nav class="br-breadcrumb"><a href="home.html">Home</a><span>/</span><a href="product.html">Products</a><span>/</span><a href="cotton.html">Cotton</a><span>/</span><span>' + esc(post.title).substring(0, 50) + '</span></nav>';
       html += '<div class="br-blog-meta" style="margin:16px 0">';
       html += '<span class="br-blog-category-badge">' + esc(post.category || 'General').replace(/-/g, ' ') + '</span>';
       html += '<span class="br-blog-date">' + date + '</span>';
@@ -91,7 +91,7 @@
         html += '<div class="br-post-tags">';
         html += '<span class="br-post-tags-label">Tags:</span>';
         tags.forEach(function(tag) {
-          html += '<a href="blog.html?tag=' + encodeURIComponent(tag) + '" class="br-post-tag">' + esc(tag) + '</a>';
+          html += '<a href="cotton.html?tag=' + encodeURIComponent(tag) + '" class="br-post-tag">' + esc(tag) + '</a>';
         });
         html += '</div>';
       }
@@ -108,7 +108,7 @@
       html += '<button onclick="navigator.clipboard.writeText(window.location.href);this.textContent=\'Copied!\';setTimeout(function(){this.textContent=\'&#x1F517;\'},2000)" class="br-share-btn" title="Copy link">&#x1F517;</button>';
       html += '</div></div>';
 
-      html += '</div></div>'; // end body
+      html += '</div></div>';
 
       /* ── Related Posts ── */
       html += '<section class="br-section-alt"><div class="br-container">';
@@ -117,12 +117,12 @@
       html += '</div></section>';
 
       /* ── CTA ── */
-      html += '<section class="br-cta-banner"><div class="br-container"><h2>Ready to Order Custom Apparel?</h2><p>Experience the quality of dye sublimation printing for your team, brand, or event.</p><div class="br-btn-group"><a href="order.html" class="br-btn br-btn-primary br-btn-lg">Get Free Quote</a><a href="blog.html" class="br-btn br-btn-outline br-btn-lg" style="border-color:#fff;color:#fff">More Articles</a></div></div></section>';
+      html += '<section class="br-cta-banner"><div class="br-container"><h2>Ready to Order Custom Apparel?</h2><p>Experience the quality of our custom printing for your team, brand, or event.</p><div class="br-btn-group"><a href="order.html" class="br-btn br-btn-primary br-btn-lg">Get Free Quote</a><a href="cotton.html" class="br-btn br-btn-outline br-btn-lg" style="border-color:#fff;color:#fff">More Cotton Articles</a></div></div></section>';
 
-      document.getElementById('blog-article').innerHTML = html;
+      document.getElementById('cotton-article').innerHTML = html;
 
       // Increment view count silently
-      db.from('blog_posts').update({ views: (post.views || 0) + 1 }).eq('id', post.id).then(function(){});
+      db.from('cotton_posts').update({ views: (post.views || 0) + 1 }).eq('id', post.id).then(function(){});
 
       // Load related posts
       loadRelatedPosts(post.slug, post.category);
@@ -138,14 +138,14 @@
       });
 
     } catch(err) {
-      console.error('[blog-post]', err);
-      document.getElementById('blog-article').innerHTML =
-        '<div class="br-empty" style="padding:200px 20px"><h3>Article Not Found</h3><p>This article could not be loaded. <a href="blog.html" style="color:var(--br-primary)">View all articles</a></p></div>';
+      console.error('[cotton-post]', err);
+      document.getElementById('cotton-article').innerHTML =
+        '<div class="br-empty" style="padding:200px 20px"><h3>Article Not Found</h3><p>This article could not be loaded. <a href="cotton.html" style="color:var(--br-primary)">View all cotton articles</a></p></div>';
     }
 
     async function loadRelatedPosts(currentSlug, category) {
       try {
-        var r = await db.from('blog_posts')
+        var r = await db.from('cotton_posts')
           .select('title, slug, excerpt, featured_image, category, published_at, author, content')
           .eq('status', 'published')
           .neq('slug', currentSlug)
@@ -161,10 +161,10 @@
         }
         container.innerHTML = posts.map(function(p) {
           var pDate = p.published_at ? new Date(p.published_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : '';
-          return '<a href="blog-post.html?slug=' + encodeURIComponent(p.slug) + '" class="br-blog-card">' +
+          return '<a href="cotton-detail.html?slug=' + encodeURIComponent(p.slug) + '" class="br-blog-card">' +
             '<div class="br-blog-card-image">' +
               (p.featured_image ? '<img src="' + esc(p.featured_image) + '" alt="' + esc(p.title) + '" loading="lazy">' :
-              '<div class="br-blog-placeholder">&#x1F4DD;</div>') +
+              '<div class="br-blog-placeholder">&#x1F9F5;</div>') +
             '</div>' +
             '<div class="br-blog-card-body">' +
               '<div class="br-blog-meta"><span class="br-blog-category-badge">' + esc(p.category || 'General').replace(/-/g,' ') + '</span><span class="br-blog-date">' + pDate + '</span></div>' +
@@ -172,7 +172,7 @@
               '<p>' + esc(p.excerpt || '').substring(0, 100) + '</p>' +
             '</div></a>';
         }).join('');
-      } catch(e) { console.warn('[related-posts]', e.message); }
+      } catch(e) { console.warn('[related-cotton]', e.message); }
     }
 
     function estimateReadTime(content) {
