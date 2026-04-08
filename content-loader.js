@@ -1033,9 +1033,146 @@
     }
   };
 
+  /* ── WEBSITE DESIGN SERVICES SUBMENU ───────────────────────── */
+  // Finds or injects "Website Design" in the Services dropdown and
+  // converts it into a nested flyout submenu with all web design services.
+  window.brLoadWebDesignMenu = async function() {
+    if (typeof db === 'undefined') return;
+    try {
+      var result = await db.from('website_design_services')
+        .select('title, slug, sort_order')
+        .eq('active', true)
+        .order('sort_order');
+      if (result.error) throw result.error;
+      var services = result.data || [];
+      if (services.length === 0) return;
+
+      // Build submenu HTML
+      var subHtml = '';
+      services.forEach(function(svc) {
+        var title = (svc.title || '').replace(/</g, '&lt;');
+        var slug = (svc.slug || '').replace(/"/g, '&quot;');
+        subHtml += '<li><a href="web-design-service.html?slug=' + slug + '">' + title + '</a></li>';
+      });
+
+      var arrowSvg = ' <svg width="8" height="5" viewBox="0 0 10 6" style="margin-left:6px;transform:rotate(-90deg)"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>';
+
+      // Search links in Services dropdown for "website" or "web design"
+      var allDropdownLinks = document.querySelectorAll('.br-dropdown-menu li a');
+      var wdLink = null;
+      allDropdownLinks.forEach(function(a) {
+        var href = (a.getAttribute('href') || '').toLowerCase();
+        var text = (a.textContent || '').toLowerCase().trim();
+        if (href.indexOf('web-design') !== -1 || text.indexOf('website design') !== -1 || text.indexOf('web design') !== -1) {
+          wdLink = a;
+        }
+      });
+
+      if (wdLink) {
+        // Convert existing link into nested dropdown
+        var parentLi = wdLink.parentElement;
+        if (parentLi.classList.contains('br-dropdown-nested')) return; // already converted
+        parentLi.classList.add('br-dropdown-nested');
+        if (wdLink.innerHTML.indexOf('svg') === -1) {
+          wdLink.innerHTML = wdLink.textContent.trim() + arrowSvg;
+        }
+        var submenu = document.createElement('ul');
+        submenu.className = 'br-dropdown-submenu';
+        submenu.innerHTML = subHtml;
+        parentLi.appendChild(submenu);
+      } else {
+        // Inject "Website Design" into the Services dropdown
+        var navLinks = document.querySelectorAll('.br-nav-links > li.br-dropdown');
+        var servicesDropdown = null;
+        navLinks.forEach(function(li) {
+          var a = li.querySelector(':scope > a');
+          if (!a) return;
+          var text = (a.textContent || '').toLowerCase().trim();
+          if (text.indexOf('service') !== -1) {
+            servicesDropdown = li;
+          }
+        });
+
+        if (servicesDropdown) {
+          var menu = servicesDropdown.querySelector('.br-dropdown-menu');
+          if (!menu) {
+            menu = document.createElement('ul');
+            menu.className = 'br-dropdown-menu';
+            servicesDropdown.appendChild(menu);
+          }
+          var nestedLi = document.createElement('li');
+          nestedLi.className = 'br-dropdown-nested';
+          nestedLi.innerHTML = '<a href="services.html#web-design">Website Design' + arrowSvg + '</a>'
+            + '<ul class="br-dropdown-submenu">' + subHtml + '</ul>';
+          menu.appendChild(nestedLi);
+        }
+      }
+
+      // Handle mobile nested dropdown toggle
+      document.querySelectorAll('.br-dropdown-nested > a').forEach(function(link) {
+        if (link.dataset.nestedBound) return;
+        link.dataset.nestedBound = '1';
+        link.addEventListener('click', function(e) {
+          if (window.innerWidth <= 1100) {
+            e.preventDefault();
+            e.stopPropagation();
+            link.parentElement.classList.toggle('open');
+          }
+        });
+      });
+
+    } catch(e) {
+      console.warn('[web-design-menu]', e.message);
+    }
+  };
+
+  /* ── WEBSITE DESIGN SERVICES LISTING (for services.html) ──── */
+  // Loads all active web design services and renders a grid on the page
+  window.brLoadWebDesignListing = async function(containerId) {
+    if (typeof db === 'undefined') return;
+    var container = document.getElementById(containerId || 'webDesignGrid');
+    if (!container) return;
+
+    try {
+      var result = await db.from('website_design_services')
+        .select('title, slug, hero_subtitle, main_image, sort_order')
+        .eq('active', true)
+        .order('sort_order');
+      if (result.error) throw result.error;
+      var services = result.data || [];
+
+      if (services.length === 0) {
+        container.innerHTML = '<p style="text-align:center;color:var(--br-text-muted);padding:40px;">No services available yet.</p>';
+        return;
+      }
+
+      var esc = function(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); };
+
+      var html = '';
+      services.forEach(function(svc) {
+        var img = svc.main_image
+          ? '<img src="' + esc(svc.main_image) + '" alt="' + esc(svc.title) + '" loading="lazy">'
+          : '<div class="br-service-placeholder-sm">' + esc(svc.title).charAt(0) + '</div>';
+        html += '<a href="web-design-service.html?slug=' + esc(svc.slug) + '" class="br-blog-card">'
+          + '<div class="br-blog-card-image">' + img + '</div>'
+          + '<div class="br-blog-card-body">'
+          + '<h3>' + esc(svc.title) + '</h3>'
+          + '<p>' + esc(svc.hero_subtitle || '') + '</p>'
+          + '<span class="br-blog-read-more">Learn More &rarr;</span>'
+          + '</div></a>';
+      });
+
+      container.innerHTML = html;
+    } catch(e) {
+      console.warn('[web-design-listing]', e.message);
+      container.innerHTML = '<p style="text-align:center;color:red;padding:20px;">Error loading services.</p>';
+    }
+  };
+
   // Auto-invoke sublimation submenu on public pages
   if (typeof db !== 'undefined' && currentPage.indexOf('admin') !== 0 && currentPage !== 'login.html' && currentPage !== 'signup.html') {
     window.brLoadSubServicesMenu();
+    window.brLoadWebDesignMenu();
   }
 
 })();

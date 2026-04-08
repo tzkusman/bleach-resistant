@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Service Pages &#x2014; Admin | Bleach Resistant</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css">
+  <style>
+    .svc-tabs { display: flex; gap: 8px; margin-bottom: 24px; }
+    .svc-tab { padding: 10px 20px; background: var(--bg-card); border: 1.5px solid var(--border); border-radius: 8px; cursor: pointer; font-family: 'Montserrat',sans-serif; font-weight: 600; font-size: 0.88rem; transition: all .2s; }
+    .svc-tab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .svc-tab:hover:not(.active) { border-color: var(--primary); color: var(--primary); }
+    .svc-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px,1fr)); gap: 12px; margin-bottom: 24px; }
+    .svc-stat { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 16px; text-align: center; }
+    .svc-stat .num { font-size: 1.6rem; font-weight: 800; font-family: 'Montserrat',sans-serif; color: var(--primary); }
+    .svc-stat .label { font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px; }
+    .svc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+    .svc-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; transition: all .2s; }
+    .svc-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+    .svc-card-img { height: 160px; background: linear-gradient(135deg, #1a1a2e, #0f3460); display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.3); font-size: 1.1rem; overflow: hidden; }
+    .svc-card-img img { width: 100%; height: 100%; object-fit: cover; }
+    .svc-card-body { padding: 16px; }
+    .svc-card-body h3 { font-size: 1rem; margin-bottom: 4px; }
+    .svc-card-body p { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 12px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .svc-card-meta { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
+    .svc-badge { padding: 3px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
+    .svc-badge.active { background: rgba(76,175,80,0.1); color: #4caf50; }
+    .svc-badge.inactive { background: rgba(255,152,0,0.1); color: #ff9800; }
+    .svc-card-actions { display: flex; gap: 6px; }
+    .svc-card-actions button { padding: 6px 12px; border-radius: 6px; font-size: 0.78rem; font-weight: 600; cursor: pointer; border: 1px solid var(--border); background: var(--bg-card); color: var(--text-primary); transition: all .15s; font-family: 'Poppins',sans-serif; }
+    .svc-card-actions button:hover { border-color: var(--primary); color: var(--primary); }
+    .svc-card-actions .btn-del:hover { border-color: #e53935; color: #e53935; }
+    /* Editor modal */
+    .svc-modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 1000; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); }
+    .svc-modal.open { display: flex; align-items: center; justify-content: center; }
+    .svc-modal-content { background: var(--bg-main); border-radius: 12px; width: 95vw; max-width: 900px; max-height: 90vh; overflow-y: auto; padding: 32px; position: relative; }
+    .svc-modal-close { position: absolute; top: 16px; right: 16px; width: 32px; height: 32px; border: none; background: none; cursor: pointer; font-size: 1.4rem; color: var(--text-secondary); }
+    .svc-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    .svc-form-full { grid-column: 1/-1; }
+    .svc-field label { display: block; font-size: 0.78rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; font-family: 'Montserrat',sans-serif; }
+    .svc-field input, .svc-field textarea, .svc-field select { width: 100%; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 0.88rem; font-family: 'Poppins',sans-serif; transition: border .2s; outline: none; background: var(--bg-card); color: var(--text-primary); box-sizing: border-box; }
+    .svc-field input:focus, .svc-field textarea:focus { border-color: var(--primary); }
+    .svc-field textarea { resize: vertical; min-height: 80px; }
+    .svc-section-title { font-size: 0.88rem; font-weight: 700; color: var(--primary); margin: 20px 0 8px; padding-top: 12px; border-top: 1px solid var(--border); font-family: 'Montserrat',sans-serif; }
+    .svc-json-field textarea { font-family: 'Courier New', monospace; font-size: 0.82rem; min-height: 120px; }
+    .svc-form-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
+    .svc-form-actions button { padding: 10px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; font-family: 'Montserrat',sans-serif; border: none; font-size: 0.88rem; transition: all .2s; }
+    .svc-btn-save { background: var(--primary); color: #fff; }
+    .svc-btn-save:hover { opacity: 0.9; }
+    .svc-btn-cancel { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-primary); }
+    .svc-toolbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
+    .svc-toolbar-right { display: flex; gap: 8px; align-items: center; }
+    .svc-search { padding: 8px 14px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 0.85rem; width: 220px; outline: none; font-family: 'Poppins',sans-serif; background: var(--bg-card); color: var(--text-primary); }
+    .svc-search:focus { border-color: var(--primary); }
+    .svc-empty { text-align: center; padding: 60px 20px; color: var(--text-secondary); }
+    .svc-empty h3 { margin-bottom: 8px; }
+    .svc-field-check { display: flex; align-items: center; gap: 8px; }
+    .svc-field-check input { width: auto; }
+  </style>
+</head>
+<body>
+  <div class="admin-layout">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <a href="home.html" class="logo">Bleach<strong>Resistant</strong></a>
+        <span class="admin-badge">Admin</span>
+      </div>
+      <div class="sidebar-nav">
+        <div class="nav-section">Main</div>
+        <a href="admin.html"><span class="icon">&#x1F4CA;</span> Dashboard</a>
+        <a href="admin-orders.html"><span class="icon">&#x1F4E6;</span> Orders</a>
+        <a href="admin-contacts.html"><span class="icon">&#x1F4AC;</span> Contacts</a>
+
+        <div class="nav-section">Content</div>
+        <a href="admin-products.html"><span class="icon">&#x1F6CD;&#xFE0F;</span> Products</a>
+        <a href="admin-slider.html"><span class="icon">&#x1F3A0;</span> Hero Slider</a>
+        <a href="admin-sections.html"><span class="icon">&#x1F4D0;</span> Page Sections</a>
+        <a href="admin-pages.html"><span class="icon">&#x1F4C4;</span> Pages</a>
+        <a href="admin-blog.html"><span class="icon">&#x270D;&#xFE0F;</span> Blog</a>
+        <a href="admin-services.html" class="active"><span class="icon">&#x1F6E0;&#xFE0F;</span> Service Pages</a>
+        <a href="admin-media.html"><span class="icon">&#x1F5BC;&#xFE0F;</span> Media Library</a>
+        <a href="admin-navigation.html"><span class="icon">&#x1F517;</span> Navigation</a>
+
+        <div class="nav-section">Settings</div>
+        <a href="admin-settings.html"><span class="icon">&#x2699;&#xFE0F;</span> Site Settings</a>
+        <a href="admin-analytics.html"><span class="icon">&#x1F4C8;</span> Analytics</a>
+
+        <div class="nav-section">Website</div>
+        <a href="home.html" target="_blank"><span class="icon">&#x1F310;</span> View Site</a>
+        <a href="order.html" target="_blank"><span class="icon">&#x1F6D2;</span> Order Page</a>
+      </div>
+      <div class="sidebar-footer">
+        <div class="user-info"><span id="admin-email">Loading...</span></div>
+        <button class="btn btn-outline btn-sm" onclick="logoutAdmin()">Logout</button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <div class="content-header">
+        <h1>Service Pages</h1>
+        <p>Manage sublimation printing and website design service subcategories</p>
+      </div>
+      <div class="content-body">
+        <!-- Tabs for switching between tables -->
+        <div class="svc-tabs">
+          <button class="svc-tab active" data-table="sublimation_services" onclick="switchTab(this)">&#x1F455; Sublimation Services</button>
+          <button class="svc-tab" data-table="website_design_services" onclick="switchTab(this)">&#x1F4BB; Website Design Services</button>
+        </div>
+
+        <!-- Stats -->
+        <div class="svc-stats" id="svcStats"></div>
+
+        <!-- Toolbar -->
+        <div class="svc-toolbar">
+          <button class="btn btn-primary btn-sm" onclick="openEditor()">+ Add Service</button>
+          <div class="svc-toolbar-right">
+            <input type="text" class="svc-search" placeholder="Search services..." oninput="searchServices(this.value)">
+          </div>
+        </div>
+
+        <!-- Grid -->
+        <div class="svc-grid" id="svcGrid">
+          <div class="svc-empty"><div class="spinner"></div><p>Loading...</p></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Editor Modal -->
+  <div class="svc-modal" id="editorModal">
+    <div class="svc-modal-content">
+      <button class="svc-modal-close" onclick="closeEditor()">&times;</button>
+      <h2 id="editorTitle" style="margin-bottom:20px;font-family:'Montserrat',sans-serif">Add Service</h2>
+      <form id="svcForm" onsubmit="return saveService(event)">
+        <input type="hidden" id="svcId">
+
+        <div class="svc-form-grid">
+          <div class="svc-field">
+            <label>Title *</label>
+            <input type="text" id="svcTitle" required oninput="autoSlug()">
+          </div>
+          <div class="svc-field">
+            <label>Slug (URL)</label>
+            <input type="text" id="svcSlug" placeholder="auto-generated">
+          </div>
+          <div class="svc-field svc-form-full">
+            <label>Meta Description</label>
+            <input type="text" id="svcMeta" maxlength="160" placeholder="SEO description (max 160 chars)">
+          </div>
+        </div>
+
+        <div class="svc-section-title">Hero Section</div>
+        <div class="svc-form-grid">
+          <div class="svc-field">
+            <label>Hero Title *</label>
+            <input type="text" id="svcHeroTitle" required>
+          </div>
+          <div class="svc-field">
+            <label>Hero Highlight (accent text)</label>
+            <input type="text" id="svcHeroHighlight" placeholder="e.g. Design Made Easy">
+          </div>
+          <div class="svc-field svc-form-full">
+            <label>Hero Subtitle</label>
+            <input type="text" id="svcHeroSub">
+          </div>
+        </div>
+
+        <div class="svc-section-title">Main Content</div>
+        <div class="svc-form-grid">
+          <div class="svc-field svc-form-full">
+            <label>Main Image URL</label>
+            <input type="text" id="svcMainImg" placeholder="https://...">
+          </div>
+          <div class="svc-field svc-form-full">
+            <label>Main Heading</label>
+            <input type="text" id="svcMainHead">
+          </div>
+          <div class="svc-field svc-form-full">
+            <label>Main Description (separate paragraphs with blank lines)</label>
+            <textarea id="svcMainDesc" rows="6"></textarea>
+          </div>
+        </div>
+
+        <div class="svc-section-title">Checklist Items (JSON array)</div>
+        <div class="svc-field svc-json-field">
+          <textarea id="svcChecklist" placeholder='["Item 1","Item 2","Item 3"]'></textarea>
+        </div>
+
+        <div class="svc-section-title">CTA Buttons</div>
+        <div class="svc-form-grid">
+          <div class="svc-field">
+            <label>Button 1 Text</label>
+            <input type="text" id="svcBtn1Text" value="Order Today">
+          </div>
+          <div class="svc-field">
+            <label>Button 1 Link</label>
+            <input type="text" id="svcBtn1Link" value="order.html">
+          </div>
+          <div class="svc-field">
+            <label>Button 2 Text</label>
+            <input type="text" id="svcBtn2Text" value="Call Us">
+          </div>
+          <div class="svc-field">
+            <label>Button 2 Link</label>
+            <input type="text" id="svcBtn2Link" value="tel:">
+          </div>
+        </div>
+
+        <div class="svc-section-title">Why Choose Section (JSON array)</div>
+        <div class="svc-form-grid">
+          <div class="svc-field">
+            <label>Why Heading</label>
+            <input type="text" id="svcWhyHead">
+          </div>
+          <div class="svc-field">
+            <label>Why Description</label>
+            <input type="text" id="svcWhyDesc">
+          </div>
+        </div>
+        <div class="svc-field svc-json-field">
+          <label>Why Features (JSON)</label>
+          <textarea id="svcWhyFeatures" placeholder='[{"title":"Feature","description":"Details"}]'></textarea>
+        </div>
+
+        <div class="svc-section-title">FAQ Section (JSON array)</div>
+        <div class="svc-field svc-json-field">
+          <textarea id="svcFaqs" placeholder='[{"question":"Q?","answer":"A."}]'></textarea>
+        </div>
+
+        <div class="svc-section-title">Gallery (JSON array of URLs)</div>
+        <div class="svc-field svc-json-field">
+          <textarea id="svcGallery" placeholder='["https://img1.jpg","https://img2.jpg"]'></textarea>
+        </div>
+
+        <div class="svc-section-title">Settings</div>
+        <div class="svc-form-grid">
+          <div class="svc-field">
+            <label>Sort Order</label>
+            <input type="number" id="svcSort" value="0">
+          </div>
+          <div class="svc-field svc-field-check" style="align-self:end;padding-bottom:10px">
+            <input type="checkbox" id="svcActive" checked>
+            <label for="svcActive" style="margin:0">Active</label>
+            <input type="checkbox" id="svcFeatured" style="margin-left:16px">
+            <label for="svcFeatured" style="margin:0">Featured</label>
+          </div>
+        </div>
+
+        <div class="svc-form-actions">
+          <button type="button" class="svc-btn-cancel" onclick="closeEditor()">Cancel</button>
+          <button type="submit" class="svc-btn-save" id="svcSaveBtn">Save Service</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js?v=7"></script>
+  <script>
+  var currentTable = 'sublimation_services';
+  var allServices = [];
+  var searchTerm = '';
+  var templateLink = { sublimation_services: 'sublimation-service.html', website_design_services: 'web-design-service.html' };
+
+  // Auth guard
+  (async function() {
+    var s = await db.auth.getSession();
+    if (!s.data.session || s.data.session.user.email !== 'usman@gmail.com') {
+      window.location.href = 'login.html';
+      return;
+    }
+    document.getElementById('admin-email').textContent = s.data.session.user.email;
+    loadServices();
+  })();
+
+  async function logoutAdmin() {
+    await db.auth.signOut();
+    window.location.href = 'login.html';
+  }
+
+  function switchTab(btn) {
+    document.querySelectorAll('.svc-tab').forEach(function(t) { t.classList.remove('active'); });
+    btn.classList.add('active');
+    currentTable = btn.dataset.table;
+    loadServices();
+  }
+
+  async function loadServices() {
+    try {
+      var r = await db.from(currentTable).select('*').order('sort_order');
+      if (r.error) throw r.error;
+      allServices = r.data || [];
+      renderStats();
+      renderGrid();
+    } catch(e) {
+      document.getElementById('svcGrid').innerHTML = '<div class="svc-empty"><h3>Error</h3><p>' + e.message + '</p></div>';
+    }
+  }
+
+  function renderStats() {
+    var total = allServices.length;
+    var active = allServices.filter(function(s) { return s.active; }).length;
+    var inactive = total - active;
+    var featured = allServices.filter(function(s) { return s.featured; }).length;
+    document.getElementById('svcStats').innerHTML =
+      '<div class="svc-stat"><div class="num">' + total + '</div><div class="label">Total</div></div>' +
+      '<div class="svc-stat"><div class="num">' + active + '</div><div class="label">Active</div></div>' +
+      '<div class="svc-stat"><div class="num">' + inactive + '</div><div class="label">Inactive</div></div>' +
+      '<div class="svc-stat"><div class="num">' + featured + '</div><div class="label">Featured</div></div>';
+  }
+
+  function renderGrid() {
+    var filtered = allServices;
+    if (searchTerm) {
+      var q = searchTerm.toLowerCase();
+      filtered = allServices.filter(function(s) {
+        return (s.title||'').toLowerCase().indexOf(q) !== -1 || (s.slug||'').toLowerCase().indexOf(q) !== -1;
+      });
+    }
+
+    if (filtered.length === 0) {
+      document.getElementById('svcGrid').innerHTML = '<div class="svc-empty"><h3>No services found</h3><p>Click &ldquo;+ Add Service&rdquo; to create one.</p></div>';
+      return;
+    }
+
+    var esc = function(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); };
+    var link = templateLink[currentTable] || '#';
+
+    var html = '';
+    filtered.forEach(function(svc) {
+      var badgeClass = svc.active ? 'active' : 'inactive';
+      var badgeText = svc.active ? 'Active' : 'Inactive';
+      html += '<div class="svc-card">';
+      html += '<div class="svc-card-img">';
+      if (svc.main_image) {
+        html += '<img src="' + esc(svc.main_image) + '" alt="' + esc(svc.title) + '">';
+      } else {
+        html += esc(svc.title);
+      }
+      html += '</div>';
+      html += '<div class="svc-card-body">';
+      html += '<div class="svc-card-meta"><span class="svc-badge ' + badgeClass + '">' + badgeText + '</span>';
+      html += '<span style="font-size:0.75rem;color:var(--text-secondary)">Order: ' + (svc.sort_order||0) + '</span></div>';
+      html += '<h3>' + esc(svc.title) + '</h3>';
+      html += '<p>' + esc(svc.hero_subtitle || svc.meta_description || '') + '</p>';
+      html += '<div class="svc-card-actions">';
+      html += '<button onclick="editService(\'' + svc.id + '\')">Edit</button>';
+      html += '<button onclick="duplicateService(\'' + svc.id + '\')">Duplicate</button>';
+      html += '<button onclick="toggleActive(\'' + svc.id + '\',' + !svc.active + ')">' + (svc.active ? 'Deactivate' : 'Activate') + '</button>';
+      html += '<a href="' + link + '?slug=' + esc(svc.slug) + '" target="_blank" style="padding:6px 12px;border-radius:6px;font-size:0.78rem;font-weight:600;border:1px solid var(--border);background:var(--bg-card);color:var(--text-primary);text-decoration:none;display:inline-flex;align-items:center">View</a>';
+      html += '<button class="btn-del" onclick="deleteService(\'' + svc.id + '\',\'' + esc(svc.title).replace(/'/g,'\\\'') + '\')">Delete</button>';
+      html += '</div></div></div>';
+    });
+
+    document.getElementById('svcGrid').innerHTML = html;
+  }
+
+  function searchServices(val) {
+    searchTerm = val;
+    renderGrid();
+  }
+
+  // Editor
+  function openEditor(svc) {
+    document.getElementById('editorTitle').textContent = svc ? 'Edit Service' : 'Add Service';
+    document.getElementById('svcId').value = svc ? svc.id : '';
+    document.getElementById('svcTitle').value = svc ? svc.title : '';
+    document.getElementById('svcSlug').value = svc ? svc.slug : '';
+    document.getElementById('svcMeta').value = svc ? svc.meta_description || '' : '';
+    document.getElementById('svcHeroTitle').value = svc ? svc.hero_title : '';
+    document.getElementById('svcHeroHighlight').value = svc ? svc.hero_highlight || '' : '';
+    document.getElementById('svcHeroSub').value = svc ? svc.hero_subtitle || '' : '';
+    document.getElementById('svcMainImg').value = svc ? svc.main_image || '' : '';
+    document.getElementById('svcMainHead').value = svc ? svc.main_heading || '' : '';
+    document.getElementById('svcMainDesc').value = svc ? svc.main_description || '' : '';
+    document.getElementById('svcChecklist').value = svc ? JSON.stringify(svc.checklist || [], null, 2) : '[]';
+    document.getElementById('svcBtn1Text').value = svc ? svc.btn1_text || 'Order Today' : 'Order Today';
+    document.getElementById('svcBtn1Link').value = svc ? svc.btn1_link || 'order.html' : 'order.html';
+    document.getElementById('svcBtn2Text').value = svc ? svc.btn2_text || 'Call Us' : 'Call Us';
+    document.getElementById('svcBtn2Link').value = svc ? svc.btn2_link || 'tel:' : 'tel:';
+    document.getElementById('svcWhyHead').value = svc ? svc.why_heading || '' : '';
+    document.getElementById('svcWhyDesc').value = svc ? svc.why_description || '' : '';
+    document.getElementById('svcWhyFeatures').value = svc ? JSON.stringify(svc.why_features || [], null, 2) : '[]';
+    document.getElementById('svcFaqs').value = svc ? JSON.stringify(svc.faqs || [], null, 2) : '[]';
+    document.getElementById('svcGallery').value = svc ? JSON.stringify(svc.gallery || [], null, 2) : '[]';
+    document.getElementById('svcSort').value = svc ? svc.sort_order || 0 : allServices.length + 1;
+    document.getElementById('svcActive').checked = svc ? svc.active : true;
+    document.getElementById('svcFeatured').checked = svc ? svc.featured : false;
+    document.getElementById('editorModal').classList.add('open');
+  }
+
+  function closeEditor() {
+    document.getElementById('editorModal').classList.remove('open');
+  }
+
+  function autoSlug() {
+    var slug = document.getElementById('svcSlug');
+    if (!slug.dataset.manual) {
+      slug.value = document.getElementById('svcTitle').value
+        .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    }
+  }
+  document.getElementById('svcSlug').addEventListener('input', function() { this.dataset.manual = '1'; });
+
+  function parseJSON(str, fallback) {
+    try { return JSON.parse(str); } catch(e) { return fallback; }
+  }
+
+  async function saveService(e) {
+    e.preventDefault();
+    var btn = document.getElementById('svcSaveBtn');
+    btn.disabled = true;
+    btn.textContent = 'Saving...';
+
+    var id = document.getElementById('svcId').value;
+    var data = {
+      title: document.getElementById('svcTitle').value.trim(),
+      slug: document.getElementById('svcSlug').value.trim() || document.getElementById('svcTitle').value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
+      meta_description: document.getElementById('svcMeta').value.trim() || null,
+      hero_title: document.getElementById('svcHeroTitle').value.trim(),
+      hero_highlight: document.getElementById('svcHeroHighlight').value.trim() || null,
+      hero_subtitle: document.getElementById('svcHeroSub').value.trim() || null,
+      main_image: document.getElementById('svcMainImg').value.trim() || null,
+      main_heading: document.getElementById('svcMainHead').value.trim() || null,
+      main_description: document.getElementById('svcMainDesc').value.trim() || null,
+      checklist: parseJSON(document.getElementById('svcChecklist').value, []),
+      btn1_text: document.getElementById('svcBtn1Text').value.trim() || null,
+      btn1_link: document.getElementById('svcBtn1Link').value.trim() || null,
+      btn2_text: document.getElementById('svcBtn2Text').value.trim() || null,
+      btn2_link: document.getElementById('svcBtn2Link').value.trim() || null,
+      why_heading: document.getElementById('svcWhyHead').value.trim() || null,
+      why_description: document.getElementById('svcWhyDesc').value.trim() || null,
+      why_features: parseJSON(document.getElementById('svcWhyFeatures').value, []),
+      faqs: parseJSON(document.getElementById('svcFaqs').value, []),
+      gallery: parseJSON(document.getElementById('svcGallery').value, []),
+      sort_order: parseInt(document.getElementById('svcSort').value) || 0,
+      active: document.getElementById('svcActive').checked,
+      featured: document.getElementById('svcFeatured').checked
+    };
+
+    try {
+      var r;
+      if (id) {
+        r = await db.from(currentTable).update(data).eq('id', id);
+      } else {
+        r = await db.from(currentTable).insert(data);
+      }
+      if (r.error) throw r.error;
+      closeEditor();
+      loadServices();
+    } catch(e) {
+      alert('Error: ' + e.message);
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Save Service';
+  }
+
+  function editService(id) {
+    var svc = allServices.find(function(s) { return s.id === id; });
+    if (svc) openEditor(svc);
+  }
+
+  async function duplicateService(id) {
+    var svc = allServices.find(function(s) { return s.id === id; });
+    if (!svc) return;
+    var copy = Object.assign({}, svc);
+    delete copy.id;
+    delete copy.created_at;
+    delete copy.updated_at;
+    copy.title = svc.title + ' (Copy)';
+    copy.slug = svc.slug + '-copy-' + Date.now().toString(36);
+    copy.active = false;
+    try {
+      var r = await db.from(currentTable).insert(copy);
+      if (r.error) throw r.error;
+      loadServices();
+    } catch(e) {
+      alert('Error: ' + e.message);
+    }
+  }
+
+  async function toggleActive(id, newState) {
+    try {
+      var r = await db.from(currentTable).update({ active: newState }).eq('id', id);
+      if (r.error) throw r.error;
+      loadServices();
+    } catch(e) {
+      alert('Error: ' + e.message);
+    }
+  }
+
+  async function deleteService(id, title) {
+    if (!confirm('Delete "' + title + '"? This cannot be undone.')) return;
+    try {
+      var r = await db.from(currentTable).delete().eq('id', id);
+      if (r.error) throw r.error;
+      loadServices();
+    } catch(e) {
+      alert('Error: ' + e.message);
+    }
+  }
+  </script>
+</body>
+</html>
