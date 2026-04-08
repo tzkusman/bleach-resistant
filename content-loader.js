@@ -900,6 +900,8 @@
   // Works with both static HTML navs and dynamic nav loaded by brLoadDynamicNav().
   window.brLoadSubServicesMenu = async function() {
     if (typeof db === 'undefined') return;
+    if (window._subMenuLoaded) return;
+    window._subMenuLoaded = true;
     try {
       var result = await db.from('sublimation_services')
         .select('title, slug, sort_order')
@@ -919,13 +921,14 @@
 
       var arrowSvg = ' <svg width="8" height="5" viewBox="0 0 10 6" style="margin-left:6px;transform:rotate(-90deg)"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>';
 
-      // Search ALL links inside dropdown menus for one that points to sublimation
-      var allDropdownLinks = document.querySelectorAll('.br-dropdown-menu li a');
+      // Search only DIRECT children of dropdown menus (not nested submenu items)
+      var allDropdownLinks = document.querySelectorAll('.br-dropdown-menu > li > a');
       var subLink = null;
       allDropdownLinks.forEach(function(a) {
+        if (subLink) return;
         var href = (a.getAttribute('href') || '').toLowerCase();
         var text = (a.textContent || '').toLowerCase().trim();
-        if (href.indexOf('sublimationprinting') !== -1 || href.indexOf('sublimation-service') !== -1 || text.indexOf('sublimation') !== -1) {
+        if (href.indexOf('sublimationprinting') !== -1 || text === 'sublimation printing') {
           subLink = a;
         }
       });
@@ -1038,6 +1041,8 @@
   // converts it into a nested flyout submenu with all web design services.
   window.brLoadWebDesignMenu = async function() {
     if (typeof db === 'undefined') return;
+    if (window._wdMenuLoaded) return;
+    window._wdMenuLoaded = true;
     try {
       var result = await db.from('website_design_services')
         .select('title, slug, sort_order')
@@ -1057,10 +1062,11 @@
 
       var arrowSvg = ' <svg width="8" height="5" viewBox="0 0 10 6" style="margin-left:6px;transform:rotate(-90deg)"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>';
 
-      // Search links in Services dropdown for "website" or "web design"
-      var allDropdownLinks = document.querySelectorAll('.br-dropdown-menu li a');
+      // Search only DIRECT children of dropdown menus (not nested submenu items)
+      var allDropdownLinks = document.querySelectorAll('.br-dropdown-menu > li > a');
       var wdLink = null;
       allDropdownLinks.forEach(function(a) {
+        if (wdLink) return;
         var href = (a.getAttribute('href') || '').toLowerCase();
         var text = (a.textContent || '').toLowerCase().trim();
         if (href.indexOf('web-design') !== -1 || text.indexOf('website design') !== -1 || text.indexOf('web design') !== -1) {
