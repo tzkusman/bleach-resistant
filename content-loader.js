@@ -704,6 +704,10 @@
         if (a.getAttribute('href') === cp) a.classList.add('active');
       });
       // Mobile dropdown toggles handled by event delegation (top of file)
+
+      // Now inject nested submenus after nav is fully built
+      if (window.brLoadSubServicesMenu) window.brLoadSubServicesMenu();
+      if (window.brLoadWebDesignMenu) window.brLoadWebDesignMenu();
     } catch(e) {
       console.warn('[dynamic-nav]', e.message);
     }
@@ -1176,9 +1180,13 @@
   };
 
   // Auto-invoke sublimation submenu on public pages
+  // These are called inside brLoadDynamicNav() after nav is built.
+  // Fallback: if nav_items table is empty (static nav kept), call them after a short delay.
   if (typeof db !== 'undefined' && currentPage.indexOf('admin') !== 0 && currentPage !== 'login.html' && currentPage !== 'signup.html') {
-    window.brLoadSubServicesMenu();
-    window.brLoadWebDesignMenu();
+    setTimeout(function() {
+      if (window.brLoadSubServicesMenu) window.brLoadSubServicesMenu();
+      if (window.brLoadWebDesignMenu) window.brLoadWebDesignMenu();
+    }, 1500);
   }
 
 })();
