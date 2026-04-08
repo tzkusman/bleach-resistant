@@ -34,23 +34,24 @@
     .svc-card-actions button:hover { border-color: var(--primary); color: var(--primary); }
     .svc-card-actions .btn-del:hover { border-color: #e53935; color: #e53935; }
     /* Editor modal */
-    .svc-modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 1000; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); }
-    .svc-modal.open { display: flex; align-items: center; justify-content: center; }
-    .svc-modal-content { background: var(--bg-main); border-radius: 12px; width: 95vw; max-width: 900px; max-height: 90vh; overflow-y: auto; padding: 32px; position: relative; }
-    .svc-modal-close { position: absolute; top: 16px; right: 16px; width: 32px; height: 32px; border: none; background: none; cursor: pointer; font-size: 1.4rem; color: var(--text-secondary); }
+    .svc-modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 99990; background: rgba(0,0,0,0.7); backdrop-filter: blur(6px); overflow-y: auto; }
+    .svc-modal.open { display: flex; align-items: flex-start; justify-content: center; padding: 40px 16px; }
+    .svc-modal-content { background: #ffffff; border-radius: 12px; width: 95vw; max-width: 900px; padding: 32px; position: relative; box-shadow: 0 20px 60px rgba(0,0,0,0.4); margin: auto; }
+    .svc-modal-close { position: absolute; top: 12px; right: 12px; width: 36px; height: 36px; border: none; background: #f0f0f0; border-radius: 50%; cursor: pointer; font-size: 1.4rem; color: #333; display: flex; align-items: center; justify-content: center; z-index: 1; }
+    .svc-modal-close:hover { background: #e0e0e0; }
     .svc-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
     .svc-form-full { grid-column: 1/-1; }
-    .svc-field label { display: block; font-size: 0.78rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; font-family: 'Montserrat',sans-serif; }
-    .svc-field input, .svc-field textarea, .svc-field select { width: 100%; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 0.88rem; font-family: 'Poppins',sans-serif; transition: border .2s; outline: none; background: var(--bg-card); color: var(--text-primary); box-sizing: border-box; }
-    .svc-field input:focus, .svc-field textarea:focus { border-color: var(--primary); }
+    .svc-field label { display: block; font-size: 0.78rem; font-weight: 600; color: #666; margin-bottom: 4px; font-family: 'Montserrat',sans-serif; }
+    .svc-field input, .svc-field textarea, .svc-field select { width: 100%; padding: 10px 14px; border: 1.5px solid #ddd; border-radius: 8px; font-size: 0.88rem; font-family: 'Poppins',sans-serif; transition: border .2s; outline: none; background: #fff; color: #333; box-sizing: border-box; }
+    .svc-field input:focus, .svc-field textarea:focus { border-color: #e91e63; }
     .svc-field textarea { resize: vertical; min-height: 80px; }
-    .svc-section-title { font-size: 0.88rem; font-weight: 700; color: var(--primary); margin: 20px 0 8px; padding-top: 12px; border-top: 1px solid var(--border); font-family: 'Montserrat',sans-serif; }
+    .svc-section-title { font-size: 0.88rem; font-weight: 700; color: #e91e63; margin: 20px 0 8px; padding-top: 12px; border-top: 1px solid #eee; font-family: 'Montserrat',sans-serif; }
     .svc-json-field textarea { font-family: 'Courier New', monospace; font-size: 0.82rem; min-height: 120px; }
-    .svc-form-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
+    .svc-form-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; padding-top: 16px; border-top: 1px solid #eee; }
     .svc-form-actions button { padding: 10px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; font-family: 'Montserrat',sans-serif; border: none; font-size: 0.88rem; transition: all .2s; }
-    .svc-btn-save { background: var(--primary); color: #fff; }
+    .svc-btn-save { background: #e91e63; color: #fff; }
     .svc-btn-save:hover { opacity: 0.9; }
-    .svc-btn-cancel { background: var(--bg-card); border: 1px solid var(--border); color: var(--text-primary); }
+    .svc-btn-cancel { background: #f5f5f5; border: 1px solid #ddd !important; color: #666; }
     .svc-toolbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
     .svc-toolbar-right { display: flex; gap: 8px; align-items: center; }
     .svc-search { padding: 8px 14px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 0.85rem; width: 220px; outline: none; font-family: 'Poppins',sans-serif; background: var(--bg-card); color: var(--text-primary); }
@@ -171,8 +172,19 @@
         <div class="svc-section-title">Main Content</div>
         <div class="svc-form-grid">
           <div class="svc-field svc-form-full">
-            <label>Main Image URL</label>
-            <input type="text" id="svcMainImg" placeholder="https://...">
+            <label>Main Image</label>
+            <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+              <div id="svcImgPreview" style="width:120px;height:80px;border-radius:8px;background:#1a1a2e;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;color:rgba(255,255,255,0.3);font-size:0.75rem">No image</div>
+              <div style="flex:1">
+                <input type="text" id="svcMainImg" placeholder="https://..." oninput="previewImg()">
+                <div style="display:flex;gap:6px;margin-top:6px">
+                  <label style="padding:6px 14px;border-radius:6px;font-size:0.78rem;font-weight:600;cursor:pointer;border:1px solid #ddd;background:#f8f8f8;color:#333;display:inline-flex;align-items:center;gap:4px;margin:0">
+                    &#x1F4F7; Upload <input type="file" id="svcImgFile" accept="image/*" style="display:none" onchange="uploadSvcImage(this)">
+                  </label>
+                  <button type="button" onclick="document.getElementById('svcMainImg').value='';previewImg()" style="padding:6px 10px;border-radius:6px;font-size:0.78rem;border:1px solid #ddd;background:#f8f8f8;color:#999;cursor:pointer">Clear</button>
+                </div>
+              </div>
+            </div>
           </div>
           <div class="svc-field svc-form-full">
             <label>Main Heading</label>
@@ -264,6 +276,33 @@
   var allServices = [];
   var searchTerm = '';
   var templateLink = { sublimation_services: 'sublimation-service.html', website_design_services: 'web-design-service.html' };
+
+  function previewImg() {
+    var url = document.getElementById('svcMainImg').value.trim();
+    var box = document.getElementById('svcImgPreview');
+    if (url) {
+      box.innerHTML = '<img src="' + url.replace(/"/g,'&quot;') + '" style="width:100%;height:100%;object-fit:cover">';
+    } else {
+      box.innerHTML = 'No image';
+    }
+  }
+
+  async function uploadSvcImage(input) {
+    if (!input.files || !input.files[0]) return;
+    var file = input.files[0];
+    var ext = file.name.split('.').pop().toLowerCase();
+    var name = 'services/' + Date.now() + '-' + Math.random().toString(36).substr(2,6) + '.' + ext;
+    try {
+      var r = await db.storage.from('media').upload(name, file, { cacheControl: '3600', upsert: false });
+      if (r.error) throw r.error;
+      var pub = db.storage.from('media').getPublicUrl(name);
+      document.getElementById('svcMainImg').value = pub.data.publicUrl;
+      previewImg();
+    } catch(e) {
+      alert('Upload failed: ' + e.message);
+    }
+    input.value = '';
+  }
 
   // Auth guard
   (async function() {
@@ -389,11 +428,14 @@
     document.getElementById('svcSort').value = svc ? svc.sort_order || 0 : allServices.length + 1;
     document.getElementById('svcActive').checked = svc ? svc.active : true;
     document.getElementById('svcFeatured').checked = svc ? svc.featured : false;
+    previewImg();
     document.getElementById('editorModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
   }
 
   function closeEditor() {
     document.getElementById('editorModal').classList.remove('open');
+    document.body.style.overflow = '';
   }
 
   function autoSlug() {
