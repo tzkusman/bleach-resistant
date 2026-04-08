@@ -232,7 +232,15 @@
     var categoryLabels = {
       apparel: 'Apparel', headgear: 'Head Gear', basicpoly: 'Basic Poly',
       stockdesigns: 'Stock Designs', sublimation: 'Sublimation',
-      design: 'Graphic Design', logos: 'Custom Logos', wraps: 'Vehicle Wraps'
+      design: 'Graphic Design', logos: 'Custom Logos', wraps: 'Vehicle Wraps',
+      'lawn-care-shirts': 'Lawn Care Shirts', 'pressure-washing-shirts': 'Pressure Washing Shirts',
+      'christmas-shirts': 'Christmas Shirts', 'construction-shirts': 'Construction Shirts',
+      'pool-cleaning-shirts': 'Pool Cleaning Shirts', 'sport-uniforms': 'Sport Uniforms',
+      'hvac-shirts': 'HVAC Shirts',
+      'ecommerce': 'E-commerce Web Design', 'pressure-washing-web-design': 'Pressure Washing Web Design',
+      'roof-cleaning-web-design': 'Roof Cleaning Web Design', 'hvac-web-design': 'HVAC Web Design',
+      'pool-service-web-design': 'Pool Service Web Design', 'construction-web-design': 'Construction Web Design',
+      'lawn-care-web-design': 'Lawn Care Web Design'
     };
 
     function catLabel(c) { return categoryLabels[c] || c; }
@@ -569,7 +577,21 @@
       {value:'sublimation',label:'Sublimation',page:'sublimationprinting.html'},
       {value:'design',label:'Graphic Design',page:'grapicdesign.html'},
       {value:'logos',label:'Custom Logos',page:'customlogos.html'},
-      {value:'wraps',label:'Vehicle Wraps',page:'wrapdesign.html'}
+      {value:'wraps',label:'Vehicle Wraps',page:'wrapdesign.html'},
+      {value:'lawn-care-shirts',label:'Lawn Care Shirts',page:'sublimation-service.html?slug=lawn-care-shirts'},
+      {value:'pressure-washing-shirts',label:'Pressure Washing Shirts',page:'sublimation-service.html?slug=pressure-washing-shirts'},
+      {value:'christmas-shirts',label:'Christmas Shirts',page:'sublimation-service.html?slug=christmas-shirts'},
+      {value:'construction-shirts',label:'Construction Shirts',page:'sublimation-service.html?slug=construction-shirts'},
+      {value:'pool-cleaning-shirts',label:'Pool Cleaning Shirts',page:'sublimation-service.html?slug=pool-cleaning-shirts'},
+      {value:'sport-uniforms',label:'Sport Uniforms',page:'sublimation-service.html?slug=sport-uniforms'},
+      {value:'hvac-shirts',label:'HVAC Shirts',page:'sublimation-service.html?slug=hvac-shirts'},
+      {value:'ecommerce',label:'E-commerce Web Design',page:'web-design-service.html?slug=ecommerce'},
+      {value:'pressure-washing-web-design',label:'Pressure Washing Web Design',page:'web-design-service.html?slug=pressure-washing-web-design'},
+      {value:'roof-cleaning-web-design',label:'Roof Cleaning Web Design',page:'web-design-service.html?slug=roof-cleaning-web-design'},
+      {value:'hvac-web-design',label:'HVAC Web Design',page:'web-design-service.html?slug=hvac-web-design'},
+      {value:'pool-service-web-design',label:'Pool Service Web Design',page:'web-design-service.html?slug=pool-service-web-design'},
+      {value:'construction-web-design',label:'Construction Web Design',page:'web-design-service.html?slug=construction-web-design'},
+      {value:'lawn-care-web-design',label:'Lawn Care Web Design',page:'web-design-service.html?slug=lawn-care-web-design'}
     ];
     var customPageCats = [];
 
@@ -590,19 +612,31 @@
       // Add categories from existing products not in defaults
       allProducts.forEach(function(p) {
         if (p.category && knownValues.indexOf(p.category) === -1) {
-          cats.push({ value: p.category, label: p.category.charAt(0).toUpperCase() + p.category.slice(1), page: '' });
+          cats.push({ value: p.category, label: p.category.charAt(0).toUpperCase() + p.category.slice(1), page: '', group: 'site' });
           knownValues.push(p.category);
         }
       });
 
-      // Sort site pages alphabetically
-      cats.sort(function(a,b) { return a.label.localeCompare(b.label); });
+      // Separate into groups
+      var subSlugs = ['lawn-care-shirts','pressure-washing-shirts','christmas-shirts','construction-shirts','pool-cleaning-shirts','sport-uniforms','hvac-shirts'];
+      var wdSlugs = ['ecommerce','pressure-washing-web-design','roof-cleaning-web-design','hvac-web-design','pool-service-web-design','construction-web-design','lawn-care-web-design'];
+      var siteCats = [], subCats = [], wdCats = [];
+      cats.forEach(function(c) {
+        if (subSlugs.indexOf(c.value) !== -1) subCats.push(c);
+        else if (wdSlugs.indexOf(c.value) !== -1) wdCats.push(c);
+        else siteCats.push(c);
+      });
+      siteCats.sort(function(a,b) { return a.label.localeCompare(b.label); });
 
       // Build options HTML
-      var siteOpts = cats.map(function(c) {
-        var suffix = c.page ? ' (' + c.page + ')' : '';
-        return '<option value="'+brEscapeHtml(c.value)+'">'+brEscapeHtml(c.label)+suffix+'</option>';
-      }).join('');
+      var makeOpts = function(arr) {
+        return arr.map(function(c) {
+          return '<option value="'+brEscapeHtml(c.value)+'">'+brEscapeHtml(c.label)+'</option>';
+        }).join('');
+      };
+      var siteOpts = makeOpts(siteCats);
+      var subOpts = subCats.length ? '<optgroup label="Sublimation Services">' + makeOpts(subCats) + '</optgroup>' : '';
+      var wdOpts = wdCats.length ? '<optgroup label="Website Design Services">' + makeOpts(wdCats) + '</optgroup>' : '';
 
       var customOpts = '';
       if (customPageCats.length > 0) {
@@ -616,14 +650,14 @@
       var filter = document.getElementById('filter-category');
       var filterVal = filter.value;
       filter.innerHTML = '<option value="">All Categories</option>' +
-        '<optgroup label="Site Pages">' + siteOpts + '</optgroup>' + customOpts;
+        '<optgroup label="Site Pages">' + siteOpts + '</optgroup>' + subOpts + wdOpts + customOpts;
       filter.value = filterVal;
 
       // Modal form dropdown
       var form = document.getElementById('pf-category');
       var formVal = form.value;
       form.innerHTML = '<option value="">Select category</option>' +
-        '<optgroup label="Site Pages">' + siteOpts + '</optgroup>' + customOpts;
+        '<optgroup label="Site Pages">' + siteOpts + '</optgroup>' + subOpts + wdOpts + customOpts;
       form.value = formVal;
     }
 

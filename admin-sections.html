@@ -106,6 +106,25 @@
               <option value="sizechart.html">Size Chart</option>
               <option value="copyofwashingsamples.html">Washing Samples</option>
               <option value="Pricelist.html">Price List</option>
+              <option value="blog.html">Blog</option>
+            </optgroup>
+            <optgroup label="Sublimation Service Pages">
+              <option value="sublimation-service.html?slug=lawn-care-shirts">Lawn Care Shirts</option>
+              <option value="sublimation-service.html?slug=pressure-washing-shirts">Pressure Washing Shirts</option>
+              <option value="sublimation-service.html?slug=christmas-shirts">Christmas Shirts</option>
+              <option value="sublimation-service.html?slug=construction-shirts">Construction Shirts</option>
+              <option value="sublimation-service.html?slug=pool-cleaning-shirts">Pool Cleaning Shirts</option>
+              <option value="sublimation-service.html?slug=sport-uniforms">Sublimated Sport Uniforms</option>
+              <option value="sublimation-service.html?slug=hvac-shirts">HVAC Shirts</option>
+            </optgroup>
+            <optgroup label="Website Design Service Pages">
+              <option value="web-design-service.html?slug=ecommerce">E-commerce</option>
+              <option value="web-design-service.html?slug=pressure-washing-web-design">Pressure Washing Web Design</option>
+              <option value="web-design-service.html?slug=roof-cleaning-web-design">Roof Cleaning Website Design</option>
+              <option value="web-design-service.html?slug=hvac-web-design">HVAC Website Design</option>
+              <option value="web-design-service.html?slug=pool-service-web-design">Pool Service Website Design</option>
+              <option value="web-design-service.html?slug=construction-web-design">Construction Website Design</option>
+              <option value="web-design-service.html?slug=lawn-care-web-design">Lawn Care Website Design</option>
             </optgroup>
             <optgroup label="Company Pages">
               <option value="home.html">Home Page</option>
@@ -505,6 +524,33 @@
             grp.appendChild(opt);
           });
           sel.appendChild(grp);
+        }
+      } catch(e) {}
+
+      // Dynamically refresh sublimation & web design service page options from DB
+      try {
+        var sel = document.getElementById('sec-page');
+        var subGrp = sel.querySelector('optgroup[label="Sublimation Service Pages"]');
+        var wdGrp = sel.querySelector('optgroup[label="Website Design Service Pages"]');
+        var subR = await db.from('sublimation_services').select('title,slug').eq('active',true).order('sort_order');
+        if (subR.data && subR.data.length > 0 && subGrp) {
+          subGrp.innerHTML = '';
+          subR.data.forEach(function(s) {
+            var o = document.createElement('option');
+            o.value = 'sublimation-service.html?slug=' + s.slug;
+            o.textContent = s.title;
+            subGrp.appendChild(o);
+          });
+        }
+        var wdR = await db.from('website_design_services').select('title,slug').eq('active',true).order('sort_order');
+        if (wdR.data && wdR.data.length > 0 && wdGrp) {
+          wdGrp.innerHTML = '';
+          wdR.data.forEach(function(s) {
+            var o = document.createElement('option');
+            o.value = 'web-design-service.html?slug=' + s.slug;
+            o.textContent = s.title;
+            wdGrp.appendChild(o);
+          });
         }
       } catch(e) {}
     })();
