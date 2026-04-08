@@ -894,4 +894,136 @@
     return false;
   };
 
+  /* ── SUBLIMATION SERVICES SUBMENU ──────────────────────────── */
+  // Builds nested submenu under Sublimation Printing nav item from sublimation_services table
+  window.brLoadSubServicesMenu = async function() {
+    if (typeof db === 'undefined') return;
+    try {
+      var result = await db.from('sublimation_services')
+        .select('title, slug, sort_order')
+        .eq('active', true)
+        .order('sort_order');
+      if (result.error) throw result.error;
+      var services = result.data || [];
+      if (services.length === 0) return;
+
+      // Find the Sublimation Printing nav link (match by href or text)
+      var navLinks = document.querySelectorAll('.br-nav-links > li');
+      var subNavItem = null;
+      navLinks.forEach(function(li) {
+        var a = li.querySelector('a');
+        if (!a) return;
+        var text = (a.textContent || '').toLowerCase().trim();
+        var href = (a.getAttribute('href') || '').toLowerCase();
+        if (text.indexOf('sublimation') !== -1 || href.indexOf('sublimation') !== -1) {
+          subNavItem = li;
+        }
+      });
+
+      if (!subNavItem) return;
+
+      // Ensure the parent has dropdown class
+      if (!subNavItem.classList.contains('br-dropdown')) {
+        subNavItem.classList.add('br-dropdown');
+        var mainLink = subNavItem.querySelector('a');
+        if (mainLink && mainLink.innerHTML.indexOf('svg') === -1) {
+          mainLink.innerHTML += ' <svg width="10" height="6" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>';
+        }
+      }
+
+      // Check if dropdown menu already exists
+      var dropMenu = subNavItem.querySelector('.br-dropdown-menu');
+      if (!dropMenu) {
+        dropMenu = document.createElement('ul');
+        dropMenu.className = 'br-dropdown-menu';
+        subNavItem.appendChild(dropMenu);
+      }
+
+      // Build submenu items
+      var subHtml = '';
+      services.forEach(function(svc) {
+        var title = (svc.title || '').replace(/</g, '&lt;');
+        var slug = (svc.slug || '').replace(/"/g, '&quot;');
+        subHtml += '<li><a href="sublimation-service.html?slug=' + slug + '">' + title + '</a></li>';
+      });
+
+      // Insert as a nested dropdown within the existing dropdown, or append items
+      // If there are existing items in the dropdown, wrap sublimation services in nested submenu
+      var existingItems = dropMenu.querySelectorAll(':scope > li');
+      if (existingItems.length > 0) {
+        // There are already dropdown items; add a "Services" nested group
+        var nestedLi = document.createElement('li');
+        nestedLi.className = 'br-dropdown-nested';
+        nestedLi.innerHTML = '<a href="sublimationprinting.html">Our Services <svg width="8" height="5" viewBox="0 0 10 6" style="margin-left:8px;transform:rotate(-90deg)"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></a>'
+          + '<ul class="br-dropdown-submenu">' + subHtml + '</ul>';
+        dropMenu.appendChild(nestedLi);
+      } else {
+        // No existing items — just add services directly
+        dropMenu.innerHTML = subHtml;
+      }
+
+      // Handle mobile nested dropdown toggle
+      document.querySelectorAll('.br-dropdown-nested > a').forEach(function(link) {
+        link.addEventListener('click', function(e) {
+          if (window.innerWidth <= 1100) {
+            e.preventDefault();
+            e.stopPropagation();
+            link.parentElement.classList.toggle('open');
+          }
+        });
+      });
+
+    } catch(e) {
+      console.warn('[sub-services-menu]', e.message);
+    }
+  };
+
+  /* ── SUBLIMATION SERVICES LISTING (for sublimationprinting.html) ── */
+  // Loads all active sublimation services and renders a grid on the page
+  window.brLoadSubServicesListing = async function(containerId) {
+    if (typeof db === 'undefined') return;
+    var container = document.getElementById(containerId || 'subServicesGrid');
+    if (!container) return;
+
+    try {
+      var result = await db.from('sublimation_services')
+        .select('title, slug, hero_subtitle, main_image, sort_order')
+        .eq('active', true)
+        .order('sort_order');
+      if (result.error) throw result.error;
+      var services = result.data || [];
+
+      if (services.length === 0) {
+        container.innerHTML = '<p style="text-align:center;color:var(--br-text-muted);padding:40px;">No services available yet.</p>';
+        return;
+      }
+
+      var esc = function(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); };
+
+      var html = '';
+      services.forEach(function(svc) {
+        var img = svc.main_image
+          ? '<img src="' + esc(svc.main_image) + '" alt="' + esc(svc.title) + '" loading="lazy">'
+          : '<div class="br-service-placeholder-sm">' + esc(svc.title).charAt(0) + '</div>';
+        html += '<a href="sublimation-service.html?slug=' + esc(svc.slug) + '" class="br-blog-card">'
+          + '<div class="br-blog-card-image">' + img + '</div>'
+          + '<div class="br-blog-card-body">'
+          + '<h3>' + esc(svc.title) + '</h3>'
+          + '<p>' + esc(svc.hero_subtitle || '') + '</p>'
+          + '<span class="br-blog-read-more">Learn More &rarr;</span>'
+          + '</div></a>';
+      });
+
+      container.innerHTML = html;
+    } catch(e) {
+      console.warn('[sub-services-listing]', e.message);
+      container.innerHTML = '<p style="text-align:center;color:red;padding:20px;">Error loading services.</p>';
+    }
+  };
+
+  // Auto-invoke sublimation submenu on public pages
+  if (typeof db !== 'undefined' && currentPage.indexOf('admin') !== 0 && currentPage !== 'login.html' && currentPage !== 'signup.html') {
+    window.brLoadSubServicesMenu();
+  }
+
 })();

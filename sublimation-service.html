@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Loading... &#x2014; Bleach Resistant</title>
+  <meta name="description" content="Custom sublimation printing services by Bleach Resistant.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="overhaul.css?v=11">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-BKMJVM1TY0"></script>
+  <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-BKMJVM1TY0');</script>
+</head>
+<body>
+  <!-- ===== NAVBAR ===== -->
+  <nav class="br-nav" id="navbar"><div class="br-container"><a href="home.html" class="br-logo"><img src="favicon.svg" alt="BR" class="br-logo-icon"><span>Bleach<strong>Resistant</strong></span></a><button class="br-nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button><div class="br-nav-menu" id="navMenu"><ul class="br-nav-links"><li><a href="home.html">Home</a></li><li class="br-dropdown"><a href="product.html">Products <svg width="10" height="6" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></a><ul class="br-dropdown-menu"><li><a href="headgear.html">Head Gear</a></li><li><a href="basicpoly.html">Basic Poly</a></li><li><a href="stockdesigns.html">Stock Designs</a></li><li><a href="fabricdescriptions.html">Fabric Guide</a></li><li class="br-dropdown-nested"><a href="sublimationprinting.html">Sublimation Printing <svg width="8" height="5" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></a><ul class="br-dropdown-submenu" id="subServicesMenu"><li><a href="sublimationprinting.html">Overview</a></li></ul></li></ul></li><li class="br-dropdown"><a href="services.html">Services <svg width="10" height="6" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></a><ul class="br-dropdown-menu"><li><a href="grapicdesign.html">Graphic Design</a></li><li><a href="customlogos.html">Custom Logos</a></li><li><a href="wrapdesign.html">Vehicle Wraps</a></li></ul></li><li><a href="copyofwashingsamples.html">Gallery</a></li><li><a href="About.html">About</a></li><li><a href="FAQs.html">FAQs</a></li></ul><div class="br-nav-actions"><a href="order.html" class="br-btn br-btn-primary br-btn-sm">Order Now</a></div></div></div></nav>
+
+  <!-- ===== PAGE HEADER ===== -->
+  <section class="br-page-header">
+    <div class="br-container">
+      <nav class="br-breadcrumb"><a href="home.html">Home</a><span>/</span><a href="product.html">Products</a><span>/</span><a href="sublimationprinting.html">Sublimation Printing</a><span>/</span><span id="breadcrumb-title">Loading...</span></nav>
+      <h1 id="page-title">Loading...</h1>
+      <p id="page-subtitle"></p>
+    </div>
+  </section>
+
+  <!-- ===== MAIN CONTENT (loaded dynamically) ===== -->
+  <div id="service-content">
+    <div class="br-loading" style="padding:120px 20px"><div class="br-spinner"></div><p>Loading service details...</p></div>
+  </div>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="br-footer"><div class="br-container"><div class="br-footer-grid"><div class="br-footer-brand"><a href="home.html" class="br-logo"><img src="favicon.svg" alt="BR" class="br-logo-icon"><span>Bleach<strong>Resistant</strong></span></a><p>Premium custom sublimation printing. Affordable quality apparel for teams, businesses, and individuals.</p></div><div class="br-footer-links"><h4>Products</h4><ul><li><a href="product.html">All Products</a></li><li><a href="headgear.html">Head Gear</a></li><li><a href="basicpoly.html">Basic Poly</a></li><li><a href="stockdesigns.html">Stock Designs</a></li><li><a href="sublimationprinting.html">Sublimation</a></li></ul></div><div class="br-footer-links"><h4>Services</h4><ul><li><a href="services.html">All Services</a></li><li><a href="grapicdesign.html">Graphic Design</a></li><li><a href="customlogos.html">Custom Logos</a></li><li><a href="wrapdesign.html">Vehicle Wraps</a></li><li><a href="sizechart.html">Size Chart</a></li></ul></div><div class="br-footer-links"><h4>Company</h4><ul><li><a href="About.html">About Us</a></li><li><a href="FAQs.html">FAQs</a></li><li><a href="order.html">Get a Quote</a></li><li><a href="privacypolicy.html">Privacy Policy</a></li><li><a href="termsconditions.html">Terms &amp; Conditions</a></li></ul></div></div><div class="br-footer-bottom"><p>&copy; 2026 Bleach Resistant. All rights reserved.</p><div class="br-footer-bottom-links"><a href="privacypolicy.html">Privacy</a><a href="termsconditions.html">Terms</a><a href="sitemap.xml">Sitemap</a></div></div></div></footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js?v=7"></script>
+  <script src="content-loader.js?v=16"></script>
+  <script>
+  (async function() {
+    var slug = new URLSearchParams(window.location.search).get('slug');
+    if (!slug) { window.location.href = 'sublimationprinting.html'; return; }
+
+    try {
+      var r = await db.from('sublimation_services').select('*').eq('slug', slug).eq('active', true).single();
+      if (r.error || !r.data) { window.location.href = 'sublimationprinting.html'; return; }
+      var s = r.data;
+
+      // Update page meta
+      document.title = s.title + ' \u2014 Bleach Resistant | Custom Sublimation Printing';
+      var metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc && s.meta_description) metaDesc.setAttribute('content', s.meta_description);
+
+      // Update header
+      document.getElementById('breadcrumb-title').textContent = s.title;
+      document.getElementById('page-title').textContent = s.hero_title + (s.hero_highlight ? '' : '');
+      if (s.hero_highlight) {
+        document.getElementById('page-title').innerHTML =
+          esc(s.hero_title) + ' <span class="br-text-primary">' + esc(s.hero_highlight) + '</span>';
+      }
+      document.getElementById('page-subtitle').textContent = s.hero_subtitle || '';
+
+      // Build page content
+      var html = '';
+
+      /* ── Section 1: Image + Text Hero ── */
+      html += '<section class="br-section"><div class="br-container">';
+      html += '<div class="br-service-hero-grid" data-animate="fade-up">';
+
+      // Image side
+      html += '<div class="br-service-hero-image">';
+      if (s.main_image) {
+        html += '<img src="' + esc(s.main_image) + '" alt="' + esc(s.title) + '" loading="lazy">';
+      } else {
+        html += '<div class="br-service-placeholder"><span>' + esc(s.title) + '</span></div>';
+      }
+      html += '</div>';
+
+      // Text side
+      html += '<div class="br-service-hero-text">';
+      html += '<h2 class="br-service-main-heading">' + esc(s.main_heading || s.title).replace(/^(.*?)(Ideas Into Reality|Design Made Easy|Built for the Job Site|Designs for Every Occasion|Designs That Perform|Designs That Impress|Unforgettable With Custom Shirts)/,
+        function(m, p1, p2) { return p1 + '<span class="br-text-accent">' + p2 + '</span>'; }) + '</h2>';
+      html += '<div class="br-service-divider"></div>';
+
+      if (s.main_description) {
+        var paragraphs = s.main_description.split('\n\n');
+        paragraphs.forEach(function(p) {
+          if (p.trim()) html += '<p class="br-service-desc">' + p.trim() + '</p>';
+        });
+      }
+
+      // Checklist
+      var checklist = s.checklist || [];
+      if (typeof checklist === 'string') { try { checklist = JSON.parse(checklist); } catch(e) { checklist = []; } }
+      if (checklist.length > 0) {
+        html += '<ul class="br-service-checklist">';
+        checklist.forEach(function(item) {
+          html += '<li><svg class="br-check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg><span>' + esc(item) + '</span></li>';
+        });
+        html += '</ul>';
+      }
+
+      // CTA Buttons
+      html += '<div class="br-btn-group br-service-cta">';
+      if (s.btn1_text) html += '<a href="' + esc(s.btn1_link || 'order.html') + '" class="br-btn br-btn-primary br-btn-lg">' + esc(s.btn1_text) + '</a>';
+      if (s.btn2_text) html += '<a href="' + esc(s.btn2_link || '#') + '" class="br-btn br-btn-accent br-btn-lg">' + esc(s.btn2_text) + '</a>';
+      html += '</div>';
+
+      html += '</div>'; // end text
+      html += '</div>'; // end grid
+      html += '</div></section>';
+
+      /* ── Section 2: Why Choose (features grid) ── */
+      var whyFeatures = s.why_features || [];
+      if (typeof whyFeatures === 'string') { try { whyFeatures = JSON.parse(whyFeatures); } catch(e) { whyFeatures = []; } }
+      if (whyFeatures.length > 0) {
+        html += '<section class="br-section-dark"><div class="br-container">';
+        html += '<div class="br-text-center" data-animate="fade-up">';
+        html += '<span class="br-section-label">Why Us</span>';
+        html += '<h2 class="br-section-title">' + esc(s.why_heading || 'Why Choose ' + s.title + '?') + '</h2>';
+        if (s.why_description) html += '<p class="br-section-subtitle centered">' + esc(s.why_description) + '</p>';
+        html += '</div>';
+        html += '<div class="br-why-grid" data-animate="fade-up" data-stagger>';
+        var whyIcons = ['&#x1F3AF;','&#x1F4AA;','&#x2728;','&#x1F680;','&#x1F525;','&#x2B50;'];
+        whyFeatures.forEach(function(feat, i) {
+          html += '<div class="br-why-card">';
+          html += '<div class="br-why-icon">' + whyIcons[i % whyIcons.length] + '</div>';
+          html += '<h3>' + esc(feat.title) + '</h3>';
+          html += '<p>' + esc(feat.description) + '</p>';
+          html += '</div>';
+        });
+        html += '</div>';
+        html += '</div></section>';
+      }
+
+      /* ── Section 3: Gallery ── */
+      var gallery = s.gallery || [];
+      if (typeof gallery === 'string') { try { gallery = JSON.parse(gallery); } catch(e) { gallery = []; } }
+      if (gallery.length > 0) {
+        html += '<section class="br-section"><div class="br-container">';
+        html += '<div class="br-text-center" data-animate="fade-up"><span class="br-section-label">Our Work</span><h2 class="br-section-title">Recent ' + esc(s.title) + ' Projects</h2></div>';
+        html += '<div class="br-service-gallery" data-animate="fade-up">';
+        gallery.forEach(function(img) {
+          var url = typeof img === 'string' ? img : img.url;
+          html += '<div class="br-service-gallery-item"><img src="' + esc(url) + '" alt="' + esc(s.title) + '" loading="lazy"></div>';
+        });
+        html += '</div>';
+        html += '</div></section>';
+      }
+
+      /* ── Section 4: FAQ ── */
+      var faqs = s.faqs || [];
+      if (typeof faqs === 'string') { try { faqs = JSON.parse(faqs); } catch(e) { faqs = []; } }
+      if (faqs.length > 0) {
+        html += '<section class="br-section-alt"><div class="br-container" style="max-width:800px">';
+        html += '<div class="br-text-center" data-animate="fade-up"><span class="br-section-label">Common Questions</span><h2 class="br-section-title">Frequently Asked Questions</h2></div>';
+        html += '<div class="br-faq-list" data-animate="fade-up">';
+        faqs.forEach(function(faq) {
+          html += '<div class="br-faq-item"><button class="br-faq-question">' + esc(faq.question) + '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button><div class="br-faq-answer"><div class="br-faq-answer-inner"><p>' + esc(faq.answer) + '</p></div></div></div>';
+        });
+        html += '</div>';
+        html += '</div></section>';
+      }
+
+      /* ── Section 5: Related Services ── */
+      html += '<section class="br-section"><div class="br-container">';
+      html += '<div class="br-text-center" data-animate="fade-up"><span class="br-section-label">More Services</span><h2 class="br-section-title">Other Sublimation Services</h2></div>';
+      html += '<div class="br-related-services" id="related-services" data-animate="fade-up"><div class="br-loading"><div class="br-spinner"></div></div></div>';
+      html += '</div></section>';
+
+      /* ── Section 6: CTA Banner ── */
+      html += '<section class="br-cta-banner"><div class="br-container"><h2 data-animate="fade-up">Ready to Order Custom ' + esc(s.title) + '?</h2><p data-animate="fade-up">Get started today with a free quote. No minimums, unlimited revisions, and free shipping.</p><div class="br-btn-group" data-animate="fade-up"><a href="order.html" class="br-btn br-btn-primary br-btn-lg">Get Free Quote</a><a href="sublimationprinting.html" class="br-btn br-btn-outline br-btn-lg" style="border-color:#fff;color:#fff">All Sublimation Services</a></div></div></section>';
+
+      // Render
+      document.getElementById('service-content').innerHTML = html;
+
+      // Bind FAQ accordion
+      document.querySelectorAll('.br-faq-question').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var item = this.closest('.br-faq-item');
+          var wasActive = item.classList.contains('active');
+          document.querySelectorAll('.br-faq-item').forEach(function(i) { i.classList.remove('active'); });
+          if (!wasActive) item.classList.add('active');
+        });
+      });
+
+      // Scroll animations
+      document.querySelectorAll('[data-animate]').forEach(function(el) {
+        var obs = new IntersectionObserver(function(entries) {
+          entries.forEach(function(entry) {
+            if (entry.isIntersecting) { entry.target.classList.add('animated'); obs.unobserve(entry.target); }
+          });
+        }, { threshold: 0.1 });
+        obs.observe(el);
+      });
+      document.querySelectorAll('[data-stagger]').forEach(function(parent) {
+        Array.from(parent.children).forEach(function(child, i) { child.style.setProperty('--i', i); });
+      });
+
+      // Load related services
+      loadRelatedServices(slug);
+
+    } catch(err) {
+      console.error('[sublimation-service]', err);
+      document.getElementById('service-content').innerHTML =
+        '<div class="br-empty" style="padding:120px 20px"><h3>Service Not Found</h3><p>This service page could not be loaded. <a href="sublimationprinting.html" style="color:var(--br-primary)">View all sublimation services</a></p></div>';
+    }
+
+    // Load sublimation submenu
+    if (typeof window.brLoadSubServicesMenu === 'function') window.brLoadSubServicesMenu();
+  })();
+
+  async function loadRelatedServices(currentSlug) {
+    try {
+      var r = await db.from('sublimation_services').select('title, slug, main_image, hero_subtitle').eq('active', true).neq('slug', currentSlug).order('sort_order').limit(6);
+      if (r.error) throw r.error;
+      var services = r.data || [];
+      var container = document.getElementById('related-services');
+      if (!container || services.length === 0) return;
+
+      container.innerHTML = services.map(function(s) {
+        return '<a href="sublimation-service.html?slug=' + encodeURIComponent(s.slug) + '" class="br-related-card">' +
+          '<div class="br-related-image">' +
+            (s.main_image ? '<img src="' + esc(s.main_image) + '" alt="' + esc(s.title) + '" loading="lazy">' :
+            '<div class="br-service-placeholder-sm">' + esc(s.title.charAt(0)) + '</div>') +
+          '</div>' +
+          '<div class="br-related-info">' +
+            '<h4>' + esc(s.title) + '</h4>' +
+            '<p>' + esc(s.hero_subtitle || '').substring(0, 80) + '</p>' +
+            '<span class="br-related-link">View Details &#8594;</span>' +
+          '</div>' +
+        '</a>';
+      }).join('');
+    } catch(e) { console.warn('[related-services]', e.message); }
+  }
+
+  function esc(s) { return s ? s.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : ''; }
+  </script>
+</body>
+</html>
