@@ -1,0 +1,33 @@
+# Set home.html as the default homepage
+DirectoryIndex home.html index.html
+
+# Enable URL rewriting
+RewriteEngine On
+
+# Custom page URLs: /p/slug → page.html?slug=slug
+RewriteRule ^p/([a-zA-Z0-9_-]+)/?$ /page.html?slug=$1 [L,QSA]
+
+# Force HTTPS
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
+
+# Security headers
+<IfModule mod_headers.c>
+  Header set X-Frame-Options "DENY"
+  Header set X-Content-Type-Options "nosniff"
+  Header set X-XSS-Protection "1; mode=block"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+  Header set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+</IfModule>
+
+# Block sensitive files from public access
+<FilesMatch "\.(sql|md|gitignore)$">
+  Order allow,deny
+  Deny from all
+</FilesMatch>
+
+# Prevent directory listing
+Options -Indexes
+
+# 404 → homepage
+ErrorDocument 404 /home.html
