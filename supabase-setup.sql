@@ -662,3 +662,33 @@ CREATE POLICY "page_blocks_admin_all" ON page_blocks
 
 GRANT SELECT ON TABLE page_blocks TO anon;
 GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE page_blocks TO authenticated;
+
+
+-- ============================================================
+-- SECTION 13: CUSTOMER REVIEWS (April 20, 2026)
+-- Admin adds reviews; approved ones show on home page.
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS reviews (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  created_at  TIMESTAMPTZ DEFAULT NOW(),
+  author_name TEXT NOT NULL,
+  location    TEXT,
+  rating      INTEGER DEFAULT 5 CHECK (rating BETWEEN 1 AND 5),
+  review_text TEXT NOT NULL,
+  approved    BOOLEAN DEFAULT false,
+  sort_order  INTEGER DEFAULT 0
+);
+
+ALTER TABLE reviews ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "reviews_public_read" ON reviews
+  FOR SELECT TO anon, authenticated USING (approved = true);
+
+CREATE POLICY "reviews_admin_all" ON reviews
+  FOR ALL TO authenticated
+  USING (auth.email() = 'usman@gmail.com')
+  WITH CHECK (auth.email() = 'usman@gmail.com');
+
+GRANT SELECT ON TABLE reviews TO anon;
+GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE reviews TO authenticated;
