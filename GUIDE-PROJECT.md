@@ -1285,6 +1285,7 @@ ADMIN PAGES:
     Tab 5: Redirects â€” URL redirect management
   admin-settings.html     â†’ 6 TABS: Business Info, Branding (live color pickers), Social Links, SEO, Code Injection (head/body), Maintenance Mode + Backup (export all tables as JSON)
   admin-analytics.html    â†’ Stat cards with time range filter (7d/30d/90d/all)
+  admin-reviews.html      â†’ Approve/deny/edit/delete/add customer reviews. Stats row (total, approved, pending, avg rating). Filter by All/Pending/Approved. Search by name/text. Edit modal.
 
 ============================
 PRODUCT CATEGORIES SYSTEM
@@ -1586,3 +1587,112 @@ See **[GUIDE-HOSTINGER.md](GUIDE-HOSTINGER.md)** for the simple 4-step Hostinger
 4. Update Supabase redirect URLs
 
 Your Supabase stays separate â€” Hostinger only hosts the static HTML/CSS/JS files.
+
+
+---
+
+## 18. Session Log — April 20, 2026
+
+### Changes Made This Session
+
+#### ? Customer Reviews System (Full Stack)
+
+**Feature:** Customers can leave reviews on the home page. Admin can approve/deny/edit/delete them. Approved reviews display publicly.
+
+**Database table** (eviews) — added to supabase-setup.sql Section 13:
+`sql
+CREATE TABLE IF NOT EXISTS reviews (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  created_at  TIMESTAMPTZ DEFAULT NOW(),
+  author_name TEXT NOT NULL,
+  location    TEXT,
+  rating      INTEGER CHECK (rating BETWEEN 1 AND 5) DEFAULT 5,
+  review_text TEXT NOT NULL,
+  approved    BOOLEAN DEFAULT false,
+  sort_order  INTEGER DEFAULT 0
+);
+ALTER TABLE reviews ENABLE ROW LEVEL SECURITY;
+-- Policies: anon can SELECT approved=true, anon can INSERT approved=false, admin can do ALL
+GRANT USAGE ON SCHEMA public TO anon;
+GRANT SELECT, INSERT ON TABLE reviews TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE reviews TO authenticated;
+`
+
+**home.html — Reviews section added:**
+- Grid: <div id="reviewsGrid" class="br-reviews-grid"> populated by JS
+- Empty state: <div id="reviewsEmpty"> shown if 0 approved reviews
+- User submission form: id="reviewForm" with name, location, star picker, textarea
+- Inline JS: loadReviews() polls until db is ready, fetches approved reviews, builds cards with .animated class directly (bypasses IntersectionObserver invisible bug)
+- Star picker: <div id="starPicker"> with 5 <span data-val="N"> elements, JS highlights gold on hover/click
+- Form submit: inserts with pproved: false, shows confirmation message
+
+**overhaul.css — New classes added:**
+- .br-reviews-grid — CSS grid, auto-fit columns min 280px
+- .br-review-card — white card with border, hover lift
+- .br-review-stars / .br-star / .br-star.active — star display (active = #f59e0b gold)
+- .br-star-picker / .br-star-picker span — interactive star input
+- .br-review-form-wrap / .br-review-form — submission form layout
+- .br-review-avatar — circular initial avatar
+- .br-section-label-lg — larger label variant (used in Why Us / How It Works)
+
+**admin-reviews.html — New admin page:**
+- Auth guard: rRequireAdmin() before revealing
+- Stats row: Total, Approved, Pending, Avg Rating
+- Table: Date | Name | Location | Rating (stars) | Review (truncated) | Status badge | Actions
+- Actions: Approve / Deny toggle, Edit (modal), Delete (with confirm)
+- Filter dropdown: All / Pending / Approved
+- Search: live filter by name or review text
+- Add Review button: opens modal to manually add a review
+- Edit modal: name, location, rating, review text, approved toggle
+- Toast notifications for all actions
+
+**All 15 admin sidebars updated:** dmin-reviews.html link added under Contacts in every admin page sidebar.
+
+---
+
+#### ? Bug Fixes This Session
+
+| Bug | Cause | Fix |
+|-----|-------|-----|
+| Reviews not showing (blank grid) | JS syntax error — corrupted duplicate loadReviews call left orphaned .catch blocks after a bad edit | Removed duplicate lines, kept single clean loadReviews() call |
+| Review cards invisible (space but no content) | Cards had data-animate="fade-up" ? CSS sets opacity:0 by default, IntersectionObserver not triggering for dynamically-injected elements | Changed to class="br-review-card animated" — nimated class sets opacity:1 immediately |
+| Star picker showing black stars | CSS color:#f59e0b was already in .br-star-picker span — was masked by JS syntax error above | Fixed by resolving the JS syntax error |
+
+---
+
+#### ? Key Lesson: data-animate on Dynamic Elements
+
+**Problem:** Any element built by JS and injected into the DOM AFTER the IntersectionObserver was set up will NOT be observed automatically. The CSS rule [data-animate] { opacity: 0 } makes them invisible permanently.
+
+**Solution:** For JS-rendered cards/items, add the nimated class directly in the HTML string:
+`javascript
+html += '<div class="br-review-card animated">'; // NOT data-animate="fade-up"
+`
+This makes the element immediately visible without needing the observer.
+
+---
+
+### Current Project State (April 20, 2026)
+
+| Feature | Status |
+|---------|--------|
+| Hosting (bleachresistant.com, Hostinger) | ? Live |
+| GitHub auto-push | ? (tzkusman/bleach-resistant, master) |
+| Supabase (URL, auth, RLS) | ? Wired |
+| Logo (src/logo.png) on all pages | ? |
+| Social links (Instagram, Facebook, TikTok) in footer | ? |
+| Google Search Console verified | ? |
+| Sitemap (bleachresistant.com URLs) | ? |
+| Reviews — user submission form | ? |
+| Reviews — display on home page | ? |
+| Reviews — admin-reviews.html | ? |
+| Reviews — sidebar link on all admin pages | ? |
+| Why Us / How It Works — larger labels | ? |
+| og:url / og:image SEO meta | ? |
+
+### Files Changed This Session
+- home.html — reviews section, JS loader, star picker, form
+- overhaul.css — review CSS classes
+- dmin-reviews.html — NEW FILE created
+- dmin.html + all dmin-*.html — Reviews sidebar link added
+- GUIDE-PROJECT.md — this update
