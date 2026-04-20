@@ -294,7 +294,8 @@
         var { data, error } = await db.from('reviews').select('*').eq('approved', true).order('created_at', { ascending: false }).limit(12);
         var grid = document.getElementById('reviewsGrid');
         var empty = document.getElementById('reviewsEmpty');
-        if (error || !data || data.length === 0) { if (grid) grid.style.display='none'; if (empty) empty.style.display='block'; return; }
+        if (error) { console.error('Reviews query error:', error); if (grid) grid.style.display='none'; if (empty) empty.style.display='block'; return; }
+        if (!data || data.length === 0) { if (grid) grid.style.display='none'; if (empty) empty.style.display='block'; return; }
         var html = '';
         data.forEach(function(r) {
           var stars = '';
@@ -313,7 +314,7 @@
         document.querySelectorAll('#reviewsGrid [data-animate]').forEach(function(el) {
           if (typeof animObserver !== 'undefined') animObserver.observe(el);
         });
-      } catch(e) {}
+      } catch(e) { console.error('Reviews load error:', e); }
     })();
 
     // ── Star picker ──
