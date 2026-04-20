@@ -302,7 +302,7 @@
           data.forEach(function(r) {
             var stars = '';
             for (var i = 1; i <= 5; i++) stars += '<span class="br-star' + (i <= (r.rating || 5) ? ' active' : '') + '">&#9733;</span>';
-            html += '<div class="br-review-card" data-animate="fade-up">';
+            html += '<div class="br-review-card animated">';
             html += '<div class="br-review-stars">' + stars + '</div>';
             html += '<p class="br-review-text">"' + (r.review_text || '').replace(/</g,'&lt;') + '"</p>';
             html += '<div class="br-review-author">';
@@ -313,9 +313,6 @@
           });
           if (grid) { grid.style.display='grid'; grid.innerHTML = html; }
           if (empty) empty.style.display='none';
-          document.querySelectorAll('#reviewsGrid [data-animate]').forEach(function(el) {
-            if (typeof animObserver !== 'undefined') animObserver.observe(el);
-          });
         })
         .catch(function(e) { console.error('Reviews load error:', e); });
     }
