@@ -1158,6 +1158,43 @@ p { margin-bottom: 1rem; }
 .br-review-author strong { font-size: 0.92rem; color: var(--br-dark); display: block; }
 .br-review-loc { font-size: 0.8rem; color: var(--br-text-light); display: block; margin-top: 2px; }
 
+/* Review submission form */
+.br-review-form-wrap {
+  margin-top: 60px;
+  background: var(--br-bg-alt);
+  border: 1px solid var(--br-border);
+  border-radius: var(--radius-lg);
+  padding: 40px;
+  max-width: 640px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.br-review-form-wrap h3 { margin-bottom: 6px; }
+.br-review-form-wrap > p { color: var(--br-text-light); font-size: 0.92rem; margin-bottom: 28px; }
+.br-review-form { display: flex; flex-direction: column; gap: 20px; }
+.br-review-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.br-form-group { display: flex; flex-direction: column; gap: 6px; }
+.br-form-group label { font-size: 0.85rem; font-weight: 600; color: var(--br-dark); }
+.br-form-group input,
+.br-form-group textarea {
+  padding: 10px 14px;
+  border: 1px solid var(--br-border);
+  border-radius: var(--radius);
+  font-size: 0.92rem;
+  background: #fff;
+  transition: border-color var(--transition);
+  outline: none;
+  resize: vertical;
+}
+.br-form-group input:focus,
+.br-form-group textarea:focus { border-color: var(--br-primary); }
+.br-star-picker { display: flex; gap: 6px; cursor: pointer; }
+.br-star-picker span { font-size: 1.6rem; color: #f59e0b; transition: color 0.15s; user-select: none; }
+@media (max-width: 600px) {
+  .br-review-form-row { grid-template-columns: 1fr; }
+  .br-review-form-wrap { padding: 24px; }
+}
+
 /* ── 19. SCROLL ANIMATIONS ─────────────────────────────────── */
 [data-animate] {
   opacity: 0;

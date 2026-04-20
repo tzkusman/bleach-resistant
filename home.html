@@ -190,6 +190,41 @@
       <div id="reviewsEmpty" style="display:none;text-align:center;padding:40px 0;color:var(--br-text-light)">
         <p>Be the first to share your experience!</p>
       </div>
+
+      <!-- Submit Review Form -->
+      <div class="br-review-form-wrap" data-animate="fade-up">
+        <h3>Leave a Review</h3>
+        <p>Ordered from us? Share your experience — we'd love to hear from you.</p>
+        <form id="reviewForm" class="br-review-form" novalidate>
+          <div class="br-review-form-row">
+            <div class="br-form-group">
+              <label for="rv_name">Your Name *</label>
+              <input type="text" id="rv_name" placeholder="e.g. John Smith" required maxlength="80">
+            </div>
+            <div class="br-form-group">
+              <label for="rv_location">City / Location</label>
+              <input type="text" id="rv_location" placeholder="e.g. Guelph, ON" maxlength="80">
+            </div>
+          </div>
+          <div class="br-form-group">
+            <label>Rating *</label>
+            <div class="br-star-picker" id="starPicker">
+              <span data-val="1">&#9733;</span>
+              <span data-val="2">&#9733;</span>
+              <span data-val="3">&#9733;</span>
+              <span data-val="4">&#9733;</span>
+              <span data-val="5">&#9733;</span>
+            </div>
+            <input type="hidden" id="rv_rating" value="5">
+          </div>
+          <div class="br-form-group">
+            <label for="rv_text">Your Review *</label>
+            <textarea id="rv_text" rows="4" placeholder="Tell us about your experience..." required maxlength="1000"></textarea>
+          </div>
+          <button type="submit" class="br-btn br-btn-primary" id="reviewSubmitBtn">Submit Review</button>
+          <p id="reviewMsg" style="display:none;margin-top:14px;font-weight:600"></p>
+        </form>
+      </div>
     </div>
   </section>
 
@@ -280,6 +315,72 @@
         });
       } catch(e) {}
     })();
+
+    // ── Star picker ──
+    (function() {
+      var picker = document.getElementById('starPicker');
+      var ratingInput = document.getElementById('rv_rating');
+      if (!picker) return;
+      var stars = picker.querySelectorAll('span');
+      function highlight(val) {
+        stars.forEach(function(s) {
+          s.style.color = parseInt(s.dataset.val) <= val ? '#f59e0b' : '#d1d5db';
+        });
+      }
+      highlight(5);
+      stars.forEach(function(s) {
+        s.addEventListener('mouseenter', function() { highlight(parseInt(s.dataset.val)); });
+        s.addEventListener('mouseleave', function() { highlight(parseInt(ratingInput.value)); });
+        s.addEventListener('click', function() {
+          ratingInput.value = s.dataset.val;
+          highlight(parseInt(s.dataset.val));
+        });
+      });
+    })();
+
+    // ── Review form submit ──
+    document.getElementById('reviewForm') && document.getElementById('reviewForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      if (typeof db === 'undefined') return;
+      var btn = document.getElementById('reviewSubmitBtn');
+      var msg = document.getElementById('reviewMsg');
+      var name = document.getElementById('rv_name').value.trim();
+      var location = document.getElementById('rv_location').value.trim();
+      var rating = parseInt(document.getElementById('rv_rating').value) || 5;
+      var text = document.getElementById('rv_text').value.trim();
+      if (!name || !text) {
+        msg.textContent = 'Please fill in your name and review.';
+        msg.style.color = '#ef4444';
+        msg.style.display = 'block';
+        return;
+      }
+      btn.disabled = true;
+      btn.textContent = 'Submitting...';
+      try {
+        var { error } = await db.from('reviews').insert([{
+          author_name: name,
+          location: location || null,
+          rating: rating,
+          review_text: text,
+          approved: false
+        }]);
+        if (error) throw error;
+        msg.textContent = '✓ Thank you! Your review has been submitted and will appear after approval.';
+        msg.style.color = '#10b981';
+        msg.style.display = 'block';
+        e.target.reset();
+        document.getElementById('rv_rating').value = 5;
+        document.querySelectorAll('#starPicker span').forEach(function(s, i) {
+          s.style.color = '#f59e0b';
+        });
+      } catch(err) {
+        msg.textContent = 'Something went wrong. Please try again.';
+        msg.style.color = '#ef4444';
+        msg.style.display = 'block';
+      }
+      btn.disabled = false;
+      btn.textContent = 'Submit Review';
+    });
   </script>
 </body>
 </html>
