@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reviews — Bleach Resistant Admin</title>
+  <link rel="icon" href="favicon.svg" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js?v=7"></script>
+</head>
+<body class="admin-hidden" style="display:none">
+
+  <!-- ===== SIDEBAR ===== -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <h2>Bleach Resistant</h2>
+      <small>Admin Panel</small>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-section">Main</div>
+      <a href="admin.html"><span class="icon">&#x1F4CA;</span> Dashboard</a>
+      <a href="admin-orders.html"><span class="icon">&#x1F4E6;</span> Orders</a>
+      <a href="admin-contacts.html"><span class="icon">&#x1F4AC;</span> Contacts</a>
+      <a href="admin-reviews.html" class="active"><span class="icon">&#x2B50;</span> Reviews</a>
+      <div class="nav-section">Content</div>
+      <a href="admin-products.html"><span class="icon">&#x1F6CD;&#xFE0F;</span> Products</a>
+      <a href="admin-slider.html"><span class="icon">&#x1F3A0;</span> Hero Slider</a>
+      <a href="admin-sections.html"><span class="icon">&#x1F4D0;</span> Page Sections</a>
+      <a href="admin-pages.html"><span class="icon">&#x1F4C4;</span> Pages</a>
+      <a href="admin-blog.html"><span class="icon">&#x270D;&#xFE0F;</span> Blog</a>
+      <a href="admin-cotton.html"><span class="icon">&#x1F9F5;</span> Cotton</a>
+      <a href="admin-services.html"><span class="icon">&#x1F6E0;&#xFE0F;</span> Service Pages</a>
+      <a href="admin-media.html"><span class="icon">&#x1F5BC;&#xFE0F;</span> Media Library</a>
+      <a href="admin-navigation.html"><span class="icon">&#x1F517;</span> Navigation</a>
+      <div class="nav-section">Settings</div>
+      <a href="admin-settings.html"><span class="icon">&#x2699;&#xFE0F;</span> Site Settings</a>
+      <a href="admin-analytics.html"><span class="icon">&#x1F4C8;</span> Analytics</a>
+      <div class="nav-section">Website</div>
+      <a href="home.html" target="_blank"><span class="icon">&#x1F310;</span> View Site</a>
+      <a href="order.html" target="_blank"><span class="icon">&#x1F6D2;</span> Order Page</a>
+    </div>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" id="user-avatar">A</div>
+        <div>
+          <div style="font-size:12px;font-weight:600;" id="user-name">Admin</div>
+          <div class="user-email" id="user-email">loading&#x2026;</div>
+        </div>
+      </div>
+      <button class="btn btn-secondary btn-sm btn-block" onclick="brSignOut()">Sign Out</button>
+    </div>
+  </nav>
+
+  <!-- ===== MAIN ===== -->
+  <div class="main-content">
+    <div class="topbar">
+      <div>
+        <h1>Reviews</h1>
+        <div class="breadcrumb">Approve or deny customer reviews shown on the home page</div>
+      </div>
+      <div class="topbar-actions">
+        <select id="filter-status" style="padding:8px 12px;border:1px solid #ddd;border-radius:6px;font-size:12px;">
+          <option value="">All Reviews</option>
+          <option value="pending">Pending</option>
+          <option value="approved">Approved</option>
+        </select>
+        <button class="btn btn-sm btn-primary" onclick="openAddModal()">&#x2B; Add Review</button>
+      </div>
+    </div>
+
+    <div class="content-area">
+      <!-- Stats Row -->
+      <div class="stats-grid" style="margin-bottom:24px">
+        <div class="stat-card">
+          <div class="stat-label">Total Reviews</div>
+          <div class="stat-value" id="stat-total">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Approved</div>
+          <div class="stat-value" id="stat-approved" style="color:#10b981">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Pending Approval</div>
+          <div class="stat-value" id="stat-pending" style="color:#f59e0b">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Avg Rating</div>
+          <div class="stat-value" id="stat-rating">—</div>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <div class="table-header">
+          <h3>All Reviews <span id="review-count" style="color:#aaa;font-weight:400"></span></h3>
+          <div class="table-actions">
+            <input type="text" class="search-input" id="search-input" placeholder="Search by name or review text&#x2026;">
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Name</th>
+                <th>Location</th>
+                <th>Rating</th>
+                <th>Review</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="reviews-body">
+              <tr><td colspan="7" class="loading-overlay"><span class="spinner"></span> Loading&#x2026;</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL ===== -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modal-title">Review Details</h3>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="modal-body"></div>
+      <div class="modal-footer" id="modal-footer"></div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    let allReviews = [];
+
+    function showToast(msg, type) {
+      const t = document.getElementById('toast');
+      t.className = 'toast toast-' + (type || 'info');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
+    function closeModal() {
+      document.getElementById('modal-overlay').classList.remove('active');
+    }
+    function stars(n) {
+      let s = '';
+      for (let i = 1; i <= 5; i++) s += '<span style="color:' + (i <= n ? '#f59e0b' : '#ddd') + '">&#9733;</span>';
+      return s;
+    }
+    function fmtDate(ts) {
+      if (!ts) return '—';
+      return new Date(ts).toLocaleDateString('en-CA', { year:'numeric', month:'short', day:'numeric' });
+    }
+
+    async function loadReviews() {
+      try {
+        const { data, error } = await db.from('reviews').select('*').order('created_at', { ascending: false });
+        if (error) throw error;
+        allReviews = data || [];
+        updateStats();
+        render();
+      } catch(err) {
+        console.error(err);
+        document.getElementById('reviews-body').innerHTML = '<tr><td colspan="7" class="empty-state"><p>Error loading reviews</p></td></tr>';
+      }
+    }
+
+    function updateStats() {
+      const approved = allReviews.filter(r => r.approved).length;
+      const pending = allReviews.filter(r => !r.approved).length;
+      const avg = allReviews.length ? (allReviews.reduce((s,r) => s + (r.rating||5), 0) / allReviews.length).toFixed(1) : '—';
+      document.getElementById('stat-total').textContent = allReviews.length;
+      document.getElementById('stat-approved').textContent = approved;
+      document.getElementById('stat-pending').textContent = pending;
+      document.getElementById('stat-rating').textContent = avg + (allReviews.length ? ' ★' : '');
+    }
+
+    function getFiltered() {
+      const search = document.getElementById('search-input').value.toLowerCase();
+      const status = document.getElementById('filter-status').value;
+      return allReviews.filter(r => {
+        if (status === 'approved' && !r.approved) return false;
+        if (status === 'pending' && r.approved) return false;
+        if (search && !r.author_name?.toLowerCase().includes(search) && !r.review_text?.toLowerCase().includes(search)) return false;
+        return true;
+      });
+    }
+
+    function render() {
+      const rows = getFiltered();
+      document.getElementById('review-count').textContent = '(' + rows.length + ')';
+      if (!rows.length) {
+        document.getElementById('reviews-body').innerHTML = '<tr><td colspan="7" class="empty-state"><p>No reviews found</p></td></tr>';
+        return;
+      }
+      document.getElementById('reviews-body').innerHTML = rows.map(r => `
+        <tr>
+          <td>${fmtDate(r.created_at)}</td>
+          <td><strong>${brEscapeHtml(r.author_name || '—')}</strong></td>
+          <td>${brEscapeHtml(r.location || '—')}</td>
+          <td>${stars(r.rating || 5)}</td>
+          <td style="max-width:300px;white-space:normal;font-size:13px">${brEscapeHtml((r.review_text || '').substring(0, 140))}${r.review_text?.length > 140 ? '…' : ''}</td>
+          <td>${r.approved
+            ? '<span class="badge badge-complete">Approved</span>'
+            : '<span class="badge badge-new">Pending</span>'}</td>
+          <td>
+            ${r.approved
+              ? `<button class="btn btn-sm btn-secondary" onclick="setApproved('${r.id}', false)">Deny</button>`
+              : `<button class="btn btn-sm btn-primary" onclick="setApproved('${r.id}', true)">Approve</button>`}
+            <button class="btn btn-sm btn-secondary" onclick="openEdit('${r.id}')" style="margin-left:4px">Edit</button>
+            <button class="btn btn-sm" style="margin-left:4px;background:#fee2e2;color:#ef4444;border:none;padding:5px 10px;border-radius:4px;cursor:pointer" onclick="deleteReview('${r.id}')">Delete</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function setApproved(id, val) {
+      try {
+        const { error } = await db.from('reviews').update({ approved: val }).eq('id', id);
+        if (error) throw error;
+        const r = allReviews.find(x => x.id === id);
+        if (r) r.approved = val;
+        updateStats();
+        render();
+        showToast(val ? 'Review approved — now visible on home page' : 'Review denied', val ? 'success' : 'info');
+      } catch(err) {
+        showToast('Error: ' + err.message, 'error');
+      }
+    }
+
+    async function deleteReview(id) {
+      if (!confirm('Delete this review? This cannot be undone.')) return;
+      try {
+        const { error } = await db.from('reviews').delete().eq('id', id);
+        if (error) throw error;
+        allReviews = allReviews.filter(x => x.id !== id);
+        updateStats();
+        render();
+        showToast('Review deleted', 'info');
+      } catch(err) {
+        showToast('Error: ' + err.message, 'error');
+      }
+    }
+
+    function openEdit(id) {
+      const r = allReviews.find(x => x.id === id);
+      if (!r) return;
+      document.getElementById('modal-title').textContent = 'Edit Review';
+      document.getElementById('modal-body').innerHTML = `
+        <div class="form-group"><label>Author Name</label><input id="ed_name" class="form-control" value="${brEscapeHtml(r.author_name || '')}"></div>
+        <div class="form-group"><label>Location</label><input id="ed_loc" class="form-control" value="${brEscapeHtml(r.location || '')}"></div>
+        <div class="form-group"><label>Rating (1–5)</label><input id="ed_rating" class="form-control" type="number" min="1" max="5" value="${r.rating || 5}"></div>
+        <div class="form-group"><label>Review Text</label><textarea id="ed_text" class="form-control" rows="4">${brEscapeHtml(r.review_text || '')}</textarea></div>
+        <div class="form-group"><label>Approved</label>
+          <select id="ed_approved" class="form-control">
+            <option value="true" ${r.approved ? 'selected' : ''}>Approved (visible on site)</option>
+            <option value="false" ${!r.approved ? 'selected' : ''}>Pending (hidden)</option>
+          </select></div>
+      `;
+      document.getElementById('modal-footer').innerHTML = `
+        <button class="btn btn-primary" onclick="saveEdit('${r.id}')">Save Changes</button>
+        <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      `;
+      document.getElementById('modal-overlay').classList.add('active');
+    }
+
+    async function saveEdit(id) {
+      const name = document.getElementById('ed_name').value.trim();
+      const loc = document.getElementById('ed_loc').value.trim();
+      const rating = parseInt(document.getElementById('ed_rating').value) || 5;
+      const text = document.getElementById('ed_text').value.trim();
+      const approved = document.getElementById('ed_approved').value === 'true';
+      if (!name || !text) { showToast('Name and review text are required', 'error'); return; }
+      try {
+        const { error } = await db.from('reviews').update({ author_name: name, location: loc || null, rating, review_text: text, approved }).eq('id', id);
+        if (error) throw error;
+        const r = allReviews.find(x => x.id === id);
+        if (r) Object.assign(r, { author_name: name, location: loc || null, rating, review_text: text, approved });
+        updateStats(); render(); closeModal();
+        showToast('Review updated', 'success');
+      } catch(err) {
+        showToast('Error: ' + err.message, 'error');
+      }
+    }
+
+    function openAddModal() {
+      document.getElementById('modal-title').textContent = 'Add Review';
+      document.getElementById('modal-body').innerHTML = `
+        <div class="form-group"><label>Author Name *</label><input id="add_name" class="form-control" placeholder="Customer name"></div>
+        <div class="form-group"><label>Location</label><input id="add_loc" class="form-control" placeholder="e.g. Guelph, ON"></div>
+        <div class="form-group"><label>Rating (1–5)</label><input id="add_rating" class="form-control" type="number" min="1" max="5" value="5"></div>
+        <div class="form-group"><label>Review Text *</label><textarea id="add_text" class="form-control" rows="4" placeholder="Review content&#x2026;"></textarea></div>
+        <div class="form-group"><label>Status</label>
+          <select id="add_approved" class="form-control">
+            <option value="true">Approved (visible on site)</option>
+            <option value="false">Pending (hidden)</option>
+          </select></div>
+      `;
+      document.getElementById('modal-footer').innerHTML = `
+        <button class="btn btn-primary" onclick="saveAdd()">Add Review</button>
+        <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      `;
+      document.getElementById('modal-overlay').classList.add('active');
+    }
+
+    async function saveAdd() {
+      const name = document.getElementById('add_name').value.trim();
+      const loc = document.getElementById('add_loc').value.trim();
+      const rating = parseInt(document.getElementById('add_rating').value) || 5;
+      const text = document.getElementById('add_text').value.trim();
+      const approved = document.getElementById('add_approved').value === 'true';
+      if (!name || !text) { showToast('Name and review text are required', 'error'); return; }
+      try {
+        const { data, error } = await db.from('reviews').insert([{ author_name: name, location: loc || null, rating, review_text: text, approved }]).select().single();
+        if (error) throw error;
+        allReviews.unshift(data);
+        updateStats(); render(); closeModal();
+        showToast('Review added' + (approved ? ' and published' : ' (pending)'), 'success');
+      } catch(err) {
+        showToast('Error: ' + err.message, 'error');
+      }
+    }
+
+    // ── Auth guard ──
+    (async function() {
+      try {
+        const user = await brGetUser();
+        if (!user || !brIsAdmin(user)) { window.location.href = 'login.html'; return; }
+        document.body.style.display = '';
+        document.body.classList.remove('admin-hidden');
+        document.getElementById('user-name').textContent = user.email.split('@')[0];
+        document.getElementById('user-email').textContent = user.email;
+        document.getElementById('user-avatar').textContent = user.email[0].toUpperCase();
+        loadReviews();
+      } catch(e) { window.location.href = 'login.html'; }
+    })();
+
+    document.getElementById('search-input').addEventListener('input', render);
+    document.getElementById('filter-status').addEventListener('change', render);
+
+    function brEscapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+    async function brSignOut() {
+      await db.auth.signOut();
+      window.location.href = 'login.html';
+    }
+  </script>
+</body>
+</html>
