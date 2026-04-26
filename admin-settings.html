@@ -527,6 +527,12 @@ async function loadSettings() {
     if (settings.seo_desc) document.getElementById('s-seo-desc').value = settings.seo_desc;
     if (settings.seo_keywords) document.getElementById('s-seo-keywords').value = settings.seo_keywords;
     if (settings.domain) document.getElementById('s-domain').value = settings.domain;
+    if (settings.notify_orders) document.getElementById('s-notify-orders').value = settings.notify_orders;
+    if (settings.notify_contacts) document.getElementById('s-notify-contacts').value = settings.notify_contacts;
+    if (settings.maintenance) document.getElementById('s-maintenance').checked = settings.maintenance === 'true';
+    if (settings.notify_new_order) document.getElementById('s-notify-new-order').checked = settings.notify_new_order === 'true';
+    if (settings.notify_status) document.getElementById('s-notify-status').checked = settings.notify_status === 'true';
+    if (settings.notify_contact) document.getElementById('s-notify-contact').checked = settings.notify_contact === 'true';
   } catch(e) { console.warn('Failed to load settings:', e); }
 }
 

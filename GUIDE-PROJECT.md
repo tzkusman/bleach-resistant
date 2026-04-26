@@ -1591,7 +1591,7 @@ Your Supabase stays separate â€” Hostinger only hosts the static HTML/CSS/JS fil
 
 ---
 
-## 18. Session Log — April 20, 2026
+## 18. Session Log ï¿½ April 20, 2026
 
 ### Changes Made This Session
 
@@ -1599,7 +1599,8 @@ Your Supabase stays separate â€” Hostinger only hosts the static HTML/CSS/JS fil
 
 **Feature:** Customers can leave reviews on the home page. Admin can approve/deny/edit/delete them. Approved reviews display publicly.
 
-**Database table** (eviews) — added to supabase-setup.sql Section 13:
+**Database table** (
+eviews) ï¿½ added to supabase-setup.sql Section 13:
 `sql
 CREATE TABLE IF NOT EXISTS reviews (
   id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -1618,7 +1619,7 @@ GRANT SELECT, INSERT ON TABLE reviews TO anon;
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE reviews TO authenticated;
 `
 
-**home.html — Reviews section added:**
+**home.html ï¿½ Reviews section added:**
 - Grid: <div id="reviewsGrid" class="br-reviews-grid"> populated by JS
 - Empty state: <div id="reviewsEmpty"> shown if 0 approved reviews
 - User submission form: id="reviewForm" with name, location, star picker, textarea
@@ -1626,16 +1627,16 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE reviews TO authenticated;
 - Star picker: <div id="starPicker"> with 5 <span data-val="N"> elements, JS highlights gold on hover/click
 - Form submit: inserts with pproved: false, shows confirmation message
 
-**overhaul.css — New classes added:**
-- .br-reviews-grid — CSS grid, auto-fit columns min 280px
-- .br-review-card — white card with border, hover lift
-- .br-review-stars / .br-star / .br-star.active — star display (active = #f59e0b gold)
-- .br-star-picker / .br-star-picker span — interactive star input
-- .br-review-form-wrap / .br-review-form — submission form layout
-- .br-review-avatar — circular initial avatar
-- .br-section-label-lg — larger label variant (used in Why Us / How It Works)
+**overhaul.css ï¿½ New classes added:**
+- .br-reviews-grid ï¿½ CSS grid, auto-fit columns min 280px
+- .br-review-card ï¿½ white card with border, hover lift
+- .br-review-stars / .br-star / .br-star.active ï¿½ star display (active = #f59e0b gold)
+- .br-star-picker / .br-star-picker span ï¿½ interactive star input
+- .br-review-form-wrap / .br-review-form ï¿½ submission form layout
+- .br-review-avatar ï¿½ circular initial avatar
+- .br-section-label-lg ï¿½ larger label variant (used in Why Us / How It Works)
 
-**admin-reviews.html — New admin page:**
+**admin-reviews.html ï¿½ New admin page:**
 - Auth guard: rRequireAdmin() before revealing
 - Stats row: Total, Approved, Pending, Avg Rating
 - Table: Date | Name | Location | Rating (stars) | Review (truncated) | Status badge | Actions
@@ -1654,9 +1655,9 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE reviews TO authenticated;
 
 | Bug | Cause | Fix |
 |-----|-------|-----|
-| Reviews not showing (blank grid) | JS syntax error — corrupted duplicate loadReviews call left orphaned .catch blocks after a bad edit | Removed duplicate lines, kept single clean loadReviews() call |
-| Review cards invisible (space but no content) | Cards had data-animate="fade-up" ? CSS sets opacity:0 by default, IntersectionObserver not triggering for dynamically-injected elements | Changed to class="br-review-card animated" — nimated class sets opacity:1 immediately |
-| Star picker showing black stars | CSS color:#f59e0b was already in .br-star-picker span — was masked by JS syntax error above | Fixed by resolving the JS syntax error |
+| Reviews not showing (blank grid) | JS syntax error ï¿½ corrupted duplicate loadReviews call left orphaned .catch blocks after a bad edit | Removed duplicate lines, kept single clean loadReviews() call |
+| Review cards invisible (space but no content) | Cards had data-animate="fade-up" ? CSS sets opacity:0 by default, IntersectionObserver not triggering for dynamically-injected elements | Changed to class="br-review-card animated" ï¿½ nimated class sets opacity:1 immediately |
+| Star picker showing black stars | CSS color:#f59e0b was already in .br-star-picker span ï¿½ was masked by JS syntax error above | Fixed by resolving the JS syntax error |
 
 ---
 
@@ -1683,16 +1684,16 @@ This makes the element immediately visible without needing the observer.
 | Social links (Instagram, Facebook, TikTok) in footer | ? |
 | Google Search Console verified | ? |
 | Sitemap (bleachresistant.com URLs) | ? |
-| Reviews — user submission form | ? |
-| Reviews — display on home page | ? |
-| Reviews — admin-reviews.html | ? |
-| Reviews — sidebar link on all admin pages | ? |
-| Why Us / How It Works — larger labels | ? |
+| Reviews ï¿½ user submission form | ? |
+| Reviews ï¿½ display on home page | ? |
+| Reviews ï¿½ admin-reviews.html | ? |
+| Reviews ï¿½ sidebar link on all admin pages | ? |
+| Why Us / How It Works ï¿½ larger labels | ? |
 | og:url / og:image SEO meta | ? |
 
 ### Files Changed This Session
-- home.html — reviews section, JS loader, star picker, form
-- overhaul.css — review CSS classes
-- dmin-reviews.html — NEW FILE created
-- dmin.html + all dmin-*.html — Reviews sidebar link added
-- GUIDE-PROJECT.md — this update
+- home.html ï¿½ reviews section, JS loader, star picker, form
+- overhaul.css ï¿½ review CSS classes
+- dmin-reviews.html ï¿½ NEW FILE created
+- dmin.html + all dmin-*.html ï¿½ Reviews sidebar link added
+- GUIDE-PROJECT.md ï¿½ this update

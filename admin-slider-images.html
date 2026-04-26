@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Service Slider Images — Bleach Resistant Admin</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css">
+  <style>
+    body { font-family: 'Poppins', sans-serif; }
+    .admin-layout { display: flex; min-height: 100vh; }
+    .sidebar { width: 280px; background: #111827; color: #f8fafc; display: flex; flex-direction: column; }
+    .sidebar-header { padding: 28px 24px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .sidebar-header .logo { color: #fff; font-size: 1.35rem; font-weight: 800; text-decoration: none; }
+    .sidebar-header .admin-badge { display: inline-flex; margin-top: 10px; font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; color: #a5b4fc; }
+    .sidebar-nav { padding: 16px 0; flex: 1; overflow-y: auto; }
+    .sidebar-nav .nav-section { padding: 14px 24px 6px; font-size: 0.75rem; letter-spacing: 0.09em; color: #94a3b8; text-transform: uppercase; }
+    .sidebar-nav a { display: block; color: #cbd5e1; text-decoration: none; padding: 12px 24px; transition: background .2s, color .2s; border-left: 3px solid transparent; }
+    .sidebar-nav a:hover { background: rgba(255,255,255,0.06); color: #fff; }
+    .sidebar-nav a.active { background: rgba(99,102,241,0.18); color: #fff; border-left-color: #6366f1; }
+    .sidebar-footer { border-top: 1px solid rgba(255,255,255,0.08); padding: 18px 24px; }
+    .sidebar-footer .user-info { display: flex; flex-direction: column; gap: 5px; font-size: 0.85rem; color: #e2e8f0; margin-bottom: 12px; }
+    .sidebar-footer .btn { width: 100%; border: 1px solid rgba(255,255,255,0.12); background: transparent; color: #f8fafc; padding: 10px 14px; border-radius: 10px; cursor: pointer; }
+    .main-content { flex: 1; background: #f8fafc; padding: 28px; }
+    .content-header h1 { margin: 0 0 6px; font-size: 2rem; color: #111827; }
+    .content-header p { margin: 0 0 24px; color: #475569; max-width: 760px; }
+    .toolbar { display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; margin-bottom: 22px; }
+    .toolbar .search { width: 100%; max-width: 360px; padding: 12px 16px; border: 1px solid #cbd5e1; border-radius: 12px; }
+    .toolbar button { border: none; border-radius: 12px; padding: 12px 18px; font-weight: 700; cursor: pointer; background: #4f46e5; color: #fff; }
+    .panel { background: #fff; border: 1px solid #e2e8f0; border-radius: 18px; padding: 24px; margin-bottom: 24px; }
+    .panel h2 { margin: 0 0 12px; font-size: 1.15rem; color: #111827; }
+    .field-group { display: grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap: 16px; margin-bottom: 18px; }
+    .field { display: flex; flex-direction: column; gap: 8px; }
+    .field label { font-size: 0.82rem; font-weight: 700; color: #334155; }
+    .field input, .field select, .field textarea { width: 100%; padding: 12px 14px; border: 1px solid #cbd5e1; border-radius: 12px; background: #f8fafc; color: #0f172a; font-size: 0.95rem; }
+    .field textarea { min-height: 110px; resize: vertical; }
+    .slide-grid { display: grid; gap: 18px; grid-template-columns: repeat(auto-fill,minmax(280px,1fr)); }
+    .slide-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 18px; overflow: hidden; box-shadow: 0 14px 30px rgba(15,23,42,0.04); transition: transform .2s; }
+    .slide-card:hover { transform: translateY(-2px); }
+    .slide-card img { width: 100%; height: 220px; object-fit: cover; display: block; }
+    .slide-card-body { padding: 18px; }
+    .slide-card-body h3 { margin: 0 0 8px; font-size: 1rem; color: #0f172a; }
+    .slide-card-body p { margin: 0 0 12px; color: #64748b; font-size: 0.9rem; }
+    .slide-card-meta { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 14px; }
+    .badge { padding: 6px 12px; border-radius: 999px; font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em; }
+    .badge.on { background: #d1fae5; color: #15803d; }
+    .badge.off { background: #fee2e2; color: #b91c1c; }
+    .slide-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    .slide-actions button { flex: 1 1 auto; border: 1px solid #cbd5e1; border-radius: 12px; padding: 10px 12px; background: #fff; color: #334155; font-weight: 700; cursor: pointer; transition: background .15s, border-color .15s; }
+    .slide-actions button:hover { border-color: #4f46e5; color: #4f46e5; }
+    .slide-actions .delete { border-color: #f8d7da; color: #991b1b; }
+    .modal { display: none; position: fixed; inset: 0; background: rgba(15,23,42,0.65); z-index: 9999; align-items: center; justify-content: center; padding: 20px; }
+    .modal.open { display: flex; }
+    .modal-content { width: min(100%, 780px); max-height: calc(100vh - 40px); overflow-y: auto; background: #fff; border-radius: 20px; padding: 28px; box-shadow: 0 24px 60px rgba(15,23,42,0.2); position: relative; }
+    .modal-close { position: absolute; top: 14px; right: 14px; width: 36px; height: 36px; border: none; border-radius: 50%; background: #f8fafc; color: #334155; font-size: 1.25rem; cursor: pointer; }
+    .modal-footer { display: flex; justify-content: flex-end; gap: 12px; flex-wrap: wrap; margin-top: 18px; }
+    .btn-primary { background: #4f46e5; color: #fff; }
+    .btn-secondary { background: #f8fafc; color: #334155; border: 1px solid #cbd5e1; }
+    .toast { position: fixed; bottom: 24px; right: 24px; min-width: 260px; padding: 14px 18px; border-radius: 18px; color: #fff; box-shadow: 0 18px 40px rgba(15,23,42,0.2); opacity: 0; transform: translateY(10px); transition: opacity .2s, transform .2s; font-weight: 700; z-index: 10000; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.success { background: #16a34a; }
+    .toast.error { background: #dc2626; }
+    .toast.info { background: #0f172a; }
+  </style>
+</head>
+<body>
+  <div class="admin-layout">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <a href="home.html" class="logo">Bleach<strong>Resistant</strong></a>
+        <span class="admin-badge">Admin</span>
+      </div>
+      <div class="sidebar-nav">
+        <div class="nav-section">Main</div>
+        <a href="admin.html"><span class="icon">📊</span> Dashboard</a>
+        <a href="admin-orders.html"><span class="icon">📦</span> Orders</a>
+        <a href="admin-contacts.html"><span class="icon">💬</span> Contacts</a>
+        <a href="admin-reviews.html"><span class="icon">⭐</span> Reviews</a>
+        <div class="nav-section">Content</div>
+        <a href="admin-products.html"><span class="icon">🛍️</span> Products</a>
+        <a href="admin-slider.html"><span class="icon">🎞️</span> Hero Slider</a>
+        <a href="admin-sections.html"><span class="icon">🧩</span> Page Sections</a>
+        <a href="admin-pages.html"><span class="icon">📄</span> Pages</a>
+        <a href="admin-blog.html"><span class="icon">✍️</span> Blog</a>
+        <a href="admin-cotton.html"><span class="icon">🧵</span> Cotton</a>
+        <a href="admin-services.html"><span class="icon">🛠️</span> Service Pages</a>
+        <a href="admin-media.html"><span class="icon">🖼️</span> Media Library</a>
+        <a href="admin-service-slides.html"><span class="icon">🖼️</span> Service Slides</a>
+        <a href="admin-slider-images.html" class="active"><span class="icon">🖼️</span> Slider Images</a>
+        <a href="admin-navigation.html"><span class="icon">🔗</span> Navigation</a>
+        <div class="nav-section">Settings</div>
+        <a href="admin-settings.html"><span class="icon">⚙️</span> Site Settings</a>
+        <a href="admin-analytics.html"><span class="icon">📈</span> Analytics</a>
+        <div class="nav-section">Website</div>
+        <a href="home.html" target="_blank"><span class="icon">🌐</span> View Site</a>
+      </div>
+      <div class="sidebar-footer">
+        <div class="user-info">
+          <div id="admin-email">Loading...</div>
+        </div>
+        <button class="btn" onclick="logoutAdmin()">Logout</button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <div class="content-header">
+        <h1>Slider Images</h1>
+        <p>Manage slide images for specific service pages independently. Add, edit, reorder, and store hover / main images per page.</p>
+      </div>
+
+      <div class="panel">
+        <div class="toolbar">
+          <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+            <select id="serviceSelect" class="search"></select>
+            <button class="btn btn-primary" onclick="openEditor()">+ New Slide</button>
+          </div>
+          <input type="search" id="serviceSearch" class="search" placeholder="Search service name..." oninput="filterServices()">
+        </div>
+        <div id="serviceInfo"></div>
+      </div>
+
+      <div class="panel">
+        <h2>Slides for Selected Page</h2>
+        <div id="slideGrid" class="slide-grid"><div class="slide-card"><div class="slide-card-body"><p>Select a service page above to view its slides.</p></div></div></div>
+      </div>
+    </main>
+  </div>
+
+  <div class="modal" id="slideModal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeEditor()">×</button>
+      <h2 id="modalTitle">Add Slide</h2>
+      <div class="field-group">
+        <div class="field">
+          <label>Slide Title</label>
+          <input type="text" id="slideTitle" placeholder="Product name or feature">
+        </div>
+        <div class="field">
+          <label>Sort Order</label>
+          <input type="number" id="slideSort" value="0" min="0">
+        </div>
+      </div>
+      <div class="field-group">
+        <div class="field">
+          <label>Main Image URL</label>
+          <input type="url" id="slideMain" placeholder="https://..." oninput="previewSlide('slideMain','mainPreview')">
+        </div>
+        <div class="field">
+          <label>Hover Image URL</label>
+          <input type="url" id="slideHover" placeholder="https://..." oninput="previewSlide('slideHover','hoverPreview')">
+        </div>
+      </div>
+      <div class="field-group">
+        <div class="field">
+          <label>Upload Main Image</label>
+          <input type="file" id="uploadMain" accept="image/*" onchange="uploadImage(this,'slideMain','mainPreview')">
+        </div>
+        <div class="field">
+          <label>Upload Hover Image</label>
+          <input type="file" id="uploadHover" accept="image/*" onchange="uploadImage(this,'slideHover','hoverPreview')">
+        </div>
+      </div>
+      <div class="field-group">
+        <div class="field">
+          <label>Active</label>
+          <select id="slideActive">
+            <option value="true">Active</option>
+            <option value="false">Inactive</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>For Page</label>
+          <input type="text" id="slidePage" disabled>
+        </div>
+      </div>
+      <div class="field-group">
+        <div class="field">
+          <label>Main Preview</label>
+          <div id="mainPreview" style="min-height:120px;border:1px solid #cbd5e1;border-radius:14px;display:flex;align-items:center;justify-content:center;background:#f8fafc;color:#64748b;">Preview main image</div>
+        </div>
+        <div class="field">
+          <label>Hover Preview</label>
+          <div id="hoverPreview" style="min-height:120px;border:1px solid #cbd5e1;border-radius:14px;display:flex;align-items:center;justify-content:center;background:#f8fafc;color:#64748b;">Preview hover image</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" type="button" onclick="closeEditor()">Cancel</button>
+        <button class="btn btn-primary" type="button" onclick="saveSlide()" id="saveButton">Save Slide</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast info"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js?v=7"></script>
+  <script>
+    let allServices = [];
+    let slides = [];
+    let currentSlug = '';
+    let editingId = '';
+
+    function showToast(message, type='info') {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = 'toast show ' + type;
+      setTimeout(() => toast.className = 'toast ' + type, 3000);
+    }
+
+    function previewSlide(inputId, previewId) {
+      const url = document.getElementById(inputId).value.trim();
+      const preview = document.getElementById(previewId);
+      if (!preview) return;
+      preview.innerHTML = url ? '<img src="' + encodeURI(url) + '" style="width:100%;height:100%;object-fit:cover;border-radius:12px;">' : previewId === 'mainPreview' ? 'Preview main image' : 'Preview hover image';
+    }
+
+    async function uploadImage(input, targetId, previewId) {
+      if (!input.files || !input.files[0]) return;
+      const file = input.files[0];
+      const ext = file.name.split('.').pop().toLowerCase();
+      const name = 'service-slider-images/' + Date.now() + '-' + Math.random().toString(36).slice(2, 8) + '.' + ext;
+      try {
+        const r = await db.storage.from('media').upload(name, file, { cacheControl: '3600', upsert: false });
+        if (r.error) throw r.error;
+        const pub = db.storage.from('media').getPublicUrl(name);
+        document.getElementById(targetId).value = pub.data.publicUrl;
+        previewSlide(targetId, previewId);
+        input.value = '';
+        showToast('Image uploaded successfully', 'success');
+      } catch (error) {
+        showToast('Upload failed: ' + error.message, 'error');
+      }
+    }
+
+    function resetEditor() {
+      editingId = '';
+      document.getElementById('modalTitle').textContent = 'Add Slide';
+      document.getElementById('slideTitle').value = '';
+      document.getElementById('slideSort').value = slides.length + 1;
+      document.getElementById('slideMain').value = '';
+      document.getElementById('slideHover').value = '';
+      document.getElementById('slideActive').value = 'true';
+      document.getElementById('slidePage').value = currentSlug || '';
+      previewSlide('slideMain', 'mainPreview');
+      previewSlide('slideHover', 'hoverPreview');
+    }
+
+    function openEditor() {
+      if (!currentSlug) {
+        showToast('Please choose a service page first.', 'error');
+        return;
+      }
+      resetEditor();
+      document.getElementById('slideModal').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeEditor() {
+      document.getElementById('slideModal').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    async function saveSlide() {
+      const title = document.getElementById('slideTitle').value.trim();
+      const main = document.getElementById('slideMain').value.trim();
+      const hover = document.getElementById('slideHover').value.trim();
+      const sort = parseInt(document.getElementById('slideSort').value, 10) || 0;
+      const active = document.getElementById('slideActive').value === 'true';
+      if (!main || !hover) {
+        showToast('Main and hover image URLs are required.', 'error');
+        return;
+      }
+      const payload = {
+        service_slug: currentSlug,
+        title: title || null,
+        main_image: main,
+        hover_image: hover,
+        sort_order: sort,
+        active: active
+      };
+      try {
+        let result;
+        if (editingId) {
+          result = await db.from('service_product_slides').update(payload).eq('id', editingId);
+        } else {
+          result = await db.from('service_product_slides').insert(payload);
+        }
+        if (result.error) throw result.error;
+        showToast('Slide saved successfully.', 'success');
+        closeEditor();
+        await loadSlides();
+      } catch (error) {
+        showToast('Save failed: ' + error.message, 'error');
+      }
+    }
+
+    function editSlide(id) {
+      const slide = slides.find(item => item.id === id);
+      if (!slide) return;
+      editingId = slide.id;
+      document.getElementById('modalTitle').textContent = 'Edit Slide';
+      document.getElementById('slideTitle').value = slide.title || '';
+      document.getElementById('slideSort').value = slide.sort_order || 0;
+      document.getElementById('slideMain').value = slide.main_image || slide.main_image_url || '';
+      document.getElementById('slideHover').value = slide.hover_image || slide.hover_image_url || '';
+      document.getElementById('slideActive').value = slide.active ? 'true' : 'false';
+      document.getElementById('slidePage').value = currentSlug;
+      previewSlide('slideMain', 'mainPreview');
+      previewSlide('slideHover', 'hoverPreview');
+      document.getElementById('slideModal').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    async function deleteSlide(id) {
+      if (!confirm('Delete this slide?')) return;
+      try {
+        const result = await db.from('service_product_slides').delete().eq('id', id);
+        if (result.error) throw result.error;
+        showToast('Slide deleted.', 'success');
+        await loadSlides();
+      } catch (error) {
+        showToast('Delete failed: ' + error.message, 'error');
+      }
+    }
+
+    async function loadServices() {
+      try {
+        const [sub, web] = await Promise.all([
+          db.from('sublimation_services').select('id,title,slug').order('sort_order'),
+          db.from('website_design_services').select('id,title,slug').order('sort_order')
+        ]);
+        if (sub.error) throw sub.error;
+        if (web.error) throw web.error;
+        allServices = (sub.data || []).map(item => ({ ...item, category: 'Sublimation' }))
+          .concat((web.data || []).map(item => ({ ...item, category: 'Web Design' })));
+        renderServiceOptions();
+      } catch (error) {
+        showToast('Unable to load pages: ' + error.message, 'error');
+      }
+    }
+
+    function renderServiceOptions() {
+      const select = document.getElementById('serviceSelect');
+      const search = document.getElementById('serviceSearch').value.trim().toLowerCase();
+      const services = allServices.filter(item => !search || item.title.toLowerCase().includes(search) || item.slug.toLowerCase().includes(search));
+      select.innerHTML = '<option value="">Select a service page...</option>' + services.map(item => `<option value="${item.slug}">${item.category}: ${item.title}</option>`).join('');
+      if (currentSlug) select.value = currentSlug;
+    }
+
+    async function filterServices() {
+      renderServiceOptions();
+    }
+
+    async function handlePageChange() {
+      const select = document.getElementById('serviceSelect');
+      currentSlug = select.value;
+      document.getElementById('slidePage').value = currentSlug;
+      document.getElementById('serviceInfo').innerHTML = currentSlug ? `<strong>Selected:</strong> ${select.options[select.selectedIndex].text}` : '<span style="color:#64748b;">Choose a service page first.</span>';
+      if (currentSlug) {
+        await loadSlides();
+      } else {
+        slides = [];
+        document.getElementById('slideGrid').innerHTML = '<div class="slide-card"><div class="slide-card-body"><p>Select a service page above to view slides.</p></div></div>';
+      }
+    }
+
+    async function loadSlides() {
+      if (!currentSlug) return;
+      document.getElementById('slideGrid').innerHTML = '<div class="slide-card"><div class="slide-card-body"><p>Loading slides...</p></div></div>';
+      try {
+        const result = await db.from('service_product_slides').select('*').eq('service_slug', currentSlug).order('sort_order');
+        if (result.error) throw result.error;
+        slides = result.data || [];
+        renderSlides();
+      } catch (error) {
+        document.getElementById('slideGrid').innerHTML = '<div class="slide-card"><div class="slide-card-body"><p>Error loading slides.</p></div></div>';
+        showToast(error.message, 'error');
+      }
+    }
+
+    function renderSlides() {
+      const grid = document.getElementById('slideGrid');
+      if (!slides.length) {
+        grid.innerHTML = '<div class="slide-card"><div class="slide-card-body"><p>No slides yet. Add a slide for this page.</p></div></div>';
+        return;
+      }
+      const esc = text => text ? text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') : '';
+      grid.innerHTML = slides.map(slide => `
+        <div class="slide-card">
+          <img src="${esc(slide.main_image || slide.main_image_url || '')}" alt="${esc(slide.title || '')}">
+          <div class="slide-card-body">
+            <div class="slide-card-meta">
+              <span>${esc(slide.title || 'Untitled')}</span>
+              <span class="badge ${slide.active ? 'on' : 'off'}">${slide.active ? 'Active' : 'Inactive'}</span>
+            </div>
+            <p>Order: ${slide.sort_order || 0}</p>
+            <div class="slide-actions">
+              <button onclick="editSlide('${slide.id}')">Edit</button>
+              <button class="delete" onclick="deleteSlide('${slide.id}')">Delete</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function logoutAdmin() {
+      try { await db.auth.signOut(); } catch(e) {}
+      window.location.href = 'login.html';
+    }
+
+    (async function init() {
+      try {
+        const s = await db.auth.getSession();
+        if (!s.data.session || s.data.session.user.email !== 'usman@gmail.com') {
+          window.location.href = 'login.html';
+          return;
+        }
+        document.getElementById('admin-email').textContent = s.data.session.user.email;
+        await loadServices();
+      } catch (error) {
+        showToast('Unable to initialize admin page.', 'error');
+      }
+      document.getElementById('serviceSelect').addEventListener('change', handlePageChange);
+    })();
+  </script>
+</body>
+</html>

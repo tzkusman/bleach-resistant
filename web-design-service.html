@@ -114,6 +114,17 @@
       html += '</div>'; // end grid
       html += '</div></section>';
 
+      /* ── Section 1.5: Product Hover Slides ── */
+      html += '<section class="br-section-alt" id="productSlidesSection" style="display:none">';
+      html += '<div class="br-container">';
+      html += '<div class="br-text-center" data-animate="fade-up">';
+      html += '<span class="br-section-label">Our Products</span>';
+      html += '<h2 class="br-section-title">Product Showcase</h2>';
+      html += '<p class="br-section-subtitle centered">Hover over any product to reveal the full design</p>';
+      html += '</div>';
+      html += '<div class="br-product-slides-grid animated" id="productSlidesGrid"></div>';
+      html += '</div></section>';
+
       /* ── Section 2: Why Choose (features grid) ── */
       var whyFeatures = s.why_features || [];
       if (typeof whyFeatures === 'string') { try { whyFeatures = JSON.parse(whyFeatures); } catch(e) { whyFeatures = []; } }
@@ -213,6 +224,9 @@
     // Load submenus
     if (typeof window.brLoadSubServicesMenu === 'function') window.brLoadSubServicesMenu();
     if (typeof window.brLoadWebDesignMenu === 'function') window.brLoadWebDesignMenu();
+
+    // Load product hover slides for this service
+    loadProductSlides(slug);
   })();
 
   async function loadRelatedServices(currentSlug) {
@@ -237,6 +251,84 @@
         '</a>';
       }).join('');
     } catch(e) { console.warn('[related-services]', e.message); }
+  }
+
+  async function loadProductSlides(slug) {
+    var isLocalPreview = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    var demoSlides = [
+      {
+        title: 'Pressure Washing Shirts',
+        main_image: 'https://designsanhour.com/wp-content/uploads/Pressure-wash-Sublimated-Shirts.jpg',
+        hover_image: 'https://designsanhour.com/wp-content/uploads/Pressure-wash-Sublimated-Shirts-Printing.jpg'
+      },
+      {
+        title: 'Lawn Care Shirts',
+        main_image: 'https://designsanhour.com/wp-content/uploads/Pressure-wash-Sublimated-Shirts-275x300.jpg',
+        hover_image: 'https://designsanhour.com/wp-content/uploads/Pressure-wash-Sublimated-Shirts-Printing-275x300.jpg'
+      },
+      {
+        title: 'Construction Shirts',
+        main_image: 'https://designsanhour.com/wp-content/uploads/Pressure-wash-Sublimated-Shirts-940x1024.jpg',
+        hover_image: 'https://designsanhour.com/wp-content/uploads/Pressure-wash-Sublimated-Shirts-Printing-940x1024.jpg'
+      }
+    ];
+
+    try {
+      var r = await db.from('service_product_slides')
+        .select('*')
+        .eq('service_slug', slug)
+        .eq('active', true)
+        .order('sort_order', { ascending: true });
+      if (r.error) throw r.error;
+      var slides = r.data || [];
+
+      if (slides.length === 0 && isLocalPreview) {
+        slides = demoSlides;
+      }
+      if (slides.length === 0) return;
+
+      var section = document.getElementById('productSlidesSection');
+      var grid    = document.getElementById('productSlidesGrid');
+      if (!section || !grid) return;
+
+      section.style.display = '';
+
+      var html = slides.map(function(slide) {
+        var mainUrl = slide.main_image || slide.main_image_url || '';
+        var hoverUrl = slide.hover_image || slide.hover_image_url || '';
+        var hasHover = !!hoverUrl;
+        var cls = 'br-product-slide-card' + (hasHover ? '' : ' no-hover');
+        var hoverImg = hasHover
+          ? '<img src="' + esc(hoverUrl) + '" class="hover-image" alt="' + esc(slide.title || '') + '" loading="lazy">'
+          : '';
+        var titleBar = slide.title
+          ? '<div class="br-slide-title">' + esc(slide.title) + '</div>'
+          : '';
+        var hint = hasHover
+          ? '<span class="br-slide-hint">Hover</span>'
+          : '';
+        return '<div class="' + cls + '">' +
+          '<img src="' + esc(mainUrl) + '" class="main-image" alt="' + esc(slide.title || '') + '" loading="lazy">' +
+          hoverImg + titleBar + hint +
+          '</div>';
+      }).join('');
+
+      grid.innerHTML = html;
+    } catch(e) {
+      if (isLocalPreview) {
+        var section = document.getElementById('productSlidesSection');
+        var grid    = document.getElementById('productSlidesGrid');
+        if (section && grid) {
+          console.log('[product-slides] local demo fallback active');
+          section.style.display = '';
+          grid.innerHTML = demoSlides.map(function(slide) {
+            return '<div class="br-product-slide-card"><img src="' + esc(slide.main_image) + '" class="main-image" alt="' + esc(slide.title) + '" loading="lazy"><img src="' + esc(slide.hover_image) + '" class="hover-image" alt="' + esc(slide.title) + '" loading="lazy"><div class="br-slide-title">' + esc(slide.title) + '</div><span class="br-slide-hint">Hover</span></div>';
+          }).join('');
+          return;
+        }
+      }
+      console.warn('[product-slides]', e.message);
+    }
   }
 
   function esc(s) { return s ? s.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : ''; }

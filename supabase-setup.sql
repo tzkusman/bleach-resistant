@@ -408,6 +408,52 @@ GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE hero_slides TO authenticated;
 
 
 -- ============================================================
+-- SECTION 7.1: SERVICE PRODUCT SLIDES TABLE
+-- Admin-managed hover-image slides for service pages.
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS service_product_slides (
+  id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  created_at   TIMESTAMPTZ DEFAULT NOW(),
+  updated_at   TIMESTAMPTZ DEFAULT NOW(),
+  service_slug TEXT NOT NULL,
+  title        TEXT,
+  main_image   TEXT,
+  hover_image  TEXT,
+  sort_order   INTEGER DEFAULT 0,
+  active       BOOLEAN DEFAULT true
+);
+
+CREATE OR REPLACE FUNCTION update_service_product_slides_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN NEW.updated_at = NOW(); RETURN NEW; END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_service_product_slides_updated ON service_product_slides;
+CREATE TRIGGER trg_service_product_slides_updated
+  BEFORE UPDATE ON service_product_slides
+  FOR EACH ROW EXECUTE FUNCTION update_service_product_slides_updated_at();
+
+ALTER TABLE service_product_slides ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "service_product_slides_public_read" ON service_product_slides
+  FOR SELECT TO anon
+  USING (active = true);
+
+CREATE POLICY "service_product_slides_auth_read" ON service_product_slides
+  FOR SELECT TO authenticated
+  USING (true);
+
+CREATE POLICY "service_product_slides_admin_all" ON service_product_slides
+  FOR ALL TO authenticated
+  USING (auth.email() = 'usman@gmail.com')
+  WITH CHECK (auth.email() = 'usman@gmail.com');
+
+GRANT SELECT ON TABLE service_product_slides TO anon;
+GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE service_product_slides TO authenticated;
+
+
+-- ============================================================
 -- SECTION 8: CONTACTS TABLE MIGRATION  (chat widget + admin reply)
 -- ============================================================
 
