@@ -438,7 +438,19 @@
   /* ── DYNAMIC HERO SLIDER LOADER ──────────────────────────── */
   window.brLoadHeroSlider = async function() {
     var hero = document.querySelector('.br-hero');
-    if (!hero || typeof db === 'undefined') return;
+    if (!hero) return;
+
+    // Wait for db to be ready
+    var maxWait = 3000;
+    var waited = 0;
+    while (typeof db === 'undefined' && waited < maxWait) {
+      await new Promise(r => setTimeout(r, 100));
+      waited += 100;
+    }
+    if (typeof db === 'undefined') {
+      console.warn('[hero-slider] Supabase client not available after waiting');
+      return;
+    }
 
     try {
       var result = await db.from('hero_slides').select('*')
@@ -540,6 +552,13 @@
       brInitSlider();
     } catch (err) {
       console.warn('[hero-slider]', err.message);
+      // Show error in hero section for debugging
+      var hero = document.querySelector('.br-hero');
+      if (hero) {
+        hero.innerHTML = '<div style="padding:60px 20px;text-align:center;color:#888;">' +
+          '<p>Unable to load hero slider: ' + err.message + '</p>' +
+          '<p style="font-size:12px;color:#aaa;">Please check console for details.</p></div>';
+      }
     }
   };
 
