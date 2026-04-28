@@ -246,13 +246,19 @@
     ];
 
     try {
+      console.log('[product-slides] Loading for slug:', slug);
       var r = await db.from('service_product_slides')
         .select('*')
         .eq('service_slug', slug)
         .eq('active', true)
         .order('sort_order', { ascending: true });
-      if (r.error) throw r.error;
+      console.log('[product-slides] DB response:', r);
+      if (r.error) {
+        console.error('[product-slides] DB error:', r.error);
+        throw r.error;
+      }
       var slides = r.data || [];
+      console.log('[product-slides] Found slides:', slides.length);
 
       // If no slides in DB, show demo slides as fallback
       if (slides.length === 0) {
