@@ -227,7 +227,6 @@
 
   /* ── PRODUCT HOVER SLIDES LOADER ──────────────────────────────── */
   async function loadProductSlides(slug) {
-    var isLocalPreview = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
     var demoSlides = [
       {
         title: 'Pressure Washing Shirts',
@@ -255,10 +254,11 @@
       if (r.error) throw r.error;
       var slides = r.data || [];
 
-      if (slides.length === 0 && isLocalPreview) {
+      // If no slides in DB, show demo slides as fallback
+      if (slides.length === 0) {
+        console.log('[product-slides] No slides in DB for slug: ' + slug + ', showing demo slides');
         slides = demoSlides;
       }
-      if (slides.length === 0) return;
 
       var section = document.getElementById('productSlidesSection');
       var grid    = document.getElementById('productSlidesGrid');
